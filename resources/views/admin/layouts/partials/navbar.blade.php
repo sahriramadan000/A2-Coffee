@@ -8,7 +8,7 @@
                 </a>
             </li>
             <li class="nav-item theme-text">
-                <a href="{{ route('dashboard') }}" class="nav-link"> Vmond Truck POS </a>
+                <a href="{{ route('dashboard') }}" class="nav-link">A2 Coffee & Eatry POS </a>
             </li>
         </ul>
 

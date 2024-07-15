@@ -29,6 +29,7 @@ class OrderController extends Controller
             $checkToken     = Order::where('token',$token)->where('payment_status', 'Paid')->get();
             $service        = (int) str_replace('.', '', $other_setting->layanan);
             $pb01           = $other_setting->pb01/100;
+            $cash           = (int) str_replace('.', '', $request['cash']);
             $total_price    = 0;
             $customer       = null;
 
@@ -38,6 +39,10 @@ class OrderController extends Controller
 
             if (count($checkToken) != 0) {
                 return redirect()->back()->with(['failed' => 'Tidak dapat mengulang transaksi!']);
+            }
+            
+            if ($request->cash == null) {
+                return redirect()->back()->with(['failed' => 'Harap Mengisi Uang Cash!']);
             }
 
             if ($other_setting->layanan != 0) {
@@ -71,6 +76,9 @@ class OrderController extends Controller
             $total_price_by_discount = $service_by_discount + $tax_by_discount;
             // ===================By Discount====================
 
+            // Kembalian
+            $kembalian = $cash - ($request->type_discount ? $total_price_by_discount : $total_price);
+
             // =================Create Data Order================
             $order = Order::create([
                 'no_invoice'        => $this->generateInvoice(),
@@ -89,6 +97,8 @@ class OrderController extends Controller
                 'service'           => $service,
                 'pb01'              => ($request->type_discount ? $tax_by_discount : $pb01),
                 'total'             => ($request->type_discount ? $total_price_by_discount : $total_price),
+                'cash'              => $cash,
+                'kembalian'         => $kembalian,
                 'token'             => $token,
                 'created_at'        => date('Y-m-d H:i:s'),
                 'updated_at'        => date('Y-m-d H:i:s'),
@@ -229,7 +239,11 @@ class OrderController extends Controller
             // Hapus sesi keranjang setelah berhasil menyimpan data pesanan
             Cart::session(Auth::user()->id)->clear();
 
-            return redirect()->route('pos')->with('success', 'Order Telah berhasil');
+            if ($request->cash) {
+                return redirect()->route('pos')->with('success','Uang Yang Di kembalikan '. $kembalian);
+            }else{
+                return redirect()->route('pos')->with('success', 'Order Telah berhasil');
+            }
         } catch (\Throwable $th) {
             //throw $th;
             DB::rollBack();

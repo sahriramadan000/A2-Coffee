@@ -62,7 +62,7 @@
                 <a href="#inventory" data-bs-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
                     <div class="">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clipboard"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
-                        <span>Inventory</span>
+                        <span>Master Data</span>
                     </div>
                     <div>
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right"><polyline points="9 18 15 12 9 6"></polyline></svg>
@@ -75,14 +75,17 @@
                     <li class="{{ request()->routeIs('materials.index') ? 'active' : '' }}">
                         <a href="{{ route('materials.index') }}"> Materials </a>
                     </li>
-                    <li class="{{ request()->routeIs('products.index') ? 'active' : '' }}">
-                        <a href="{{ route('products.index') }}"> Products </a>
-                    </li>
                     <li class="{{ request()->routeIs('tags.index') ? 'active' : '' }}">
                         <a href="{{ route('tags.index') }}"> Tags </a>
                     </li>
+                    <li class="{{ request()->routeIs('tables.index') ? 'active' : '' }}">
+                        <a href="{{ route('tables.index') }}"> Table </a>
+                    </li>
                     <li class="{{ request()->routeIs('addons.index') ? 'active' : '' }}">
                         <a href="{{ route('addons.index') }}"> Addons </a>
+                    </li>
+                    <li class="{{ request()->routeIs('products.index') ? 'active' : '' }}">
+                        <a href="{{ route('products.index') }}"> Products </a>
                     </li>
                 </ul>
             </li>
@@ -109,7 +112,7 @@
                                 <a href="{{ route('report.sales.report-gross') }}"> Gross Profit </a>
                             </li>
                             <li>
-                                <a href="{{ route('payment-method.index') }}"> Payment Method </a>
+                                <a href="{{ route('report.sales.payment-method') }}"> Payment Method </a>
                             </li>
                         </ul>
                     </li>

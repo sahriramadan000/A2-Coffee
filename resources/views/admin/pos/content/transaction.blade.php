@@ -166,7 +166,7 @@
 
                                                         <div class="form-group mt-2" id="cashInput" style="display: none;">
                                                             <label for="cash" class="form-label">Cash</label>
-                                                            <input type="number" name="cash" value="{{ old('cash') }}" class="form-control form-control-sm" placeholder="Ex:50.000" id="cash" aria-describedby="cash">
+                                                            <input type="text" name="cash" value="{{ old('cash') }}" class="form-control form-control-sm" placeholder="Ex:50.000" id="cash" aria-describedby="cash">
                                                         </div>
                                                     </div>
                                                 </div>
@@ -219,3 +219,18 @@
 		<!--end page wrapper -->
 	</div>
 </div>
+
+<script>
+    const selectInput = document.getElementById('payment_method');
+    const cashInput = document.getElementById('cashInput');
+
+    selectInput.addEventListener('change', function() {
+        if (selectInput.value === 'Cash') {
+            cashInput.style.display = 'block';
+        } else {
+            cashInput.style.display = 'none';
+        }
+    });
+
+</script>
+

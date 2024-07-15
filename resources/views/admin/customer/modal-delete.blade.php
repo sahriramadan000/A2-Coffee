@@ -1,6 +1,6 @@
-<div class="modal fade modal-notification" id="tabs-{{ $customer->id }}-delete-customer" tabindex="-1" role="dialog" aria-labelledby="tabsModalLabel" aria-hidden="true">
+<div class="modal fade modal-notification" id="tabs-{{ $table->id }}-delete-table" tabindex="-1" role="dialog" aria-labelledby="tabsModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
-        <form class="mt-0 modal-content" action="{{ route('customers.destroy', $customer->id) }}" method="post" enctype="multipart/form-data">
+        <form class="mt-0 modal-content" action="{{ route('tables.destroy', $table->id) }}" method="post" enctype="multipart/form-data">
             @csrf
             @method('DELETE')
             <div class="modal-body">
@@ -11,10 +11,10 @@
                 </div>
 
                 <div class="text-center mb-3 mt-3">
-                    <h4 class="mb-0">DELETE CUSTOMER</h4>
+                    <h4 class="mb-0">DELETE Table</h4>
                 </div>
 
-                <p class="modal-text text-center">Apakah anda yakin ingin menghapus data ini? ({{ $customer->name }})</p>
+                <p class="modal-text text-center">Apakah anda yakin ingin menghapus data ini? ({{ $table->name }})</p>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-light-dark" type="button" data-bs-dismiss="modal">Cancel</button>

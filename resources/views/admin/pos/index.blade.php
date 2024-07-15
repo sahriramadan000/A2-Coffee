@@ -244,5 +244,10 @@
     <script src="{{ asset('src/assets/js/transaction.js') }}"></script>
     <script src="{{ asset('src/assets/js/typeahead.bundle.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.4/jquery-confirm.min.js"></script>
+    <script>
+        $('#cash').on('keyup', function() {
+            handleInput('cash');
+        });
+    </script>
 </body>
 </html>

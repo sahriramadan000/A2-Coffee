@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SupplierController;
+use App\Http\Controllers\Admin\TableController;
 use App\Http\Controllers\Admin\TagController;
 use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Admin\UserController;
@@ -107,6 +108,18 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('delete/{customerId}', [CustomerController::class, 'destroy'])->name('destroy');
     });
 
+    // Table
+    Route::prefix('tables')->name('tables.')->group(function () {
+        Route::get('/', [TableController::class, 'index'])->name('index');
+        Route::get('get-data', [TableController::class, 'getTable'])->name('get-data');
+        Route::get('modal-add', [TableController::class, 'getModalAdd'])->name('modal-add');
+        Route::post('store', [TableController::class, 'store'])->name('store');
+        Route::get('modal-edit/{tableId}', [TableController::class, 'getModalEdit'])->name('modal-edit');
+        Route::put('update/{tableId}', [TableController::class, 'update'])->name('update');
+        Route::get('modal-delete/{tableId}', [TableController::class, 'getModalDelete'])->name('modal-delete');
+        Route::delete('delete/{tableId}', [TableController::class, 'destroy'])->name('destroy');
+    });
+
     // Attendance
     Route::prefix('attendances')->name('attendances.')->group(function () {
         Route::get('/', [AttendanceController::class, 'index'])->name('index');
@@ -139,14 +152,8 @@ Route::middleware(['auth'])->group(function () {
             Route::get('gross-data', [ReportController::class, 'getReportGross'])->name('get-report-gross');
 
             Route::get('payment-method', [ReportController::class, 'paymentMethod'])->name('payment-method');
-            Route::get('payment-method-data', [ReportController::class, 'paymentMethod'])->name('get-payment-method');
+            Route::get('payment-method-data', [ReportController::class, 'getReportPayment'])->name('get-payment-method');
         });
-    });
-
-    // Report Payment Method
-    Route::prefix('Payment-method')->name('payment-method.')->group(function () {
-        Route::get('/', [ReportController::class, 'paymentMethod'])->name('index');
-        Route::get('get-data', [ReportController::class, 'getProducts'])->name('get-data');
     });
 
     // Tag
