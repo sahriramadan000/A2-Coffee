@@ -241,4 +241,16 @@ Route::middleware(['auth'])->group(function () {
 
 Route::prefix('mobile')->name('mobile.')->group(function () {
     Route::get('/homepage',[HomepageController::class, 'index'])->name('homepage');
+
+    Route::get('/cart', function() {
+        return view('mobile.cart.index');
+    })->name('cart');
+
+    Route::get('/checkout', function() {
+        return view('mobile.checkout.index');
+    })->name('checkout');
+
+    Route::get('/pesanan', function() {
+        return view('mobile.pesanan.index');
+    })->name('pesanan');
 });

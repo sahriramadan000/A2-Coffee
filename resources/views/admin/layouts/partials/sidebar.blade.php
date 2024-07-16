@@ -95,14 +95,13 @@
                     <div class="">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                         <span>Report</span>
-                        <span class="badge badge-warning sidebar-label"> &nbsp;</span>
                     </div>
                     <div>
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right"><polyline points="9 18 15 12 9 6"></polyline></svg>
                     </div>
                 </a>
                 <ul class="collapse submenu list-unstyled {{ (request()->routeIs(['report.sales.report-gross', 'payment-method.index'])) ? 'show' : '' }}" id="report" data-bs-parent="#accordionExample">
-                    <li>
+                    {{-- <li>
                         <a href="#sales" data-bs-toggle="collapse" aria-expanded="false" class="dropdown-toggle collapsed">
                             Sales
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right"><polyline points="9 18 15 12 9 6"></polyline></svg>
@@ -115,6 +114,12 @@
                                 <a href="{{ route('report.sales.payment-method') }}"> Payment Method </a>
                             </li>
                         </ul>
+                    </li> --}}
+                    <li class="{{ request()->routeIs('report.sales.report-gross') ? 'active' : '' }}">
+                        <a href="{{ route('report.sales.report-gross') }}"> Gross Profit </a>
+                    </li>
+                    <li class="{{ request()->routeIs('report.sales.payment-method') ? 'active' : '' }}">
+                        <a href="{{ route('report.sales.payment-method') }}"> Payment Method </a>
                     </li>
                     <li class="{{ request()->routeIs('materials.index') ? 'active' : '' }}">
                         <a href="{{ route('materials.index') }}"> Absensi </a>

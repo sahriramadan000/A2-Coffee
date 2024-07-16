@@ -17,7 +17,11 @@
 		</div>
 		<!-- Preloader End -->
 		<!-- Header Start -->
-		@include('mobile.layouts.partials.navbar')
+        @if (request()->routeIs('mobile.checkout'))
+		    @include('mobile.layouts.partials.navbar-back')
+        @else
+		    @include('mobile.layouts.partials.navbar')
+        @endif
 		<!-- Header End -->
 		<!--Homepage 1 Screen Start -->
 		@yield('content')
@@ -26,7 +30,9 @@
 		{{-- @include('mobile.layouts.partials.sidebar') --}}
 		<!--SideBar Setting Menu -->
 		<!--Bottom TabBar Section Start -->
-		@include('mobile.layouts.partials.bottom-nav')
+        @if (!request()->routeIs('mobile.checkout'))
+		    @include('mobile.layouts.partials.bottom-nav')
+        @endif
 		<!--Bottom TabBar Section End -->
 		<!-- pwa install app popup Start -->
 		{{-- <div class="offcanvas offcanvas-bottom addtohome-popup theme-offcanvas" tabindex="-1" id="offcanvas" aria-modal="true" role="dialog">

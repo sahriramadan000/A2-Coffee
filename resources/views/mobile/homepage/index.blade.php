@@ -1,6 +1,5 @@
 @extends('mobile.layouts.app')
 
-
 @section('content')
 <section id="homescreen1-deatils-page" class="homescreen1-main">
     <div class="homescreen1-deatils-page-full">
@@ -159,7 +158,7 @@
                             @endforeach
                         </div>
                     </div>
-                </div>                
+                </div>
             </div>
         </div>
     </div>
