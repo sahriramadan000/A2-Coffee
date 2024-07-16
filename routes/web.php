@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\TableController;
 use App\Http\Controllers\Admin\TagController;
 use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Mobile\HomepageController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -239,7 +240,5 @@ Route::middleware(['auth'])->group(function () {
 // ================================================================================================================================
 
 Route::prefix('mobile')->name('mobile.')->group(function () {
-    Route::get('homepage', function(){
-        return view('mobile.homepage.index');
-    });
+    Route::get('/homepage',[HomepageController::class, 'index'])->name('homepage');
 });

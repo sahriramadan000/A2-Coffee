@@ -72,348 +72,94 @@
                     <div class="homescreen-eight-bottom-full">
                         <ul class="nav nav-pills mb-3" id="homepage1-tab" role="tablist">
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link active custom-home1-tab-btn" id="pills-all-tab" data-bs-toggle="pill" data-bs-target="#pills-all" type="button" role="tab"  aria-selected="true">All</button>
+                                <button class="nav-link active custom-home1-tab-btn" id="pills-all-tab" data-bs-toggle="pill" data-bs-target="#pills-all" type="button" role="tab" aria-selected="true">All</button>
                             </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link custom-home1-tab-btn" id="pills-coffee-tab" data-bs-toggle="pill" data-bs-target="#pills-coffee" type="button" role="tab"  aria-selected="false">Coffee</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link custom-home1-tab-btn" id="pills-milk-tab" data-bs-toggle="pill" data-bs-target="#pills-milk" type="button" role="tab"  aria-selected="false">Milk Base</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link custom-home1-tab-btn" id="pills-icecream-tab" data-bs-toggle="pill" data-bs-target="#pills-icecream" type="button" role="tab"  aria-selected="false">Ice Cream</button>
-                            </li>
+                            @foreach ($tags as $tag)
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link custom-home1-tab-btn" id="pills-{{ $tag->slug }}-tab" data-bs-toggle="pill" data-bs-target="#pills-{{ $tag->slug }}" type="button" role="tab" aria-selected="false">{{ $tag->name }}</button>
+                                </li>
+                            @endforeach
                         </ul>
                         <div class="tab-content" id="pills-tabContent">
-                            <div class="tab-pane fade show active" id="pills-all" role="tabpanel"  tabindex="0">
-                                <div class="container">
-                                    <div class="homepage1-tab-details">
-                                        <div class="homepage1-tab-details-wrapper">
-                                            <div class="home1-tab-img">
-                                                <img src="{{ asset('assets/images/produk/product-1.png') }}" alt="watch-img">
-                                            </div>
-                                            <div class="home1-tab-details w-100">
-                                                <div class="home1-tab-details-full">
-                                                    <p class="tab-home1-txt1">Milk Shake</p>
-                                                    <h3 class="tab-home1-txt2">Rp. 25.000</h3>
-                                                    <div class="orange-star-tab">
-                                                        <span>
-                                                            <img src="{{ asset('assets/svg/orange-star18.svg') }}" alt="star-img">
-                                                        </span>
-                                                        <span class="tab-home1-txt3">4.8</span>
+                            <div class="tab-pane fade show active" id="pills-all" role="tabpanel" tabindex="0">
+                                @foreach ($products as $product)
+                                    <div class="container">
+                                        <div class="homepage1-tab-details">
+                                            <div class="homepage1-tab-details-wrapper">
+                                                <div class="home1-tab-img">
+                                                    <img src="{{ asset('assets/images/produk/product-1.png') }}" alt="watch-img">
+                                                </div>
+                                                <div class="home1-tab-details w-100">
+                                                    <div class="home1-tab-details-full">
+                                                        <p class="tab-home1-txt1">{{ $product->name }}</p>
+                                                        <h3 class="tab-home1-txt2">Rp. {{ number_format($product->selling_price,0) }}</h3>
+                                                        <div class="orange-star-tab">
+                                                            <span>
+                                                                <img src="{{ asset('assets/svg/orange-star18.svg') }}" alt="star-img">
+                                                            </span>
+                                                            <span class="tab-home1-txt3">4.8</span>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div class="home1-tab-favourite">
-                                                <div class="home-page-arrival-favourite">
-                                                    <a href="javascript:void(0);" class="item-bookmark" tabindex="-1">
-                                                        <img src="{{ asset('assets/svg/unfill-heart.svg') }}" alt="unfill-heart">
-                                                    </a>
-                                                </div>
-                                                <div class="plus-bnt-home1">
-                                                    <a href="javascript:void(0)">
-                                                        <img src="{{ asset('assets/svg/plus-icon.svg') }}" alt="plus-icon">
-                                                    </a>
+                                                <div class="home1-tab-favourite">
+                                                    <div class="home-page-arrival-favourite">
+                                                        <a href="javascript:void(0);" class="item-bookmark" tabindex="-1">
+                                                            <img src="{{ asset('assets/svg/unfill-heart.svg') }}" alt="unfill-heart">
+                                                        </a>
+                                                    </div>
+                                                    <div class="plus-bnt-home1">
+                                                        <a href="javascript:void(0)">
+                                                            <img src="{{ asset('assets/svg/plus-icon.svg') }}" alt="plus-icon">
+                                                        </a>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="homepage1-tab-details">
-                                        <div class="homepage1-tab-details-wrapper">
-                                            <div class="home1-tab-img">
-                                                <img src="{{ asset('assets/images/produk/product-3.png') }}" alt="watch-img">
-                                            </div>
-                                            <div class="home1-tab-details w-100">
-                                                <div class="home1-tab-details-full">
-                                                    <p class="tab-home1-txt1">Iced Coffee</p>
-                                                    <h3 class="tab-home1-txt2">Rp. 25.000</h3>
-                                                    <div class="orange-star-tab">
-                                                        <span>
-                                                            <img src="{{ asset('assets/svg/orange-star18.svg') }}" alt="star-img">
-                                                        </span>
-                                                        <span class="tab-home1-txt3">4.8</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="home1-tab-favourite">
-                                                <div class="home-page-arrival-favourite">
-                                                    <a href="javascript:void(0);" class="item-bookmark" tabindex="-1">
-                                                        <img src="{{ asset('assets/svg/unfill-heart.svg') }}" alt="unfill-heart">
-                                                    </a>
-                                                </div>
-                                                <div class="plus-bnt-home1">
-                                                    <a href="javascript:void(0)">
-                                                        <img src="{{ asset('assets/svg/plus-icon.svg') }}" alt="plus-icon">
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="homepage1-tab-details">
-                                        <div class="homepage1-tab-details-wrapper">
-                                            <div class="home1-tab-img">
-                                                <img src="{{ asset('assets/images/produk/product-5.png') }}" alt="watch-img">
-                                            </div>
-                                            <div class="home1-tab-details w-100">
-                                                <div class="home1-tab-details-full">
-                                                    <p class="tab-home1-txt1">Ice Cream 1</p>
-                                                    <h3 class="tab-home1-txt2">Rp. 25.000</h3>
-                                                    <div class="orange-star-tab">
-                                                        <span>
-                                                            <img src="{{ asset('assets/svg/orange-star18.svg') }}" alt="star-img">
-                                                        </span>
-                                                        <span class="tab-home1-txt3">4.8</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="home1-tab-favourite">
-                                                <div class="home-page-arrival-favourite">
-                                                    <a href="javascript:void(0);" class="item-bookmark" tabindex="-1">
-                                                        <img src="{{ asset('assets/svg/unfill-heart.svg') }}" alt="unfill-heart">
-                                                    </a>
-                                                </div>
-                                                <div class="plus-bnt-home1">
-                                                    <a href="javascript:void(0)">
-                                                        <img src="{{ asset('assets/svg/plus-icon.svg') }}" alt="plus-icon">
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="homepage1-tab-details">
-                                        <div class="homepage1-tab-details-wrapper">
-                                            <div class="home1-tab-img">
-                                                <img src="{{ asset('assets/images/produk/product-2.png') }}" alt="watch-img">
-                                            </div>
-                                            <div class="home1-tab-details w-100">
-                                                <div class="home1-tab-details-full">
-                                                    <p class="tab-home1-txt1">Ice Cream 2</p>
-                                                    <h3 class="tab-home1-txt2">Rp. 25.000</h3>
-                                                    <div class="orange-star-tab">
-                                                        <span>
-                                                            <img src="{{ asset('assets/svg/orange-star18.svg') }}" alt="star-img">
-                                                        </span>
-                                                        <span class="tab-home1-txt3">4.8</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="home1-tab-favourite">
-                                                <div class="home-page-arrival-favourite">
-                                                    <a href="javascript:void(0);" class="item-bookmark" tabindex="-1">
-                                                        <img src="{{ asset('assets/svg/unfill-heart.svg') }}" alt="unfill-heart">
-                                                    </a>
-                                                </div>
-                                                <div class="plus-bnt-home1">
-                                                    <a href="javascript:void(0)">
-                                                        <img src="{{ asset('assets/svg/plus-icon.svg') }}" alt="plus-icon">
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="homepage1-tab-details">
-                                        <div class="homepage1-tab-details-wrapper">
-                                            <div class="home1-tab-img">
-                                                <img src="{{ asset('assets/images/produk/product-4.png') }}" alt="watch-img">
-                                            </div>
-                                            <div class="home1-tab-details w-100">
-                                                <div class="home1-tab-details-full">
-                                                    <p class="tab-home1-txt1">Ice Cream 3</p>
-                                                    <h3 class="tab-home1-txt2">Rp. 25.000</h3>
-                                                    <div class="orange-star-tab">
-                                                        <span>
-                                                            <img src="{{ asset('assets/svg/orange-star18.svg') }}" alt="star-img">
-                                                        </span>
-                                                        <span class="tab-home1-txt3">4.8</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="home1-tab-favourite">
-                                                <div class="home-page-arrival-favourite">
-                                                    <a href="javascript:void(0);" class="item-bookmark" tabindex="-1">
-                                                        <img src="{{ asset('assets/svg/unfill-heart.svg') }}" alt="unfill-heart">
-                                                    </a>
-                                                </div>
-                                                <div class="plus-bnt-home1">
-                                                    <a href="javascript:void(0)">
-                                                        <img src="{{ asset('assets/svg/plus-icon.svg') }}" alt="plus-icon">
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                @endforeach
                             </div>
-                            <div class="tab-pane fade" id="pills-coffee" role="tabpanel" tabindex="0">
-                                <div class="container">
-                                    <div class="homepage1-tab-details">
-                                        <div class="homepage1-tab-details-wrapper">
-                                            <div class="home1-tab-img">
-                                                <img src="{{ asset('assets/images/produk/product-3.png') }}" alt="watch-img">
-                                            </div>
-                                            <div class="home1-tab-details w-100">
-                                                <div class="home1-tab-details-full">
-                                                    <p class="tab-home1-txt1">Iced Coffee</p>
-                                                    <h3 class="tab-home1-txt2">Rp. 25.000</h3>
-                                                    <div class="orange-star-tab">
-                                                        <span>
-                                                            <img src="{{ asset('assets/svg/orange-star18.svg') }}" alt="star-img">
-                                                        </span>
-                                                        <span class="tab-home1-txt3">4.8</span>
+                            @foreach ($tags as $tag)
+                                <div class="tab-pane fade" id="pills-{{ $tag->slug }}" role="tabpanel" tabindex="0">
+                                    @foreach ($productsByTag[$tag->slug] as $product)
+                                        <div class="container">
+                                            <div class="homepage1-tab-details">
+                                                <div class="homepage1-tab-details-wrapper">
+                                                    <div class="home1-tab-img">
+                                                        <img src="{{ asset('assets/images/produk/product-1.png') }}" alt="watch-img">
+                                                    </div>
+                                                    <div class="home1-tab-details w-100">
+                                                        <div class="home1-tab-details-full">
+                                                            <p class="tab-home1-txt1">{{ $product->name }}</p>
+                                                            <h3 class="tab-home1-txt2">Rp. {{ number_format($product->selling_price,0) }}</h3>
+                                                            <div class="orange-star-tab">
+                                                                <span>
+                                                                    <img src="{{ asset('assets/svg/orange-star18.svg') }}" alt="star-img">
+                                                                </span>
+                                                                <span class="tab-home1-txt3">4.8</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="home1-tab-favourite">
+                                                        <div class="home-page-arrival-favourite">
+                                                            <a href="javascript:void(0);" class="item-bookmark" tabindex="-1">
+                                                                <img src="{{ asset('assets/svg/unfill-heart.svg') }}" alt="unfill-heart">
+                                                            </a>
+                                                        </div>
+                                                        <div class="plus-bnt-home1">
+                                                            <a href="javascript:void(0)">
+                                                                <img src="{{ asset('assets/svg/plus-icon.svg') }}" alt="plus-icon">
+                                                            </a>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="home1-tab-favourite">
-                                                <div class="home-page-arrival-favourite">
-                                                    <a href="javascript:void(0);" class="item-bookmark" tabindex="-1">
-                                                        <img src="{{ asset('assets/svg/unfill-heart.svg') }}" alt="unfill-heart">
-                                                    </a>
-                                                </div>
-                                                <div class="plus-bnt-home1">
-                                                    <a href="javascript:void(0)">
-                                                        <img src="{{ asset('assets/svg/plus-icon.svg') }}" alt="plus-icon">
-                                                    </a>
-                                                </div>
-                                            </div>
                                         </div>
-                                    </div>
+                                    @endforeach
                                 </div>
-                            </div>
-                            <div class="tab-pane fade" id="pills-milk" role="tabpanel" tabindex="0">
-                                <div class="container">
-                                    <div class="homepage1-tab-details">
-                                        <div class="homepage1-tab-details-wrapper">
-                                            <div class="home1-tab-img">
-                                                <img src="{{ asset('assets/images/produk/product-1.png') }}" alt="watch-img">
-                                            </div>
-                                            <div class="home1-tab-details w-100">
-                                                <div class="home1-tab-details-full">
-                                                    <p class="tab-home1-txt1">Milk Shake</p>
-                                                    <h3 class="tab-home1-txt2">Rp. 25.000</h3>
-                                                    <div class="orange-star-tab">
-                                                        <span>
-                                                            <img src="{{ asset('assets/svg/orange-star18.svg') }}" alt="star-img">
-                                                        </span>
-                                                        <span class="tab-home1-txt3">4.8</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="home1-tab-favourite">
-                                                <div class="home-page-arrival-favourite">
-                                                    <a href="javascript:void(0);" class="item-bookmark" tabindex="-1">
-                                                        <img src="{{ asset('assets/svg/unfill-heart.svg') }}" alt="unfill-heart">
-                                                    </a>
-                                                </div>
-                                                <div class="plus-bnt-home1">
-                                                    <a href="javascript:void(0)">
-                                                        <img src="{{ asset('assets/svg/plus-icon.svg') }}" alt="plus-icon">
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="tab-pane fade" id="pills-icecream" role="tabpanel" tabindex="0">
-                                <div class="container">
-                                    <div class="homepage1-tab-details">
-                                        <div class="homepage1-tab-details-wrapper">
-                                            <div class="home1-tab-img">
-                                                <img src="{{ asset('assets/images/produk/product-5.png') }}" alt="watch-img">
-                                            </div>
-                                            <div class="home1-tab-details w-100">
-                                                <div class="home1-tab-details-full">
-                                                    <p class="tab-home1-txt1">Ice Cream 1</p>
-                                                    <h3 class="tab-home1-txt2">Rp. 25.000</h3>
-                                                    <div class="orange-star-tab">
-                                                        <span>
-                                                            <img src="{{ asset('assets/svg/orange-star18.svg') }}" alt="star-img">
-                                                        </span>
-                                                        <span class="tab-home1-txt3">4.8</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="home1-tab-favourite">
-                                                <div class="home-page-arrival-favourite">
-                                                    <a href="javascript:void(0);" class="item-bookmark" tabindex="-1">
-                                                        <img src="{{ asset('assets/svg/unfill-heart.svg') }}" alt="unfill-heart">
-                                                    </a>
-                                                </div>
-                                                <div class="plus-bnt-home1">
-                                                    <a href="javascript:void(0)">
-                                                        <img src="{{ asset('assets/svg/plus-icon.svg') }}" alt="plus-icon">
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="homepage1-tab-details">
-                                        <div class="homepage1-tab-details-wrapper">
-                                            <div class="home1-tab-img">
-                                                <img src="{{ asset('assets/images/produk/product-2.png') }}" alt="watch-img">
-                                            </div>
-                                            <div class="home1-tab-details w-100">
-                                                <div class="home1-tab-details-full">
-                                                    <p class="tab-home1-txt1">Ice Cream 2</p>
-                                                    <h3 class="tab-home1-txt2">Rp. 25.000</h3>
-                                                    <div class="orange-star-tab">
-                                                        <span>
-                                                            <img src="{{ asset('assets/svg/orange-star18.svg') }}" alt="star-img">
-                                                        </span>
-                                                        <span class="tab-home1-txt3">4.8</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="home1-tab-favourite">
-                                                <div class="home-page-arrival-favourite">
-                                                    <a href="javascript:void(0);" class="item-bookmark" tabindex="-1">
-                                                        <img src="{{ asset('assets/svg/unfill-heart.svg') }}" alt="unfill-heart">
-                                                    </a>
-                                                </div>
-                                                <div class="plus-bnt-home1">
-                                                    <a href="javascript:void(0)">
-                                                        <img src="{{ asset('assets/svg/plus-icon.svg') }}" alt="plus-icon">
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="homepage1-tab-details">
-                                        <div class="homepage1-tab-details-wrapper">
-                                            <div class="home1-tab-img">
-                                                <img src="{{ asset('assets/images/produk/product-4.png') }}" alt="watch-img">
-                                            </div>
-                                            <div class="home1-tab-details w-100">
-                                                <div class="home1-tab-details-full">
-                                                    <p class="tab-home1-txt1">Ice Cream 3</p>
-                                                    <h3 class="tab-home1-txt2">Rp. 25.000</h3>
-                                                    <div class="orange-star-tab">
-                                                        <span>
-                                                            <img src="{{ asset('assets/svg/orange-star18.svg') }}" alt="star-img">
-                                                        </span>
-                                                        <span class="tab-home1-txt3">4.8</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="home1-tab-favourite">
-                                                <div class="home-page-arrival-favourite">
-                                                    <a href="javascript:void(0);" class="item-bookmark" tabindex="-1">
-                                                        <img src="{{ asset('assets/svg/unfill-heart.svg') }}" alt="unfill-heart">
-                                                    </a>
-                                                </div>
-                                                <div class="plus-bnt-home1">
-                                                    <a href="javascript:void(0)">
-                                                        <img src="{{ asset('assets/svg/plus-icon.svg') }}" alt="plus-icon">
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            @endforeach
                         </div>
                     </div>
-                </div>
+                </div>                
             </div>
         </div>
     </div>
