@@ -17,51 +17,17 @@
                         <div class="cart-without-content-sec-full">
                             <p class="price-code-txt1">Preneum Women's Georgette a-line Knee-Long</p>
                             <p class="price-code-txt2">$150.00</p>
-                            <div class="card-without-price-sec">
-                                <div class="price-code-txt3">
-                                    <span>Color:</span>
-                                    <span>tilt</span>
+                            <div class="mt-2"></div>
+                            <div class="card-without-price-sec mt-0">
+                                <div class="price-code-txt3 ">
+                                    <span>Sugar:</span>
+                                    <span>Normal</span>
                                 </div>
+                            </div>
+                            <div class="card-without-price-sec mt-0">
                                 <div  class="price-code-txt3">
-                                    <span>Size:</span>
-                                    <span>M</span>
-                                </div>
-                            </div>
-                            <div class="card-without-promocode-increment">
-                                <div class="product-incre">
-                                    <a href="javascript:void(0)" class="product__minus sub">
-                                        <span>
-                                            <img src="{{ asset('assets/svg/minus-icon.svg') }}" alt="minus-icon">
-                                        </span>
-                                    </a>
-                                    <input name="quantity" type="text" class="product__input" value="1">
-                                    <a href="javascript:void(0)" class="product__plus add">
-                                        <span>
-                                            <img src="{{ asset('assets/svg/plus-icon.svg') }}" alt="plus-icon">
-                                        </span>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="cart-boder mt-16"></div>
-            </div>
-            <div class="cart-without-promocode-first mt-16">
-                <div class="cart-without-promocode-first-full">
-                    <div>
-                        <div class="cart-without-img-sec">
-                            <img src="{{ asset('assets/images/cart-without-promocode/watch-1.png') }}" alt="watch-img">
-                        </div>
-                    </div>
-                    <div class="cart-without-content-sec">
-                        <div class="cart-without-content-sec-full">
-                            <p class="price-code-txt1">Go Buzz Bluetooth Calling Smart Watch, 1.69” Clear</p>
-                            <p class="price-code-txt2">$150.00</p>
-                            <div class="card-without-price-sec">
-                                <div class="price-code-txt3">
-                                    <span>Color:</span>
-                                    <span>black</span>
+                                    <span>Ice:</span>
+                                    <span>Normal</span>
                                 </div>
                             </div>
                             <div class="card-without-promocode-increment">
