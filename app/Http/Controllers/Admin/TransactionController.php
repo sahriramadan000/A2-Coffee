@@ -80,10 +80,12 @@ class TransactionController extends Controller
     {
         $today = Carbon::today();
         $getOrderPaid = Order::wherePaymentStatus('Paid')->whereDate('created_at', $today)->orderBy('id', 'desc')->get();
+        $getOrderOpenBill = Order::wherePaymentStatus('Unpaid')->whereDate('created_at', $today)->orderBy('id', 'desc')->get();
         $getCacheOnhold = CacheOnholdControl::select(['key','name'])->whereDate('created_at', $today)->orderBy('id', 'desc')->get();
 
         return View::make('admin.pos.modal.modal-my-order')->with([
             'order_paids'      => $getOrderPaid,
+            'order_open_bills'      => $getOrderOpenBill,
             'onhold_orders'    => $getCacheOnhold,
         ]);
     }

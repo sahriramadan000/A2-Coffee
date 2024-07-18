@@ -22,6 +22,13 @@
                                 </div>
                             </a>
                         </li>
+                        <li class="nav-item w-50" role="presentation">
+                            <a class="nav-link" data-bs-toggle="pill" href="#primary-open-bill" role="tab" aria-selected="true">
+                                <div class="text-center">
+                                    <div class="tab-title">Open Bill</div>
+                                </div>
+                            </a>
+                        </li>
                     </ul>
 
                     <div class="tab-content tab-style" id="pills-tabContent">
@@ -71,6 +78,40 @@
                                             <p class="mb-1" style="font-size:14px;"><span class="fw-medium">Date:</span> {{ date('d-m-Y H:i', strtotime($order_paid->created_at)) }}</p>
                                             <div class="btn-group mt-2" role="group" aria-label="Basic example">
                                                 {{-- <a href="{{ route('kasir.dashboard-detail-kasir.show',$order_paid->id) }}" class="btn py-1 px-2 m-0 btn-warning" type="button"> --}}
+                                                <a href="#!" class="btn py-1 px-2 m-0 btn-warning" type="button">
+                                                    <small class="text-white">Print</small>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                @empty
+                                <a href="javascript:;" class="list-group-item list-group-item-action" aria-current="true">
+                                    <div class="d-flex w-100 justify-content-center">
+                                        <p class="mb-1">No data transaction.</p>
+                                    </div>
+                                </a>
+                                @endforelse
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="primary-open-bill" role="tabpanel">
+                            <div class="list-group">
+                                @forelse ($order_open_bills as $order_open_bill)
+                                <div class="list-group-item list-group-item-action" aria-current="true">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <div class="">
+                                            <p class="mb-1" style="font-size:14px;"><span class="fw-medium">No Invoice:</span> {{ $order_open_bill->no_invoice ?? '-' }}</p>
+                                            <p class="mb-1" style="font-size:14px;"><span class="fw-medium">Cashier:</span> {{ $order_open_bill->cashier_name ?? '-' }}</p>
+                                            <p class="mb-1" style="font-size:14px;"><span class="fw-medium">Metode Pembayaran:</span> {{ $order_open_bill->payment_method ?? '-' }}</p>
+                                            <p class="mb-1" style="font-size:14px;"><span class="fw-medium">Total:</span> Rp.{{ number_format($order_open_bill->total, 0, ',', '.' ) ?? '-' }}</p>
+                                        </div>
+                                        <div class="">
+                                            <p class="mb-1" style="font-size:14px;"><span class="fw-medium">Customer:</span> {{ $order_open_bill->customer_name ?? '-' }}</p>
+                                            <p class="mb-1" style="font-size:14px;"><span class="fw-medium">Date:</span> {{ date('d-m-Y H:i', strtotime($order_open_bill->created_at)) }}</p>
+                                            <div class="btn-group mt-2" role="group" aria-label="Basic example">
+                                                <button type="button" class="btn py-1 px-2 m-0 btn-success" onclick="openOnholdOrder('{{ route('open-on-hold-order') }}','{{ $order_open_bill->id }}', '{{ csrf_token() }}')">
+                                                    <small class="text-white">Open</small>
+                                                </button>
                                                 <a href="#!" class="btn py-1 px-2 m-0 btn-warning" type="button">
                                                     <small class="text-white">Print</small>
                                                 </a>

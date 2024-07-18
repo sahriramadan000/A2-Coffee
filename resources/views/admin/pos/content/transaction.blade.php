@@ -125,6 +125,11 @@
                                                         PAY
                                                     </h6>
                                                 </button>
+                                                <button type="button" class="btn btn-lg btn-warning fw-bold w-25 p-3" data-bs-toggle="modal" data-bs-target="#modalOpenBill">
+                                                    <h6 class="mb-0 text-white">
+                                                        OPEN BILL
+                                                    </h6>
+                                                </button>
                                                 <button type="button" class="btn btn-lg btn-primary fw-bold w-25 p-3" onclick="onHoldOrder('{{ route('on-hold-order') }}', '{{ csrf_token() }}')">
                                                     <h6 class="mb-0 text-white">
                                                         ON HOLD
@@ -173,6 +178,28 @@
 												<div class="modal-footer">
 													<button type="button" class="btn btn-danger" data-bs-dismiss="modal">CLOSE</button>
                                                     <button type="submit" class="btn btn-primary">PAY</button>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="modal fade" id="modalOpenBill" tabindex="-1" aria-labelledby="modalOpenBillLabel" aria-hidden="true">
+										<div class="modal-dialog">
+											<div class="modal-content">
+												<div class="modal-header">
+													<h5 class="modal-title" id="modalOpenBillLabel">PAYMENT</h5>
+													<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+												</div>
+												<div class="modal-body">
+                                                    <div class="modal-body p-0">
+                                                        <div class="form-group mt-2">
+                                                            <label for="name_open_bill" class="form-label">Customer Name</label>
+                                                            <input type="text" name="name_open_bill" value="{{ old('name_open_bill') }}" class="form-control form-control-sm" placeholder="Enter Customer Name....." id="name_open_bill" aria-describedby="name_open_bill">
+                                                        </div>
+                                                    </div>
+                                                </div>
+												<div class="modal-footer">
+													<button type="button" class="btn btn-danger" data-bs-dismiss="modal">CLOSE</button>
+                                                    <button type="submit" class="btn btn-primary">SUBMIT</button>
 												</div>
 											</div>
 										</div>

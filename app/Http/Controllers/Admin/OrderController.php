@@ -22,11 +22,13 @@ class OrderController extends Controller
 {
     public function checkout(Request $request, $token)
     {
+        // dd($request->all());
         DB::beginTransaction();
         try {
             $session_cart   = Cart::session(Auth::user()->id)->getContent();
             $other_setting  = OtherSetting::get()->first();
-            $checkToken     = Order::where('token',$token)->where('payment_status', 'Paid')->get();
+            $checkToken     = Order::where('token',$token)->get();
+            // $checkToken     = Order::where('token',$token)->where('payment_status', 'Paid')->get();
             $service        = (int) str_replace('.', '', $other_setting->layanan);
             $pb01           = $other_setting->pb01/100;
             $cash           = (int) str_replace('.', '', $request['cash']);
@@ -41,8 +43,10 @@ class OrderController extends Controller
                 return redirect()->back()->with(['failed' => 'Tidak dapat mengulang transaksi!']);
             }
             
-            if ($request->cash == null) {
-                return redirect()->back()->with(['failed' => 'Harap Mengisi Uang Cash!']);
+            if ($request->payment_method == 'Cash') {
+                if ($request->cash == null) {
+                    return redirect()->back()->with(['failed' => 'Harap Mengisi Uang Cash!']);
+                }
             }
 
             if ($other_setting->layanan != 0) {
@@ -80,29 +84,56 @@ class OrderController extends Controller
             $kembalian = $cash - ($request->type_discount ? $total_price_by_discount : $total_price);
 
             // =================Create Data Order================
-            $order = Order::create([
-                'no_invoice'        => $this->generateInvoice(),
-                'cashier_name'      => Auth::user()->fullname,
-                'customer_name'     => $customer->name ?? null,
-                'customer_email'    => $customer->email ?? null,
-                'customer_phone'    => $customer->phone ?? null,
-                'payment_status'    => 'Paid',
-                'payment_method'    => $request->payment_method,
-
-                'total_qty'         => array_sum($request->qty),
-                'subtotal'          => $subtotal,
-                'type_discount'     => ($request->type_discount ? $request->type_discount : null) ,
-                'price_discount'    => $getDiscountPrice,
-                'percent_discount'  => $getDiscountPercent,
-                'service'           => $service,
-                'pb01'              => ($request->type_discount ? $tax_by_discount : $pb01),
-                'total'             => ($request->type_discount ? $total_price_by_discount : $total_price),
-                'cash'              => $cash,
-                'kembalian'         => $kembalian,
-                'token'             => $token,
-                'created_at'        => date('Y-m-d H:i:s'),
-                'updated_at'        => date('Y-m-d H:i:s'),
-            ]);
+            if ($request->name_open_bill == null) {
+                $order = Order::create([
+                    'no_invoice'        => $this->generateInvoice(),
+                    'cashier_name'      => Auth::user()->fullname,
+                    'customer_name'     => $customer->name ?? null,
+                    'customer_email'    => $customer->email ?? null,
+                    'customer_phone'    => $customer->phone ?? null,
+                    'payment_status'    => 'Paid',
+                    'payment_method'    => $request->payment_method,
+    
+                    'total_qty'         => array_sum($request->qty),
+                    'subtotal'          => $subtotal,
+                    'type_discount'     => ($request->type_discount ? $request->type_discount : null) ,
+                    'price_discount'    => $getDiscountPrice,
+                    'percent_discount'  => $getDiscountPercent,
+                    'service'           => $service,
+                    'pb01'              => ($request->type_discount ? $tax_by_discount : $pb01),
+                    'total'             => ($request->type_discount ? $total_price_by_discount : $total_price),
+                    'cash'              => $cash,
+                    'kembalian'         => $kembalian,
+                    'token'             => $token,
+                    'created_at'        => date('Y-m-d H:i:s'),
+                    'updated_at'        => date('Y-m-d H:i:s'),
+                ]);
+            }else{
+                $order = Order::create([
+                    'no_invoice'        => $this->generateInvoice(),
+                    'cashier_name'      => Auth::user()->fullname,
+                    'customer_name'     => $customer->name ?? null,
+                    'customer_email'    => $customer->email ?? null,
+                    'customer_phone'    => $customer->phone ?? null,
+                    'payment_status'    => 'Unpaid',
+                    'payment_method'    => 'Open Bill',
+    
+                    'total_qty'         => array_sum($request->qty),
+                    'subtotal'          => $subtotal,
+                    'type_discount'     => ($request->type_discount ? $request->type_discount : null) ,
+                    'price_discount'    => $getDiscountPrice,
+                    'percent_discount'  => $getDiscountPercent,
+                    'service'           => $service,
+                    'pb01'              => ($request->type_discount ? $tax_by_discount : $pb01),
+                    'total'             => ($request->type_discount ? $total_price_by_discount : $total_price),
+                    'cash'              => $cash,
+                    'kembalian'         => $kembalian,
+                    'token'             => $token,
+                    'created_at'        => date('Y-m-d H:i:s'),
+                    'updated_at'        => date('Y-m-d H:i:s'),
+                ]);
+                // dd('masuk');
+            }
             // =================Create Data Order================
 
             // =================Order Coupon=====================
@@ -259,7 +290,7 @@ class OrderController extends Controller
 
         // Ambil order terakhir yang dibuat hari ini dan sudah dibayar
         $lastOrder = Order::whereDate('created_at', $today)
-                          ->where('payment_status', 'Paid')
+                        //   ->where('payment_status', 'Paid')
                           ->orderBy('id', 'desc')
                           ->first();
 
