@@ -830,7 +830,7 @@ function addToCartBarcode(barcode) {
                                         `</div>`+
                                     `</td>`+
                                     `<td>${cart.quantity}</td>`+
-                                    `<input type="hidden" name="qty[]" id="quantityInput" class="form-control qty" min="0"  value="${cart.quantity}">`+
+                                    `<input type="hidden" name="qty[]" id="quantityInput" class="form-control qty" min="0" value="${cart.quantity}">`+
                                     `<td>Rp.${numberFormat(cart.attributes['product_unit']['sale_price'])}</td>`+
                                 `</tr>`;
 

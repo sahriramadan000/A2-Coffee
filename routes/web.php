@@ -240,7 +240,7 @@ Route::middleware(['auth'])->group(function () {
 // Mobile Route
 // ================================================================================================================================
 
-Route::prefix('mobile')->name('mobile.')->group(function () {
+Route::prefix('mobile')->name('mobile.')->middleware(['web'])->group(function () {
     Route::get('/homepage',[HomepageController::class, 'index'])->name('homepage');
 
     Route::get('/cart', function() {
@@ -254,4 +254,8 @@ Route::prefix('mobile')->name('mobile.')->group(function () {
     Route::get('/pesanan', function() {
         return view('mobile.pesanan.index');
     })->name('pesanan');
+
+    Route::get('/modal-add-product/{productId}', [HomepageController::class, 'getModalAddProduct'])->name('modal-add-product');
+    Route::post('/add-item',[HomepageController::class, 'addToCart'])->name('add-item');
+
 });
