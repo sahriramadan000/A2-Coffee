@@ -8,6 +8,8 @@ use App\Models\CacheOnholdControl;
 use App\Models\Coupons;
 use App\Models\Customer;
 use App\Models\Order;
+use App\Models\OrderProduct;
+use App\Models\OrderProductAddon;
 use App\Models\OtherSetting;
 use App\Models\Product;
 use App\Models\ProductTag;
@@ -213,7 +215,7 @@ class TransactionController extends Controller
             // Cek apakah item yang akan ditambahkan sudah ada di keranjang
             $existingItem = $cartContent->first(function ($item, $key) use ($productDetailAttributes) {
                 $attributes = $item->attributes;
-
+                
                 // Periksa apakah produk dan addons sama dengan yang ada dalam keranjang
                 if ($attributes['product']['id'] === $productDetailAttributes['product']['id'] &&
                     $attributes['addons'] == $productDetailAttributes['addons']) {
@@ -240,6 +242,7 @@ class TransactionController extends Controller
                     'associatedModel' => Product::class
                 ));
             }
+
             $other_setting = OtherSetting::select(['pb01', 'layanan'])->first();
             $service       = (int) str_replace('.', '', $other_setting->layanan);
             $subtotal      = (Cart::getTotal() ?? '0');
@@ -419,6 +422,7 @@ class TransactionController extends Controller
 
                  // Add data to cart
                  foreach ($getCache as $cache) {
+                    dd($cache['attributes']);
                      Cart::session(Auth::user()->id)->add([
                          'id' => $cache['id'],
                          'name' => $cache['name'],
@@ -457,6 +461,59 @@ class TransactionController extends Controller
              return response()->json(['error' => $th->getMessage()], 500);
          }
      }
+
+    //  Open Bill
+    public function openBillOrder(Request $request)
+    {
+        try {
+            $other_setting = OtherSetting::first();
+
+            Cart::session(Auth::user()->id)->clear();
+            
+            $order = Order::where('id', $request->id)->first(); // Menggunakan first() untuk mengambil satu objek
+            $orderProducts = OrderProduct::where('order_id', $order->id)->get();
+            
+            // Add data to cart
+            foreach ($orderProducts as $orderProduct) {
+                $products = Product::where('name',$orderProduct->name)->first();
+                $orderAddOns = OrderProductAddon::where('order_product_id',$orderProduct->id)->first();
+                Cart::session(Auth::user()->id)->add([
+                    'id' => $orderProduct->id,
+                    'name' => $orderProduct->name,
+                    'price' => $orderProduct->selling_price,
+                    'quantity' => $orderProduct->qty,
+                    'attributes' => [
+                        'product' => $products,
+                        'addons' => $orderAddOns,
+                    ],
+                ]);
+            }
+
+            // Delete Cache after add to cart
+            // Cache::forget($keyCache);
+            // CacheOnholdControl::where('key', $request->key)->delete();
+
+            // Set return data
+            $dataCart = Cart::session(Auth::user()->id)->getContent();
+            $service = (int) str_replace('.', '', $other_setting->layanan);
+            $subtotal = Cart::getTotal();
+            $tax = ($subtotal + $service) * ($other_setting->pb01 / 100);
+            $total_price = ($subtotal + $service) + $tax;
+
+            return response()->json([
+                'code' => 200,
+                'message' => 'Open Bill Berhasil.',
+                'data' => $dataCart,
+                'service' => $service,
+                'subtotal' => $subtotal,
+                'tax' => $tax,
+                'total' => $total_price,
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json(['error' => $th->getMessage()], 500);
+        }
+    }
+
 
      public function deleteOnholdOrder(Request $request)
      {

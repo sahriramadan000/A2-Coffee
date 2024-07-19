@@ -109,7 +109,7 @@
                                             <p class="mb-1" style="font-size:14px;"><span class="fw-medium">Customer:</span> {{ $order_open_bill->customer_name ?? '-' }}</p>
                                             <p class="mb-1" style="font-size:14px;"><span class="fw-medium">Date:</span> {{ date('d-m-Y H:i', strtotime($order_open_bill->created_at)) }}</p>
                                             <div class="btn-group mt-2" role="group" aria-label="Basic example">
-                                                <button type="button" class="btn py-1 px-2 m-0 btn-success" onclick="openOnholdOrder('{{ route('open-on-hold-order') }}','{{ $order_open_bill->id }}', '{{ csrf_token() }}')">
+                                                <button type="button" class="btn py-1 px-2 m-0 btn-success" onclick="openBillOrder('{{ route('open-bill-order') }}','{{ $order_open_bill->id }}', '{{ csrf_token() }}')">
                                                     <small class="text-white">Open</small>
                                                 </button>
                                                 <a href="#!" class="btn py-1 px-2 m-0 btn-warning" type="button">
@@ -137,3 +137,55 @@
         </div>
     </div>
 </div>
+<script>
+    function openBillOrder(url, id, token) {
+    console.log('tes');
+    $.ajax({
+        url: url,
+        type: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        data: {
+            "_token": token,
+            "id": id,
+        },
+        success: function(response) {
+            console.log(response);
+            $('#cart-product').empty();
+            $.each(response.data, function(index, cart) {
+                var addList = `<tr class="table-cart text-white">`+
+                                    `<td class="td-cart">`+
+                                        `<div class="d-flex justify-content-between">`+
+                                            `<div class="">`+
+                                                `<p class="p-0 m-0 text-white">`+
+                                                    `${cart.name}`+
+                                                `</p>`+
+                                            `</div>`+
+
+                                            `<div>`+
+                                                `<a href="/delete-item/${index}" class="" style="border-bottom: 1px dashed red;">`+
+                                                    `<i class='bx bx-trash font-14 text-danger'></i>`+
+                                                `</a>`+
+                                            `</div>`+
+                                        `</div>`+
+                                    `</td>`+
+                                    `<td class="td-cart">${cart.quantity}</td>`+
+                                    `<input type="hidden" name="qty[]" id="quantityInput" class="form-control qty" min="0"  value="${cart.quantity}">`+
+                                    `<td class="td-cart">Rp.${numberFormat(cart.price)}</td>`+
+                                `</tr>`;
+
+                $('#cart-product').append(addList);
+            });
+
+            $('#subtotal-cart').text(`Rp.${formatRupiah(response.subtotal)}`);
+            $('#tax-cart').text(`Rp.${response.tax}`);
+            $('#total-cart').text(`Rp.${formatRupiah(response.total)}`);
+            $('#modal-my-order').modal('hide');
+        },
+        error: function(xhr, status, error) {
+            console.error('Failed to load Product: ', error);
+        }
+    });
+}
+</script>

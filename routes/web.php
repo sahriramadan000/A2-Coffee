@@ -222,6 +222,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/delete-item/{id}',[TransactionController::class, 'deleteItem'])->name('delete-item');
     Route::post('/on-hold-order',[TransactionController::class,'onHoldOrder'])->name('on-hold-order');
     Route::post('/open-on-hold-order',[TransactionController::class,'openOnholdOrder'])->name('open-on-hold-order');
+    Route::post('/open-bill-order',[TransactionController::class,'openBillOrder'])->name('open-bill-order');
     Route::post('/delete-on-hold-order',[TransactionController::class,'deleteOnholdOrder'])->name('delete-on-hold-order');
 
     // Checkout
