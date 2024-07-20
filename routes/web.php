@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Mobile\CartController;
 use App\Http\Controllers\Mobile\HomepageController;
+use App\Http\Controllers\Mobile\TransactionController as MobileTransactionController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -248,9 +249,11 @@ Route::prefix('mobile')->name('mobile.')->middleware(['web'])->group(function ()
     Route::get('/cart',[CartController::class, 'index'])->name('cart');
     Route::get('/delete-item/{id}',[CartController::class, 'deleteItem'])->name('delete-item');
 
-    Route::get('/checkout', function() {
-        return view('mobile.checkout.index');
-    })->name('checkout');
+    // Checkout
+    Route::post('/checkout/{token}',[MobileTransactionController::class,'checkout'])->name('checkout');
+    // Route::get('/checkout', function() {
+    //     return view('mobile.checkout.index');
+    // })->name('checkout');
 
     Route::get('/pesanan', function() {
         return view('mobile.pesanan.index');
