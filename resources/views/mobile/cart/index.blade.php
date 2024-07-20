@@ -13,23 +13,20 @@
                             <img src="{{ asset('assets/images/cart-without-promocode/clothes-1.png') }}" alt="clothes-img">
                         </div>
                     </div>
+                    @foreach ($dataCarts as $key => $dataCart)
+                    {{-- {{ dd($dataCart) }} --}}
                     <div class="cart-without-content-sec">
                         <div class="cart-without-content-sec-full">
-                            <p class="price-code-txt1">Preneum Women's Georgette a-line Knee-Long</p>
-                            <p class="price-code-txt2">$150.00</p>
+                            <p class="price-code-txt1">{{ $dataCart->name }}</p>
+                            <p class="price-code-txt2">{{ number_format($dataCart->price,0) }}</p>
                             <div class="mt-2"></div>
-                            <div class="card-without-price-sec mt-0">
-                                <div class="price-code-txt3 ">
-                                    <span>Sugar:</span>
-                                    <span>Normal</span>
+                            @foreach ($dataCart->attributes['addons'] as $addon)
+                                <div class="card-without-price-sec mt-0">
+                                    <div class="price-code-txt3 ">
+                                        <span>{{ $addon['name'] }}</span>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="card-without-price-sec mt-0">
-                                <div  class="price-code-txt3">
-                                    <span>Ice:</span>
-                                    <span>Normal</span>
-                                </div>
-                            </div>
+                            @endforeach
                             <div class="card-without-promocode-increment">
                                 <div class="product-incre">
                                     <a href="javascript:void(0)" class="product__minus sub">
@@ -43,53 +40,42 @@
                                             <img src="{{ asset('assets/svg/plus-icon.svg') }}" alt="plus-icon">
                                         </span>
                                     </a>
+                                    <a href="{{ route('mobile.delete-item', $key)}}" class="" style="border-bottom: 1px dashed red;">
+                                        <i class='bx bx-trash font-14 text-danger'>trash</i>
+                                    </a>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    @endforeach
+
                 </div>
                 <div class="cart-boder mt-16"></div>
             </div>
         </div>
-        {{-- <div class="without-code-second">
-            <div class="without-code-second-full">
-                <p>Promo Code:</p>
-                <div class="code-details mt-16">
-                    <div class="enter-code-promocode1">
-                        <input type="text" value="20firstorder">
-                    </div>
-                    <div class="code-plus-btn code-cancel-btn">
-                        <a href="javascript:void(0)">
-                            <img src="{{ asset('assets/svg/cancel-icon.svg') }}" alt="cancel-icon">
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <div class="cart-boder mt-24"></div>
-        </div> --}}
         <div class="check-page-bottom mt-24">
             <div class="check-page-bottom-deatails">
                 <div class="check-price-name1">
                     <p>Subtotal</p>
                 </div>
                 <div class="check-price-list1">
-                    <p>$300.00</p>
+                    <p>Rp.{{ number_format($subTotal,0) }}</p>
                 </div>
             </div>
             <div class="check-page-bottom-deatails mt-8">
                 <div class="check-price-name">
-                    <p>Discount</p>
+                    <p>Layanan</p>
                 </div>
                 <div>
-                    <p class="col-green">$0.00</p>
+                    <p class="col-green">Rp.{{ number_format($layanan,0)}}</p>
                 </div>
             </div>
             <div class="check-page-bottom-deatails mt-8">
                 <div class="check-price-name">
-                    <p>Delivery</p>
+                    <p>PPN</p>
                 </div>
                 <div>
-                    <p class="col-red">+$15.00</p>
+                    <p class="col-red">Rp.{{ number_format($ppn,0)}}</p>
                 </div>
             </div>
             <div class="cart-boder mt-24"></div>
@@ -98,7 +84,7 @@
             <div class="without-code-last-full">
                 <div>
                     <p class="total-txt">Total:</p>
-                    <p class="price-txt">$255.00</p>
+                    <p class="price-txt">Rp.{{ number_format($total,0)}}</p>
                 </div>
                 <div class="proceed-to check-btn">
                     <a href="{{ route('mobile.checkout') }}">Proceed To Checkout</a>

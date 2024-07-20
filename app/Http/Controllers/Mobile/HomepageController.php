@@ -56,6 +56,7 @@ class HomepageController extends Controller
             }
         }
 
+
         $formattedAddons = [];
 
         foreach ($structuredAddons as $structuredAddon) {
@@ -64,7 +65,7 @@ class HomepageController extends Controller
                 'children' => $structuredAddon['children']
             ];
         }
-
+        
         return View::make('mobile.homepage.modal')->with([
             'product'     => $productById,
             'addons'      => $formattedAddons
@@ -128,7 +129,6 @@ class HomepageController extends Controller
 
                 return false;
             });
-
             if ($existingItem !== null) {
                 // Jika item sudah ada, tambahkan jumlahnya
                 Cart::session($sessionId)->update($existingItem->id, [

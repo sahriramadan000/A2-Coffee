@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\TableController;
 use App\Http\Controllers\Admin\TagController;
 use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Mobile\CartController;
 use App\Http\Controllers\Mobile\HomepageController;
 use Illuminate\Support\Facades\Route;
 
@@ -242,10 +243,10 @@ Route::middleware(['auth'])->group(function () {
 
 Route::prefix('mobile')->name('mobile.')->middleware(['web'])->group(function () {
     Route::get('/homepage',[HomepageController::class, 'index'])->name('homepage');
-
-    Route::get('/cart', function() {
-        return view('mobile.cart.index');
-    })->name('cart');
+    
+    // Cart
+    Route::get('/cart',[CartController::class, 'index'])->name('cart');
+    Route::get('/delete-item/{id}',[CartController::class, 'deleteItem'])->name('delete-item');
 
     Route::get('/checkout', function() {
         return view('mobile.checkout.index');

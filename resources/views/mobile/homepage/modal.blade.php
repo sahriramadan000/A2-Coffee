@@ -85,7 +85,7 @@
                                                     {{ $child->name }}
                                                     <span>Rp.{{ number_format($child->price, 0, ',', '.') }}</span>
                                                 </div>
-                                                <input class="form-check-input child-checkbox" type="checkbox" value="{{ $child->id }}" id="form-check-{{ $child->id }}" data-parent-id="{{ $addon['addon']->id }}" data-status-optional="{{ $addon['addon']->status_optional }}" data-choose="{{ $addon['addon']->choose }}" data-price="{{ $child->price }}">
+                                                <input class="form-check-input child-checkbox" type="checkbox" value="{{ $child->id }}" id="form-check-{{ $child->id }}" data-parent-id="{{ $addon['addon']->id }}" data-name="{{ $addon['addon']->name }}" data-status-optional="{{ $addon['addon']->status_optional }}" data-choose="{{ $addon['addon']->choose }}" data-price="{{ $child->price }}">
                                             </li>
                                         @endforeach
                                     </ul>
