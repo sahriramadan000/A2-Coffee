@@ -244,16 +244,15 @@ Route::middleware(['auth'])->group(function () {
 
 Route::prefix('mobile')->name('mobile.')->middleware(['web'])->group(function () {
     Route::get('/homepage',[HomepageController::class, 'index'])->name('homepage');
-    
+
     // Cart
     Route::get('/cart',[CartController::class, 'index'])->name('cart');
     Route::get('/delete-item/{id}',[CartController::class, 'deleteItem'])->name('delete-item');
 
     // Checkout
     Route::post('/checkout/{token}',[MobileTransactionController::class,'checkout'])->name('checkout');
-    // Route::get('/checkout', function() {
-    //     return view('mobile.checkout.index');
-    // })->name('checkout');
+    Route::get('payment/success', [MobileTransactionController::class, 'midtransCallback']);
+    Route::post('payment/success', [MobileTransactionController::class, 'midtransCallback']);
 
     Route::get('/pesanan', function() {
         return view('mobile.pesanan.index');

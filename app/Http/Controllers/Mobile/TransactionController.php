@@ -14,9 +14,21 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Darryldecode\Cart\Facades\CartFacade as Cart;
+use Midtrans;
+use Str;
+
 
 class TransactionController extends Controller
 {
+
+    public function __construct()
+    {
+        Midtrans\Config::$serverKey = env('MIDTRANS_SERVER_KEY');
+        Midtrans\Config::$isProduction = env('MIDTRANS_IS_SANDBOX');
+        Midtrans\Config::$isSanitized = env('MIDTRANS_IS_SANITIZED');
+        Midtrans\Config::$is3ds = env('MIDTRANS_IS_3DS');
+    }
+
     public function checkout(Request $request,$token){
         // dd($request->all());
         DB::beginTransaction();
@@ -48,6 +60,10 @@ class TransactionController extends Controller
                 'updated_at'        => date('Y-m-d H:i:s'),
             ]);
             // =================Create Data Order================
+
+            // ==============Midtrans Invoice Create=============
+            // $this->getSnapRedirect($order);
+            // ==============Midtrans Invoice Create=============
 
             // Order Product
             $orderProducts = []; // Array untuk menyimpan detail produk yang telah dimasukkan ke dalam pesanan
@@ -135,6 +151,115 @@ class TransactionController extends Controller
             DB::rollBack();
             return redirect()->back()->with('failed', $th->getMessage());
         }
+    }
+
+    public function getSnapRedirect(Order $order)
+    {
+        $orderId = $order->no_invoice;
+        $price = $order->total;
+
+        $transaction_details = [
+            'order_id' => $orderId,
+            'gross_amount' => $price,
+        ];
+
+        $item_details[] = [
+            "id" => $orderId,
+            "price" => $price,
+            "quantity" => $order->total_qty,
+            "name" => "Payment for Midtrans"
+        ];
+
+        $userData = [
+            'first_name' => $order->customer_name,
+            'last_name' => "",
+            'address' => "",
+            'city' => "",
+            'postal_code' => "",
+            'phone' => $order->customer_phone,
+            'country_code' => "IDN",
+        ];
+
+        $customerDetails = [
+            'first_name' => $order->customer_name,
+            'last_name' => "",
+            'email' => $order->customer_email,
+            'phone' => $order->customer_phone,
+            'billing_address' => $userData,
+            'shipping_address' => $userData,
+        ];
+
+        $midtrans_params = [
+            'transaction_details' => $transaction_details,
+            'customer_details' => $customerDetails,
+            'item_details' => $item_details,
+        ];
+
+        try {
+            // Get Snap Payment Page URL
+            $paymentUrl = \Midtrans\Snap::createTransaction($midtrans_params)->redirect_url;
+            $order->midtrans_url = $paymentUrl;
+
+            $order->save();
+
+            return $paymentUrl;
+        } catch (\Throwable $th) {
+            //throw $th;
+            dd($th->getMessage());
+            return false;
+        }
+    }
+
+    public function midtransCallback(Request $request)
+    {
+        $notif = $request->method() == 'POST' ? new Midtrans\Notification() :  Midtrans\Transaction::status($request->order_id);
+
+        $transaction_status = $notif->transaction_status;
+        $fraud = $notif->fraud_status;
+
+        $checkout_id = explode('-', $notif->order_id)[0];
+        $checkout = Checkout::find($checkout_id);
+
+        if ($transaction_status == 'capture') {
+            if ($fraud == 'challenge') {
+            // TODO Set payment status in merchant's database to 'challenge'
+            $checkout->payment_status = 'pending';
+            }
+            else if ($fraud == 'accept') {
+                // TODO Set payment status in merchant's database to 'success'
+                $checkout->payment_status = 'paid';
+            }
+        }
+        else if ($transaction_status == 'cancel') {
+            if ($fraud == 'challenge') {
+                // TODO Set payment status in merchant's database to 'failure'
+                $checkout->payment_status = 'failed';
+            }
+            else if ($fraud == 'accept') {
+                // TODO Set payment status in merchant's database to 'failure'
+                $checkout->payment_status = 'failed';
+            }
+        }
+        else if ($transaction_status == 'deny') {
+            // TODO Set payment status in merchant's database to 'failure'
+            $checkout->payment_status = 'failed';
+        }
+        else if ($transaction_status == 'settlement') {
+            // TODO set payment status in merchant's database to 'Settlement'
+            $checkout->payment_status = 'paid';
+        }
+        else if ($transaction_status == 'pending') {
+            // TODO set payment status in merchant's database to 'Pending'
+            $checkout->payment_status = 'pending';
+        }
+        else if ($transaction_status == 'expire') {
+            // TODO set payment status in merchant's database to 'expire'
+            $checkout->payment_status = 'failed';
+        }
+
+        $checkout->save();
+        return view('checkout.success');
+        // Buatin checkout Success
     }
 
     private function generateInvoice()
