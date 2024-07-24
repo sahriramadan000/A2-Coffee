@@ -58,7 +58,7 @@
                 <div class="Checkout-second-full">
                     <div class="check-deatils">
                         <span class="check-txt1">Sub Total</span>
-                        <span class="check-txt2">Rp.{{ number_format($orders->sub_total) }}</span>
+                        <span class="check-txt2">Rp.{{ number_format($orders->subtotal) }}</span>
                     </div>
                     <div class="check-deatils">
                         <span class="check-txt1">Layanan</span>
@@ -76,5 +76,4 @@
         </div>
     </div>
 </section>
-
 @endsection
