@@ -30,7 +30,6 @@ class TransactionController extends Controller
     }
 
     public function checkout(Request $request,$token){
-        // dd($request->all());
         DB::beginTransaction();
         try {
             $sessionId = 'guest';
@@ -142,9 +141,14 @@ class TransactionController extends Controller
             DB::commit();
 
             // Hapus sesi keranjang setelah berhasil menyimpan data pesanan
-            Cart::session($sessionId)->clear();
+            // Cart::session($sessionId)->clear();
 
-            return redirect()->route('mobile.cart')->with('success', 'Order Telah berhasil');
+            $sessionId = 'guest';
+            $data['dataCarts'] = Cart::session($sessionId)->getContent();
+            $data['orders'] = Order::where('token', $token)->latest()->first();
+
+            return view('mobile.checkout.index',$data)->with('success', 'Order Telah berhasil');
+
         } catch (\Throwable $th) {
             //throw $th;
             dd($th->getMessage());
