@@ -218,6 +218,7 @@
                             const isOptional = $(this).data('status-optional');
                             const maxChoose = $(this).data('choose');
                             const parentId = $(this).data('parent-id');
+                            const name = $(this).data('name');
 
                             if (!isOptional) {
                                 // Wajib dipilih
@@ -235,6 +236,7 @@
                         // Event handler untuk mengontrol checkbox berdasarkan pilihan maksimal
                         $('.child-checkbox').on('change', function() {
                             const parentId = $(this).data('parent-id');
+                            const name = $(this).data('name');
                             const maxChoose = $(this).data('choose');
                             const checkboxes = $(`.child-checkbox[data-parent-id="${parentId}"]`);
                             const checkedCount = checkboxes.filter(':checked').length;
@@ -273,6 +275,7 @@
                             const selectedAddons = $('.child-checkbox:checked').map(function() {
                                 return {
                                     id: $(this).val(),
+                                    name: $(this).data('name'),
                                     parentId: $(this).data('parent-id'),
                                     statusOptional: $(this).data('status-optional'),
                                     choose: $(this).data('choose'),

@@ -8,9 +8,9 @@
                 </span>
             </a>
             <a href="{{ route('mobile.cart') }}" class="{{ request()->routeIs('mobile.cart') ? 'active' : '' }}">
-                <img src="{{ asset('assets/images/tabbar/cart.svg') }}" alt="cart-icon">
+                <img src="{{ asset('assets/images/tabbar/cart.svg') }}" alt="cart-icon"> ({{count(\Cart::session('guest')->getContent())}})
                 <span>
-                    Cart(0)
+                    Cart({{count(\Cart::session('guest')->getContent())}})
                 </span>
             </a>
             <a href="{{ route('mobile.pesanan') }}" class="{{ request()->routeIs('mobile.pesanan') ? 'active' : '' }}" >
