@@ -215,7 +215,7 @@ class TransactionController extends Controller
 
     public function getSnapRedirect(Order $order)
     {
-        $orderId = $order->no_invoice;
+        $orderId = $order->id;
         $price = $order->total;
 
         $transaction_details = [
