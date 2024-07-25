@@ -251,6 +251,7 @@ Route::prefix('mobile')->name('mobile.')->middleware(['web'])->group(function ()
 
     // Checkout
     Route::post('/checkout/{token}',[MobileTransactionController::class,'checkout'])->name('checkout');
+    Route::post('/checkout/store/{token}',[MobileTransactionController::class,'store'])->name('checkout.store');
     Route::get('payment/success', [MobileTransactionController::class, 'midtransCallback']);
     Route::post('payment/success', [MobileTransactionController::class, 'midtransCallback']);
 

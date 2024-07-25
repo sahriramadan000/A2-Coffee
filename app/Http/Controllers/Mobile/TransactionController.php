@@ -30,7 +30,11 @@ class TransactionController extends Controller
     }
 
     public function checkout(Request $request,$token){
-        DB::beginTransaction();
+        $order = Order::where('token', $token)->where('payment_status_midtrans', 'paid')->latest()->first();
+        if ($order) {
+            return redirect(route('mobile.homepage'))->with(['failed' => 'Order Failed!']);
+        }
+
         try {
             $sessionId = 'guest';
             $session_cart   = Cart::session($sessionId)->getContent();
@@ -41,7 +45,63 @@ class TransactionController extends Controller
             $pb01           = ($subTotal + $service) * $other_setting->pb01 /100 ;
             $total_price    = $subTotal + $service + $pb01;
 
-            // dd($token);
+            // Stock
+            $stockCheck    = []; // Array untuk menyimpan jumlah total produk berdasarkan ID produk
+
+            foreach ($session_cart as $cart) {
+                $productId = $cart->attributes['product']['id'];
+
+                // Perbarui total kuantitas produk untuk pengecekan stok
+                if (!isset($stockCheck[$productId])) {
+                    $stockCheck[$productId] = 0;
+                }
+                $stockCheck[$productId] += (int) $cart->quantity;
+            }
+
+            // Pengecekan stok sebelum menyimpan ke tabel order_products
+            foreach ($stockCheck as $productId => $totalQty) {
+                $product = Product::findOrFail($productId);
+                if ((int)$product->current_stock < $totalQty) {
+                    return redirect()->back()->with(['failed' => 'Stock product ' . $product->name . ' kurang - Stock tersisa ' . $product->current_stock]);
+                }
+            }
+
+            $data['dataCarts'] = $session_cart;
+            $data['subTotal'] = $subTotal;
+            $data['service'] = $service;
+            $data['pb01'] = $pb01;
+            $data['total_price'] = $total_price;
+            $data['token'] = $token;
+
+            return view('mobile.checkout.index',$data)->with('success', 'Order Telah berhasil');
+
+        } catch (\Throwable $th) {
+            dd($th->getMessage());
+            return redirect()->back()->with('failed', $th->getMessage());
+        }
+    }
+
+    public function store(Request $request,$token){
+        $order = Order::where('token', $token)->where('payment_status_midtrans', 'paid')->latest()->first();
+        if ($order) {
+            return redirect(route('mobile.homepage'))->with(['failed' => 'Order Failed!']);
+        }
+
+        $checkUrl = Order::where('token', $token)->where('payment_status_midtrans', '!=' ,'paid')->latest()->first();
+        if ($checkUrl) {
+            return redirect($checkUrl->midtrans_url);
+        }
+
+        DB::beginTransaction();
+        try {
+            $sessionId = 'guest';
+            $session_cart   = Cart::session($sessionId)->getContent();
+
+            $other_setting  = OtherSetting::get()->first();
+            $subTotal       = \Cart::session($sessionId)->getTotal();
+            $service        = $subTotal* $other_setting->layanan /100;
+            $pb01           = ($subTotal + $service) * $other_setting->pb01 /100 ;
+            $total_price    = $subTotal + $service + $pb01;
 
             // =================Create Data Order================
             $order = Order::create([
@@ -61,7 +121,7 @@ class TransactionController extends Controller
             // =================Create Data Order================
 
             // ==============Midtrans Invoice Create=============
-            // $this->getSnapRedirect($order);
+            $paymentRedirect = $this->getSnapRedirect($order);
             // ==============Midtrans Invoice Create=============
 
             // Order Product
@@ -141,13 +201,9 @@ class TransactionController extends Controller
             DB::commit();
 
             // Hapus sesi keranjang setelah berhasil menyimpan data pesanan
-            // Cart::session($sessionId)->clear();
+            Cart::session($sessionId)->clear();
 
-            $sessionId = 'guest';
-            $data['dataCarts'] = Cart::session($sessionId)->getContent();
-            $data['orders'] = Order::where('token', $token)->latest()->first();
-
-            return view('mobile.checkout.index',$data)->with('success', 'Order Telah berhasil');
+            return redirect($paymentRedirect);
 
         } catch (\Throwable $th) {
             //throw $th;
@@ -164,12 +220,13 @@ class TransactionController extends Controller
 
         $transaction_details = [
             'order_id' => $orderId,
-            'gross_amount' => $price,
+            // 'gross_amount' => $price,
+            'gross_amount' => 1,
         ];
 
         $item_details[] = [
             "id" => $orderId,
-            "price" => $price,
+            "price" => 1,
             "quantity" => $order->total_qty,
             "name" => "Payment for Midtrans"
         ];

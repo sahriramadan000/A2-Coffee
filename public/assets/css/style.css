@@ -207,7 +207,7 @@ body::-webkit-scrollbar {
 .onboarding-next-btn a,
 .inter-next-btn a,
 .add-to-cart-cloth-btn a,
-.confirm-order-btn a,
+.confirm-order-btn button,
 .success-home a ,
 .update-change-btn a,
 .add-btn-wallet a,

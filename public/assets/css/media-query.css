@@ -29,12 +29,12 @@
 		font-size: 12px;
 	}
 	.sign-with-password-btn a,
-	.sign-in-btn a, 
-	.confirm-order-btn a,
-	.send-instruction-btn a, 
-	.change-password-btn a, 
-	.open-email-btn a, 
-	.verify-btn a, 
+	.sign-in-btn a,
+	.confirm-order-btn button,
+	.send-instruction-btn a,
+	.change-password-btn a,
+	.open-email-btn a,
+	.verify-btn a,
 	.allow-btn a,
 	.next-btn a,
 	.add-to-cart-cloth-btn a,
