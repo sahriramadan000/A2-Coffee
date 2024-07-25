@@ -29,27 +29,16 @@
                 </div>
                 <div class="homescreen-second-wrapper-bottom mt-16">
                     <div class="homescreen-second-wrapper-slider">
-                        <div class="category-slide redirect-clothes">
-                            <img src="{{ asset('assets/images/category/category-1.jpg') }}" alt="category-img">
-                            <div class="category-slide-content">
-                                <h4>Milky Base</h4>
-                                <h5>1856 Items</h5>
-                            </div>
-                        </div>
-                        <div class="category-slide redirect-electronic">
-                            <img src="{{ asset('assets/images/category/category-2.jpg') }}" alt="category-img">
-                            <div class="category-slide-content">
-                                <h4>Coffee Base</h4>
-                                <h5>845 Items</h5>
-                            </div>
-                        </div>
-                        <div class="category-slide redirect-clothes">
-                            <img src="{{ asset('assets/images/category/category-3.jpg') }}" alt="category-img">
-                            <div class="category-slide-content">
-                                <h4>Tea Base</h4>
-                                <h5>286 Items</h5>
-                            </div>
-                        </div>
+                        @foreach ($tags as $tag)
+                        <a href="{{ route('mobile.detail-category', ['category' => $tag->name]) }}">
+                                <div class="category-slide">
+                                    <img src="{{ asset('assets/images/category/category-1.jpg') }}" alt="category-img">
+                                    <div class="category-slide-content">
+                                        <h4>{{ $tag->name }}</h4>
+                                    </div>
+                                </div>
+                            </a>
+                        @endforeach
                     </div>
                 </div>
             </div>

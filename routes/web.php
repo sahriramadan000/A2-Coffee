@@ -243,7 +243,11 @@ Route::middleware(['auth'])->group(function () {
 // ================================================================================================================================
 
 Route::prefix('mobile')->name('mobile.')->middleware(['web'])->group(function () {
+    // Homepage
     Route::get('/homepage',[HomepageController::class, 'index'])->name('homepage');
+    
+    // Category Detail
+    Route::get('/category-detail/{category}',[HomepageController::class, 'detailCategory'])->name('detail-category');
 
     // Cart
     Route::get('/cart',[CartController::class, 'index'])->name('cart');
