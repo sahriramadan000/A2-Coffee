@@ -319,7 +319,7 @@ class TransactionController extends Controller
         }
 
         $order->save();
-        return view('checkout.success');
+        return view('mobile.checkout.success');
     }
 
     private function generateInvoice()

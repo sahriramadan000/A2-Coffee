@@ -252,11 +252,15 @@ Route::prefix('mobile')->name('mobile.')->middleware(['web'])->group(function ()
     // Checkout
     Route::post('/checkout/{token}',[MobileTransactionController::class,'checkout'])->name('checkout');
     Route::post('/checkout/store/{token}',[MobileTransactionController::class,'store'])->name('checkout.store');
-    Route::get('payment/success', [MobileTransactionController::class, 'midtransCallback']);
-    Route::post('payment/success', [MobileTransactionController::class, 'midtransCallback']);
+    Route::get('/payment/success', [MobileTransactionController::class, 'midtransCallback']);
+    Route::post('/payment/success', [MobileTransactionController::class, 'midtransCallback']);
 
     Route::get('/pesanan', function() {
         return view('mobile.pesanan.index');
+    })->name('pesanan');
+
+    Route::get('/success', function() {
+        return view('mobile.checkout.success');
     })->name('pesanan');
 
     Route::get('/modal-add-product/{productId}', [HomepageController::class, 'getModalAddProduct'])->name('modal-add-product');
