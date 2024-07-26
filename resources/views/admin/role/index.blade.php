@@ -38,7 +38,7 @@
                     </div>
                 </div>
                 <div class="col-md-12 col-sm-12 col-12">
-                <button class="btn btn-primary roles-add" type="button" data-bs-target="#tabs-add-role" id="addTask"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> New Role</button>
+                    <button class="btn btn-primary roles-add" type="button" data-bs-target="#tabs-add-role" id="addTask"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> New Role</button>
                 </div>
             </div>
         </div>
@@ -53,7 +53,6 @@
                 <div id="ct" class="todo-box-scroll">
                 </div>
             </div>
-
         </div>
     </div>
 </div>

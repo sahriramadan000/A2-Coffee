@@ -132,7 +132,7 @@ class TableController extends Controller
     public function getModalDelete($tableId)
     {
         $table = Table::findOrFail($tableId);
-        return View::make('admin.customer.modal-delete')->with('table', $table);
+        return View::make('admin.table.modal-delete')->with('table', $table);
     }
 
     public function destroy(Request $request, $tableId)

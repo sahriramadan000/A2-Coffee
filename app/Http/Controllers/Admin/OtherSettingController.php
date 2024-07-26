@@ -31,7 +31,7 @@ class OtherSettingController extends Controller
     {
         $validate = $request->validate([
             'pb01' => 'nullable|integer|min:0|max:100|regex:/[0-9]/',
-            'layanan' => 'nullable',
+            'layanan' => 'nullable|integer|min:0|max:100|regex:/[0-9]/',
             'time_start' => 'nullable',
             'time_close' => 'nullable',
         ]);
@@ -39,15 +39,15 @@ class OtherSettingController extends Controller
         try {
             if ($otherSettingId == '0') {
                 $other = new OtherSetting();
-             } else {
-                 $other = OtherSetting::findorFail($otherSettingId);
-             }
+            } else {
+                $other = OtherSetting::findorFail($otherSettingId);
+            }
 
-             $other->pb01           = (int) str_replace('.', '', $validate['pb01']);
-             $other->layanan        = (int) str_replace('.', '', $validate['layanan']);
-             $other->time_start     = $validate['time_start'];
-             $other->time_close     = $validate['time_close'];
-             $other->save();
+            $other->pb01           = (int) str_replace('.', '', $validate['pb01']);
+            $other->layanan        = (int) str_replace('.', '', $validate['layanan']);
+            $other->time_start     = $validate['time_start'];
+            $other->time_close     = $validate['time_close'];
+            $other->save();
 
             $request->session()->flash('success', "Update data other setting successfully!");
             return redirect(route('dashboard'));
