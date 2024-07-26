@@ -217,7 +217,7 @@ class TransactionController extends Controller
             // Cek apakah item yang akan ditambahkan sudah ada di keranjang
             $existingItem = $cartContent->first(function ($item, $key) use ($productDetailAttributes) {
                 $attributes = $item->attributes;
-                
+
                 // Periksa apakah produk dan addons sama dengan yang ada dalam keranjang
                 if ($attributes['product']['id'] === $productDetailAttributes['product']['id'] &&
                     $attributes['addons'] == $productDetailAttributes['addons']) {
@@ -246,8 +246,8 @@ class TransactionController extends Controller
             }
 
             $other_setting = OtherSetting::select(['pb01', 'layanan'])->first();
-            $service       = (int) str_replace('.', '', $other_setting->layanan);
             $subtotal      = (Cart::getTotal() ?? '0');
+            $service       = $subtotal * ($other_setting->layanan / 100);
             $tax           = (($subtotal + $service) * $other_setting->pb01 / 100);
             $totalPayment  = ($subtotal + $service) + $tax;
 
@@ -286,7 +286,8 @@ class TransactionController extends Controller
         $coupon_type    = $coupon->type;
         $subtotal       = Cart::getTotal();
         $other_setting  = OtherSetting::get()->first();
-        $service = (int) str_replace('.', '', $other_setting->layanan);
+        $service        = $other_setting->layanan / 100;
+        $biaya_layanan  = 0;
 
         // Calculate discount amount based on coupon type
         if ($coupon_type == 'Percentage Discount') {
@@ -302,8 +303,8 @@ class TransactionController extends Controller
 
         // Check Layanan
         if ($other_setting->layanan != 0) {
-            $biaya_layanan  = ($subtotal - $coupon_amount) + $service;
-            $temp_total     = $biaya_layanan;
+            $biaya_layanan  = ($subtotal - $coupon_amount) * $service;
+            $temp_total     = $subtotal + $biaya_layanan;
         }else{
             $temp_total     = (($subtotal - $coupon_amount) ?? 0);
         }
@@ -320,7 +321,7 @@ class TransactionController extends Controller
             'subtotal'      => $subtotal,
             'tax'           => $tax,
             'total'         => $total,
-            'service'       => $service,
+            'service'       => $biaya_layanan,
             'info'          => $info,
         ], 200);
     }
@@ -336,7 +337,8 @@ class TransactionController extends Controller
         $discount_price     = (int) str_replace('.', '', $request->discount_price);
         $discount_percent   = (int) $request->discount_percent;
         $discount_type      = $request->discount_type;
-        $service            = (int) str_replace('.', '', $other_setting->layanan);
+        $service            = $other_setting->layanan / 100;
+        $biaya_layanan      = 0;
         $subtotal           = Cart::getTotal();
 
         if ($discount_type == 'percent') {
@@ -347,8 +349,8 @@ class TransactionController extends Controller
 
         // Check Layanan
         if ($other_setting->layanan != 0) {
-            $biaya_layanan  = ($subtotal - $discount_amount) + $service;
-            $temp_total     = $biaya_layanan;
+            $biaya_layanan  = ($subtotal - $discount_amount) * $service;
+            $temp_total     = $subtotal + $biaya_layanan;
         }else{
             $temp_total     = (($subtotal - $discount_amount) ?? 0);
         }
@@ -362,7 +364,7 @@ class TransactionController extends Controller
             'discount_percent'  => $discount_percent,
             'discount_type'     => $discount_type,
             'discount_amount'   => $discount_amount,
-            'service'           => $service,
+            'service'           => $biaya_layanan,
             'subtotal'          => $subtotal,
             'tax'               => $tax,
             'total'             => $total,
@@ -441,10 +443,10 @@ class TransactionController extends Controller
 
                  // Set return data
                  $dataCart    = Cart::session(Auth::user()->id)->getContent();
-                 $service     = (int) str_replace('.', '', $other_setting->layanan);
                  $subtotal    = Cart::getTotal();
+                 $service     = $subtotal * ($other_setting->layanan / 100);
                  $tax         = ($subtotal + $service) * ($other_setting->pb01 / 100);
-                 $total_price = ($subtotal + $service)  + $tax;
+                 $total_price = ($subtotal + $service) + $tax;
 
 
                  return response()->json([
@@ -471,11 +473,11 @@ class TransactionController extends Controller
             $other_setting = OtherSetting::first();
 
             Cart::session(Auth::user()->id)->clear();
-            
+
             $order = Order::where('id', $request->id)->first(); // Menggunakan first() untuk mengambil satu objek
             $orderProducts = OrderProduct::where('order_id', $order->id)->get();
 
-            
+
             // Add data to cart
             foreach ($orderProducts as $orderProduct) {
                 $products = Product::where('name',$orderProduct->name)->first();
@@ -497,10 +499,10 @@ class TransactionController extends Controller
             $orders->delete();
 
             // Set return data
-            $dataCart = Cart::session(Auth::user()->id)->getContent();
-            $service = (int) str_replace('.', '', $other_setting->layanan);
-            $subtotal = Cart::getTotal();
-            $tax = ($subtotal + $service) * ($other_setting->pb01 / 100);
+            $dataCart    = Cart::session(Auth::user()->id)->getContent();
+            $subtotal    = Cart::getTotal();
+            $service     = $subtotal * ($other_setting->layanan / 100);
+            $tax         = ($subtotal + $service) * ($other_setting->pb01 / 100);
             $total_price = ($subtotal + $service) + $tax;
 
             return response()->json([
