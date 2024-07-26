@@ -16,6 +16,8 @@ use App\Models\ProductTag;
 use App\Models\Tag;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Mike42\Escpos\Printer;
+use Mike42\Escpos\PrintConnectors\NetworkPrintConnector;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
 use Darryldecode\Cart\Facades\CartFacade as Cart;
@@ -472,6 +474,7 @@ class TransactionController extends Controller
             
             $order = Order::where('id', $request->id)->first(); // Menggunakan first() untuk mengambil satu objek
             $orderProducts = OrderProduct::where('order_id', $order->id)->get();
+
             
             // Add data to cart
             foreach ($orderProducts as $orderProduct) {
@@ -490,8 +493,8 @@ class TransactionController extends Controller
             }
 
             // Delete Cache after add to cart
-            // Cache::forget($keyCache);
-            // CacheOnholdControl::where('key', $request->key)->delete();
+            $orders = Order::findOrFail($request->id);
+            $orders->delete();
 
             // Set return data
             $dataCart = Cart::session(Auth::user()->id)->getContent();
@@ -531,5 +534,102 @@ class TransactionController extends Controller
          } catch (\Throwable $th) {
              return response()->json(['error' => $th->getMessage()], 500);
          }
-     }
+    }
+
+    public function printCustomer($id)
+    {
+        $orders = Order::findOrFail($id);
+
+        try {
+            $this->printItems($orders, 'food');
+            $this->printItems($orders, 'drink');
+
+            return redirect()->back()->with('success', 'Print berhasil dilakukan!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('failed', 'Gagal melakukan print! Error: ' . $e->getMessage());
+        }
+    }
+
+    public function printItems($orders, $category)
+    {
+        $connector = new NetworkPrintConnector("192.168.123.120", 9100);
+        $printer = new Printer($connector);
+
+        /* Initialize */
+        $printer->initialize();
+
+        $printer->initialize();
+        $printer->selectPrintMode(Printer::MODE_DOUBLE_HEIGHT);
+        $printer->setJustification(Printer::JUSTIFY_CENTER);
+
+        // Print store name
+        $printer->text("A2 Coffee & Eatry \n");
+        $printer->text("\n");
+
+        // Print store address
+        $printer->initialize();
+        $printer->setJustification(Printer::JUSTIFY_CENTER);
+        $printer->text(",  \n");
+        $printer->text("Jawa Barat, 17530\n");
+        $printer->text("\n\n");
+
+        // Print transaction details
+        $printer->initialize();
+        $printer->text("No Inv : " . $orders->no_invoice . "\n");
+        $printer->text("Customer : " . ($orders->customer_name ?? '-') . "\n");
+        $printer->text("Kasir : " . ($orders->cashier_name ?? '-') . "\n");
+        $printer->text("Waktu : " . $orders->created_at . "\n\n");
+
+        // Print table header
+        $printer->initialize();
+        $printer->text("--------------------------\n");
+        $printer->text(self::buatBaris2Kolom("Menu", "Qty"));
+
+        // Print each order item based on category
+        foreach ($orders->orderProducts as $orderProduct) {
+            if ($orderProduct->category == $category) {
+                $printer->text(self::buatBaris2Kolom(
+                    $orderProduct->name,
+                    $orderProduct->qty
+                ));
+            }
+        }
+
+        $printer->text("--------------------------\n");
+
+        // Print thank you message
+        $printer->initialize();
+        $printer->setJustification(Printer::JUSTIFY_CENTER);
+        $printer->text("\nTerima kasih\n");
+
+        // Cut the paper
+        $printer->feed(5);
+        $printer->cut();
+        $printer->close();
+    }
+
+    public static function buatBaris2Kolom($kolom1, $kolom2)
+    {
+        $lebar_kolom_1 = 24;
+        $lebar_kolom_2 = 5;
+
+        $kolom1 = wordwrap($kolom1, $lebar_kolom_1, "\n", true);
+        $kolom2 = wordwrap($kolom2, $lebar_kolom_2, "\n", true);
+
+        $kolom1Array = explode("\n", $kolom1);
+        $kolom2Array = explode("\n", $kolom2);
+
+        $jmlBarisTerbanyak = max(count($kolom1Array), count($kolom2Array));
+
+        $hasilBaris = array();
+
+        for ($i = 0; $i < $jmlBarisTerbanyak; $i++) {
+            $hasilKolom1 = str_pad((isset($kolom1Array[$i]) ? $kolom1Array[$i] : ""), $lebar_kolom_1, " ");
+            $hasilKolom2 = str_pad((isset($kolom2Array[$i]) ? $kolom2Array[$i] : ""), $lebar_kolom_2, " ");
+
+            $hasilBaris[] = $hasilKolom1 . " " . $hasilKolom2;
+        }
+
+        return implode("\n", $hasilBaris) . "\n";
+    }
 }

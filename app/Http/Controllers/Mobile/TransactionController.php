@@ -9,6 +9,7 @@ use App\Models\OrderProduct;
 use App\Models\OrderProductAddon;
 use App\Models\OtherSetting;
 use App\Models\Product;
+use App\Models\Table;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -34,7 +35,7 @@ class TransactionController extends Controller
         if ($order) {
             return redirect(route('mobile.homepage'))->with(['failed' => 'Order Failed!']);
         }
-
+        
         try {
             $sessionId = 'guest';
             $session_cart   = Cart::session($sessionId)->getContent();
@@ -72,11 +73,12 @@ class TransactionController extends Controller
             $data['pb01'] = $pb01;
             $data['total_price'] = $total_price;
             $data['token'] = $token;
+            $data['tables'] = Table::orderBy('name','asc')->get();
 
             return view('mobile.checkout.index',$data)->with('success', 'Order Telah berhasil');
 
         } catch (\Throwable $th) {
-            dd($th->getMessage());
+            // dd($th->getMessage());
             return redirect()->back()->with('failed', $th->getMessage());
         }
     }
@@ -85,6 +87,10 @@ class TransactionController extends Controller
         $order = Order::where('token', $token)->where('payment_status_midtrans', 'paid')->latest()->first();
         if ($order) {
             return redirect(route('mobile.homepage'))->with(['failed' => 'Order Failed!']);
+        }
+
+        if ($request->table == null) {
+            return redirect(route('mobile.homepage'))->with(['failed' => 'Silahkan Isi Meja Failed!']);
         }
 
         $checkUrl = Order::where('token', $token)->where('payment_status_midtrans', '!=' ,'paid')->latest()->first();
@@ -108,6 +114,7 @@ class TransactionController extends Controller
                 'no_invoice'        => $this->generateInvoice(),
                 'payment_status'    => 'Unpaid',
                 'payment_method'    => 'Midtrans',
+                'table'             => $request->table,
 
                 'total_qty'         => array_sum($request->quantity),
                 'subtotal'          => $subTotal,

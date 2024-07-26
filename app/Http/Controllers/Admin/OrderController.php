@@ -22,7 +22,6 @@ class OrderController extends Controller
 {
     public function checkout(Request $request, $token)
     {
-        // dd($request->all());
         DB::beginTransaction();
         try {
             $session_cart   = Cart::session(Auth::user()->id)->getContent();
@@ -82,7 +81,7 @@ class OrderController extends Controller
 
             // Kembalian
             $kembalian = $cash - ($request->type_discount ? $total_price_by_discount : $total_price);
-
+            
             // =================Create Data Order================
             if ($request->name_open_bill == null) {
                 $order = Order::create([
@@ -108,6 +107,8 @@ class OrderController extends Controller
                     'created_at'        => date('Y-m-d H:i:s'),
                     'updated_at'        => date('Y-m-d H:i:s'),
                 ]);
+            // dd('masuk');
+
             }else{
                 $order = Order::create([
                     'no_invoice'        => $this->generateInvoice(),
@@ -213,6 +214,7 @@ class OrderController extends Controller
                         'is_discount'       => $cart->attributes['product']['is_discount'],
                         'percent_discount'  => $cart->attributes['product']['percent_discount'],
                         'price_discount'    => $cart->attributes['product']['price_discount'],
+                        'category'          => $cart->attributes['product']['category'],
                         'qty'               => (int) $cart->quantity,
                         'addons'            => $cart->attributes['addons'],
                     ];
@@ -250,6 +252,7 @@ class OrderController extends Controller
                     'is_discount'       => $product['is_discount'],
                     'percent_discount'  => $product['percent_discount'],
                     'price_discount'    => $product['price_discount'],
+                    'category'          => $product['category'],
                     'qty'               => $product['qty'],
                 ]);
 
@@ -290,7 +293,7 @@ class OrderController extends Controller
 
         // Ambil order terakhir yang dibuat hari ini dan sudah dibayar
         $lastOrder = Order::whereDate('created_at', $today)
-                        //   ->where('payment_status', 'Paid')
+                        //   ->where(' payment_status', 'Paid')
                           ->orderBy('id', 'desc')
                           ->first();
 
