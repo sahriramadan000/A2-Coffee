@@ -227,6 +227,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/open-bill-order',[TransactionController::class,'openBillOrder'])->name('open-bill-order');
     Route::post('/delete-on-hold-order',[TransactionController::class,'deleteOnholdOrder'])->name('delete-on-hold-order');
 
+    // Print
+    Route::get('/print-customer/{id}', [TransactionController::class, 'printCustomer'])->name('print-customer'); 
+
     // Checkout
     Route::post('/checkout/{token}',[OrderController::class,'checkout'])->name('checkout-order');
     Route::post('/checkout/checkout-waiters/{token}',[OrderController::class,'checkoutWaiters'])->name('checkout-waiters');
@@ -243,7 +246,11 @@ Route::middleware(['auth'])->group(function () {
 // ================================================================================================================================
 
 Route::prefix('mobile')->name('mobile.')->middleware(['web'])->group(function () {
+    // Homepage
     Route::get('/homepage',[HomepageController::class, 'index'])->name('homepage');
+    
+    // Category Detail
+    Route::get('/category-detail/{category}',[HomepageController::class, 'detailCategory'])->name('detail-category');
 
     // Cart
     Route::get('/cart',[CartController::class, 'index'])->name('cart');
@@ -252,11 +259,15 @@ Route::prefix('mobile')->name('mobile.')->middleware(['web'])->group(function ()
     // Checkout
     Route::post('/checkout/{token}',[MobileTransactionController::class,'checkout'])->name('checkout');
     Route::post('/checkout/store/{token}',[MobileTransactionController::class,'store'])->name('checkout.store');
-    Route::get('payment/success', [MobileTransactionController::class, 'midtransCallback']);
-    Route::post('payment/success', [MobileTransactionController::class, 'midtransCallback']);
+    Route::get('/payment/success', [MobileTransactionController::class, 'midtransCallback']);
+    Route::post('/payment/success', [MobileTransactionController::class, 'midtransCallback']);
 
     Route::get('/pesanan', function() {
         return view('mobile.pesanan.index');
+    })->name('pesanan');
+
+    Route::get('/success', function() {
+        return view('mobile.checkout.success');
     })->name('pesanan');
 
     Route::get('/modal-add-product/{productId}', [HomepageController::class, 'getModalAddProduct'])->name('modal-add-product');

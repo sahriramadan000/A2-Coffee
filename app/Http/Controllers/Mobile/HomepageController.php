@@ -155,4 +155,17 @@ class HomepageController extends Controller
             return response()->json(['failed' => 'Product '.$product->name.' gagal masuk cart!'. $th->getMessage()], 500);
         }
     }
+
+    public function detailCategory($category){
+        $data['category'] = Tag::where('name', $category)->first();
+        if (!$data['category']) {
+            abort(404);
+        }
+        $data['products'] = Product::whereHas('tags', function ($query) use ($category) {
+            $query->where('name', $category);
+        })->orderBy('name', 'asc')->get();
+    
+        return view('mobile.homepage.detail-category', $data);
+    }
+    
 }

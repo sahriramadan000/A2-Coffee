@@ -47,6 +47,13 @@
                 </div>
             </div>
             @endforelse
+            <div class="input-group ">
+                <select class="form-control coupon-txt" name="table" id="">
+                    @foreach ($tables as $table)
+                        <option value="{{ $table->name }}">{{ $table->name }}</option>
+                    @endforeach
+                </select>
+            </div>
             <h1 class="d-none">Checkout Page</h1>
             <div class="Checkout-sec-full">
                 <div class="Checkout-first-sec">
