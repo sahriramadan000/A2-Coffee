@@ -30,13 +30,13 @@ class TransactionController extends Controller
         $data['data_items']     = Cart::session(Auth::user()->id)->getContent();
         $data['products']       = Product::orderby('id', 'asc')->get();
         $data['other_setting']  = OtherSetting::get()->first();
-        $service                = (int) str_replace('.', '', $data['other_setting']->layanan);
+        $service                = $data['other_setting']->layanan / 100;
         $subtotal               = Cart::getTotal();
-
-        $data['service']  = $service;
+        // dd($data['data_items']);
         $data['subtotal'] = $subtotal;
-        $data['tax']      = (($data['subtotal'] + ($data['data_items']->isEmpty() ? 0 : $service)) * $data['other_setting']->pb01/100);
-        $data['total']    = ($data['subtotal'] + ($data['data_items']->isEmpty() ? 0 : $service)) + $data['tax'];
+        $data['service']  = $subtotal * $service;
+        $data['tax']      = (($data['subtotal'] + ($data['data_items']->isEmpty() ? 0 : $data['service'])) * $data['other_setting']->pb01/100);
+        $data['total']    = ($data['subtotal'] + ($data['data_items']->isEmpty() ? 0 : $data['service'])) + $data['tax'];
 
         return view('admin.pos.index', $data);
     }
@@ -482,6 +482,7 @@ class TransactionController extends Controller
             foreach ($orderProducts as $orderProduct) {
                 $products = Product::where('name',$orderProduct->name)->first();
                 $orderAddOns = OrderProductAddon::where('order_product_id',$orderProduct->id)->first();
+
                 Cart::session(Auth::user()->id)->add([
                     'id' => $orderProduct->id,
                     'name' => $orderProduct->name,
@@ -489,7 +490,7 @@ class TransactionController extends Controller
                     'quantity' => $orderProduct->qty,
                     'attributes' => [
                         'product' => $products,
-                        'addons' => $orderAddOns,
+                        'addons' => $orderAddOns ?? [],
                     ],
                 ]);
             }

@@ -147,7 +147,7 @@ function onHoldOrder(url, token) {
 
                             $('#subtotal-cart').text(`Rp.0`);
                             $('#tax-cart').text(`Rp.0`);
-                            $('#tax-cart').text(`Rp.0`);
+                            $('#service-cart').text(`Rp.0`);
                             $('#total-cart').text(`Rp.0`);
 
                             // Discount
@@ -211,7 +211,8 @@ function openOnholdOrder(url, key, token) {
             });
 
             $('#subtotal-cart').text(`Rp.${formatRupiah(response.subtotal)}`);
-            $('#tax-cart').text(`Rp.${response.tax}`);
+            $('#tax-cart').text(`Rp.${formatRupiah(response.tax)}`);
+            $('#service-cart').text(`Rp.${formatRupiah(response.service)}`);
             $('#total-cart').text(`Rp.${formatRupiah(response.total)}`);
             $('#modal-my-order').modal('hide');
         },
@@ -262,7 +263,8 @@ function openBillOrder(url, id, token) {
             });
 
             $('#subtotal-cart').text(`Rp.${formatRupiah(response.subtotal)}`);
-            $('#tax-cart').text(`Rp.${response.tax}`);
+            $('#tax-cart').text(`Rp.${formatRupiah(response.tax)}`);
+            $('#service-cart').text(`Rp.${formatRupiah(response.service)}`);
             $('#total-cart').text(`Rp.${formatRupiah(response.total)}`);
             $('#modal-my-order').modal('hide');
         },
@@ -591,6 +593,7 @@ function updateCouponInCart(couponId, urlUpdateCart, token) {
             console.log(response);
             $('#coupon-info').text(`Coupon (${response.info})`)
             $('#subtotal-cart').text(`Rp.${formatRupiah(response.subtotal)}`)
+            $('#service-cart').text(`Rp.${formatRupiah(response.service)}`);
             $('#tax-cart').text(`Rp.${formatRupiah(response.tax)}`)
             $('#total-cart').text(`Rp.${formatRupiah(response.total)}`)
         },
@@ -702,6 +705,7 @@ function addToCart(productId, addons, quantity, url, token) {
 
             $('#subtotal-cart').text(`Rp.${formatRupiah(response.subtotal)}`)
             $('#tax-cart').text(`Rp.${formatRupiah(response.tax)}`)
+            $('#service-cart').text(`Rp.${formatRupiah(response.service)}`);
             $('#total-cart').text(`Rp.${formatRupiah(response.total)}`)
         },
         error: function(xhr, status, error) {
@@ -746,7 +750,7 @@ function voidCart(url, token) {
 
                             $('#subtotal-cart').text(`Rp.0`);
                             $('#tax-cart').text(`Rp.0`);
-                            $('#tax-cart').text(`Rp.0`);
+                            $('#service-cart').text(`Rp.0`);
                             $('#total-cart').text(`Rp.0`);
 
                             // Discount
@@ -837,9 +841,10 @@ function addToCartBarcode(barcode) {
                 $('#cart-product').append(addList);
             });
 
-            $('#subtotal-cart').text(`Rp.${response.subtotal}`)
-            $('#tax-cart').text(`Rp.${response.tax}`)
-            $('#total-cart').text(`Rp.${response.total}`)
+            $('#subtotal-cart').text(`Rp.${formatRupiah(response.subtotal)}`)
+            $('#tax-cart').text(`Rp.${formatRupiah(response.tax)}`)
+            $('#service-cart').text(`Rp.${formatRupiah(response.service)}`);
+            $('#total-cart').text(`Rp.${formatRupiah(response.total)}`)
         },
         error: function(xhr, status, error) {
             console.error('Failed to load Product: ', error);
@@ -889,6 +894,7 @@ function updateDiscountInCart(typeDiscount, discountPrice, discountPercent, url,
         success: function(response) {
             $('#subtotal-cart').text(`Rp.${formatRupiah(response.subtotal)}`)
             $('#tax-cart').text(`Rp.${formatRupiah(response.tax)}`)
+            $('#service-cart').text(`Rp.${formatRupiah(response.service)}`);
             $('#total-cart').text(`Rp.${formatRupiah(response.total)}`)
         },
         error: function(xhr, status, error) {

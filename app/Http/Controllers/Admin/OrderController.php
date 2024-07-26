@@ -28,11 +28,13 @@ class OrderController extends Controller
             $other_setting  = OtherSetting::get()->first();
             $checkToken     = Order::where('token',$token)->get();
             // $checkToken     = Order::where('token',$token)->where('payment_status', 'Paid')->get();
-            $service        = (int) str_replace('.', '', $other_setting->layanan);
+            $service        = $other_setting->layanan / 100;
             $pb01           = $other_setting->pb01/100;
             $cash           = (int) str_replace('.', '', $request['cash']);
             $total_price    = 0;
             $customer       = null;
+            $biaya_layanan  = 0;
+            $kembalian      = 0;
 
             if ($request->customer_id) {
                 $customer = Customer::whereId($request->customer_id)->get()->first();
@@ -49,8 +51,8 @@ class OrderController extends Controller
             }
 
             if ($other_setting->layanan != 0) {
-                $biaya_layanan  = Cart::getTotal() + $service;
-                $total_price    = $biaya_layanan;
+                $biaya_layanan  = Cart::getTotal() * $service;
+                $total_price    = Cart::getTotal() + $biaya_layanan;
             }else{
                 $total_price    = (Cart::getTotal() ?? '0');
             }
@@ -74,13 +76,15 @@ class OrderController extends Controller
             }
 
             $subtotal = Cart::getTotal();
-            $service_by_discount     = ($subtotal - $discount_amount) + (int) str_replace('.', '', $other_setting->layanan);
-            $tax_by_discount         = $service_by_discount * $other_setting->pb01 / 100;
-            $total_price_by_discount = $service_by_discount + $tax_by_discount;
+            $service_by_discount     = ($subtotal - $discount_amount) * ($other_setting->layanan / 100);
+            $tax_by_discount         = ($subtotal - $discount_amount) + $service_by_discount * $other_setting->pb01 / 100;
+            $total_price_by_discount = ($subtotal - $discount_amount) + $service_by_discount + $tax_by_discount;
             // ===================By Discount====================
 
             // Kembalian
-            $kembalian = $cash - ($request->type_discount ? $total_price_by_discount : $total_price);
+            if ($request->payment_method == 'Cash' && $request->cash != null) {
+                $kembalian = $cash - ($request->type_discount ? $total_price_by_discount : $total_price);
+            } 
             
             // =================Create Data Order================
             if ($request->name_open_bill == null) {
@@ -98,7 +102,7 @@ class OrderController extends Controller
                     'type_discount'     => ($request->type_discount ? $request->type_discount : null) ,
                     'price_discount'    => $getDiscountPrice,
                     'percent_discount'  => $getDiscountPercent,
-                    'service'           => $service,
+                    'service'           => ($request->type_discount ? $service_by_discount : $biaya_layanan),
                     'pb01'              => ($request->type_discount ? $tax_by_discount : $pb01),
                     'total'             => ($request->type_discount ? $total_price_by_discount : $total_price),
                     'cash'              => $cash,
@@ -107,9 +111,9 @@ class OrderController extends Controller
                     'created_at'        => date('Y-m-d H:i:s'),
                     'updated_at'        => date('Y-m-d H:i:s'),
                 ]);
-            // dd('masuk');
 
             }else{
+                // dd($request->all());
                 $order = Order::create([
                     'no_invoice'        => $this->generateInvoice(),
                     'cashier_name'      => Auth::user()->fullname,
@@ -124,7 +128,7 @@ class OrderController extends Controller
                     'type_discount'     => ($request->type_discount ? $request->type_discount : null) ,
                     'price_discount'    => $getDiscountPrice,
                     'percent_discount'  => $getDiscountPercent,
-                    'service'           => $service,
+                    'service'           => ($request->type_discount ? $service_by_discount : $biaya_layanan),
                     'pb01'              => ($request->type_discount ? $tax_by_discount : $pb01),
                     'total'             => ($request->type_discount ? $total_price_by_discount : $total_price),
                     'cash'              => $cash,
@@ -133,7 +137,6 @@ class OrderController extends Controller
                     'created_at'        => date('Y-m-d H:i:s'),
                     'updated_at'        => date('Y-m-d H:i:s'),
                 ]);
-                // dd('masuk');
             }
             // =================Create Data Order================
 
@@ -173,18 +176,19 @@ class OrderController extends Controller
 
                 // Check Layanan
                 if ($other_setting->layanan != 0) {
-                    $biaya_layanan  = ($subtotal - $coupon_amount) + $service;
+                    $biaya_layanan  = ($subtotal - $coupon_amount) * $service;
                     $temp_total     = $biaya_layanan;
                 }else{
                     $temp_total     = (($subtotal - $coupon_amount) ?? 0);
                 }
 
                 // Update tax & total price
-                $taxPriceByCoupon   = $temp_total * ($other_setting->pb01 / 100);
-                $totalPriceByCoupon = $temp_total + $taxPriceByCoupon;
+                $taxPriceByCoupon   = $temp_total + $biaya_layanan * ($other_setting->pb01 / 100);
+                $totalPriceByCoupon = $temp_total + $biaya_layanan + $taxPriceByCoupon;
 
                 // Set Data
                 $order->is_coupon   = true;
+                $order->service     = $biaya_layanan;
                 $order->pb01        = $taxPriceByCoupon;
                 $order->total       = $totalPriceByCoupon;
                 $order->save();
@@ -198,9 +202,9 @@ class OrderController extends Controller
 
             foreach ($session_cart as $cart) {
                 $productId = $cart->attributes['product']['id'];
-                $addonIds  = array_map(function($addon) {
+                $addonIds  = isset($cart->attributes['addons']) && is_array($cart->attributes['addons'])  ? array_map(function($addon) {
                     return $addon['id'];
-                }, $cart->attributes['addons']);
+                }, $cart->attributes['addons']) : [];
 
                 // Buat kunci unik berdasarkan ID produk dan ID addons
                 $uniqueKey = $productId . '-' . implode('-', $addonIds);
@@ -258,12 +262,14 @@ class OrderController extends Controller
 
                 // Simpan addons terkait ke tabel order_product_addons
                 foreach ($product['addons'] as $addon) {
-                    $getAddon = Addon::findOrFail($addon['id']);
-                    OrderProductAddon::create([
-                        'order_product_id' => $orderProduct->id,
-                        'name'             => $getAddon->name,
-                        'price'            => $getAddon->price,
-                    ]);
+                    if (!empty($product['addons'])) {
+                        $getAddon = Addon::findOrFail($addon['id']);
+                        OrderProductAddon::create([
+                            'order_product_id' => $orderProduct->id,
+                            'name'             => $getAddon->name,
+                            'price'            => $getAddon->price,
+                        ]);
+                    }
                 }
             }
 
