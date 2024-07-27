@@ -46,7 +46,8 @@ Route::get('/', function () {
 Route::middleware(['auth'])->group(function () {
     // Dahsboard
     Route::get('/dashboard', function () {
-        return view('admin.dashboard.index');
+        return redirect(route('attendances.index'));
+        // return view('admin.dashboard.index');
     })->name('dashboard');
 
     // Users
