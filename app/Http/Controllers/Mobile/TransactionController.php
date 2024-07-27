@@ -296,6 +296,7 @@ class TransactionController extends Controller
             else if ($fraud == 'accept') {
                 // TODO Set payment status in merchant's database to 'success'
                 $order->payment_status_midtrans = 'paid';
+                $order->payment_status = 'paid';
             }
         }
         else if ($transaction_status == 'cancel') {
@@ -315,6 +316,7 @@ class TransactionController extends Controller
         else if ($transaction_status == 'settlement') {
             // TODO set payment status in merchant's database to 'Settlement'
             $order->payment_status_midtrans = 'paid';
+            $order->payment_status = 'paid';
         }
         else if ($transaction_status == 'pending') {
             // TODO set payment status in merchant's database to 'Pending'
