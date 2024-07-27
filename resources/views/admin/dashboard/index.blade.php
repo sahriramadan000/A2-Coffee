@@ -12,7 +12,7 @@
 <nav class="breadcrumb-style-one" aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Vmond Truck 1</li>
+        <li class="breadcrumb-item active" aria-current="page">A2 Coffee 7 Eatry</li>
     </ol>
 </nav>
 @endsection
