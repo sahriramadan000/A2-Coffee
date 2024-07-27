@@ -648,6 +648,6 @@ class TransactionController extends Controller
         }
 
         $data['orders'] = $orders;
-        return PDF::loadview('process.server.pdf', $data)->stream('order-' . $orders->id . '.pdf');
+        return PDF::loadview('admin.pos.print.pdf', $data)->stream('order-' . $orders->id . '.pdf');
     }
 }
