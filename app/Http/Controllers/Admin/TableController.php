@@ -75,7 +75,7 @@ class TableController extends Controller
     public function store(AddTableRequest $request)
     {
         $dataTable = $request->validated();
-        $barcode = 'https://a2coffee.jooal.pro/tables/dashboard?kode_meja='.$dataTable['name'];
+        $barcode = 'https://a2coffee.jooal.pro/mobile/homepage?kode_meja='.$dataTable['name'];
         try {
             $table = new Table();
             $table->code               = $dataTable['code'];
@@ -105,7 +105,7 @@ class TableController extends Controller
     public function update(UpdateTableRequest $request, $tableId)
     {
         $dataTable = $request->validated();
-        $barcode = 'https://a2coffee.jooal.pro/tables/dashboard?kode_meja='.$dataTable['name'];
+        $barcode = 'https://a2coffee.jooal.pro/mobile/homepage?kode_meja='.$dataTable['name'];
         try {
             $table = Table::find($tableId);
 
