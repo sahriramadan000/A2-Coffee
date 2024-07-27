@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
 use Darryldecode\Cart\Facades\CartFacade as Cart;
 use Illuminate\Support\Facades\Cache;
+use PDF;
 
 class TransactionController extends Controller
 {
@@ -634,5 +635,19 @@ class TransactionController extends Controller
         }
 
         return implode("\n", $hasilBaris) . "\n";
+    }
+
+    public function printStruk($id){
+        $data['current_time'] = Carbon::now()->format('Y-m-d H:i:s');
+
+        $orders = Order::findOrFail($id);
+        $data['other_setting'] = OtherSetting::get()->first();
+
+        if ($orders->status_pembayaran !== 'Paid' || $orders->status_pesanan == null) {
+            abort(404);
+        }
+
+        $data['orders'] = $orders;
+        return PDF::loadview('process.server.pdf', $data)->stream('order-' . $orders->id . '.pdf');
     }
 }

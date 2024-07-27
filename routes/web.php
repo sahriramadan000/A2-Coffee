@@ -231,6 +231,9 @@ Route::middleware(['auth'])->group(function () {
     // Print
     Route::get('/print-customer/{id}', [TransactionController::class, 'printCustomer'])->name('print-customer'); 
 
+    // Print Struk
+    Route::get('/print-struk/{id}', [TransactionController::class, 'printStruk'])->name('print-struk'); 
+
     // Checkout
     Route::post('/checkout/{token}',[OrderController::class,'checkout'])->name('checkout-order');
     Route::post('/checkout/checkout-waiters/{token}',[OrderController::class,'checkoutWaiters'])->name('checkout-waiters');

@@ -80,6 +80,9 @@
                                                 <a href="{{ route('print-customer',$order_paid->id) }}" class="btn py-1 px-2 m-0 btn-warning" type="button">
                                                     <small class="text-white">Print</small>
                                                 </a>
+                                                <a href="{{ route('print-struk',$order_paid->id) }}" class="btn py-1 px-2 m-0 btn-danger" type="button">
+                                                    <small class="text-white">Print Struk</small>
+                                                </a>
                                             </div>
                                         </div>
                                     </div>
