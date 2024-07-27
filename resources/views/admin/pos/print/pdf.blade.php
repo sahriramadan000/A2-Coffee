@@ -222,6 +222,11 @@
                 @endif
                 @if ($orders->pb01 != 0)
                 <tr style="margin-top: 20px !important;">
+                    <td class="pb01" style="text-align: left" colspan="2">Service</td>
+                    <td class="total" style="text-align: right">Rp.{{ number_format($orders->service,0) }}</td>
+                </tr>
+
+                <tr style="margin-top: 20px !important;">
                     <td class="pb01" style="text-align: left" colspan="2">PB01</td>
                     <td class="total" style="text-align: right">Rp.{{ number_format($orders->pb01,0) }}</td>
                 </tr>
@@ -232,9 +237,6 @@
                 </tr>
                 <tr>
                     <td class="pb01" style="text-align: left" colspan="2">Total</td>
-                    <?php
-                        $total = $totalPrice + $biaya_pb01;
-                    ?>
                     <td class="total" style="text-align: right">Rp.{{ number_format($orders->total,0) }}</td>
                 </tr>
                 @else

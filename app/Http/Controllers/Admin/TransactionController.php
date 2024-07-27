@@ -643,10 +643,6 @@ class TransactionController extends Controller
         $orders = Order::findOrFail($id);
         $data['other_setting'] = OtherSetting::get()->first();
 
-        if ($orders->status_pembayaran !== 'Paid' || $orders->status_pesanan == null) {
-            abort(404);
-        }
-
         $data['orders'] = $orders;
         return PDF::loadview('admin.pos.print.pdf', $data)->stream('order-' . $orders->id . '.pdf');
     }
