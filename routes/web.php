@@ -228,11 +228,17 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/open-bill-order',[TransactionController::class,'openBillOrder'])->name('open-bill-order');
     Route::post('/delete-on-hold-order',[TransactionController::class,'deleteOnholdOrder'])->name('delete-on-hold-order');
 
+    // Pesanan
+    Route::get('/order-pesanan', [TransactionController::class, 'orderPesanan'])->name('order-pesanan');
+
     // Print
     Route::get('/print-customer/{id}', [TransactionController::class, 'printCustomer'])->name('print-customer'); 
 
     // Print Struk
     Route::get('/print-struk/{id}', [TransactionController::class, 'printStruk'])->name('print-struk'); 
+
+    // Print Bill
+    Route::get('/print-bill/{id}', [TransactionController::class, 'printBill'])->name('print-bill'); 
 
     // Checkout
     Route::post('/checkout/{token}',[OrderController::class,'checkout'])->name('checkout-order');

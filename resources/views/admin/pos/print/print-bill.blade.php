@@ -250,7 +250,7 @@
         </table>
 
         <div class="line"></div>
-        <p class="centered" style="margin-top: 10px; font-weight: 600;">Bill Terbayar </p>
+        <p class="centered" style="margin-top: 10px; font-weight: 600;">Bill</p>
         <p class="centered" style="margin-top: 10px; font-weight: 600;">Terimakasih Atas Kunjungan Anda </p>
         <p class="centered" style="margin-top: 10px; font-weight: 600;">Silahkan Datang Kembali!</p>
         <div class="line"></div>

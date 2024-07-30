@@ -14,6 +14,7 @@ use App\Models\OtherSetting;
 use App\Models\Product;
 use App\Models\ProductTag;
 use App\Models\Tag;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Mike42\Escpos\Printer;
@@ -645,5 +646,52 @@ class TransactionController extends Controller
 
         $data['orders'] = $orders;
         return PDF::loadview('admin.pos.print.pdf', $data)->stream('order-' . $orders->id . '.pdf');
+    }
+
+    public function printBill($id){
+        $data['current_time'] = Carbon::now()->format('Y-m-d H:i:s');
+
+        $orders = Order::findOrFail($id);
+        $data['other_setting'] = OtherSetting::get()->first();
+
+        $data['orders'] = $orders;
+        return PDF::loadview('admin.pos.print.print-bill', $data)->stream('order-' . $orders->id . '.pdf');
+    }
+
+    public function orderPesanan(Request $request){
+        $data ['page_title'] = 'Order Pesanan';
+        $data['account_users'] = User::get();
+
+        $data['order_products'] = OrderProduct::orderBy('updated_at', 'ASC')->get();
+        $data ['other_setting'] = OtherSetting::get()->first();
+
+        if (!$request->has('start_date') || $request->start_date === null) {
+            $orders = Order::whereDate('created_at', Carbon::today())
+                ->orderBy('no_invoice', 'desc')
+                ->get();
+        } else {
+            $date = $request->start_date;
+        
+            $orders = Order::whereDate('created_at', $date)
+                ->orderBy('no_invoice', 'desc')
+                ->get();
+        }
+
+        $data['orders'] = $orders;
+
+        foreach ($orders as $order) {
+            $order->elapsed_time = $this->calculateElapsedTime($order->created_at);
+        }
+
+        return view('admin.pesanan.index',$data);
+    }
+
+    public function calculateElapsedTime($createdAt)
+    {
+        $now = Carbon::now();
+        $created = Carbon::parse($createdAt);
+        $elapsedTime = $created->diffForHumans($now);
+
+        return $elapsedTime;
     }
 }
