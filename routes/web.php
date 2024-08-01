@@ -232,18 +232,22 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/order-pesanan', [TransactionController::class, 'orderPesanan'])->name('order-pesanan');
 
     // Print
-    Route::get('/print-customer/{id}', [TransactionController::class, 'printCustomer'])->name('print-customer'); 
+    Route::get('/print-customer/{id}', [TransactionController::class, 'printCustomer'])->name('print-customer');
 
     // Print Struk
-    Route::get('/print-struk/{id}', [TransactionController::class, 'printStruk'])->name('print-struk'); 
+    Route::get('/print-struk/{id}', [TransactionController::class, 'printStruk'])->name('print-struk');
 
     // Print Bill
-    Route::get('/print-bill/{id}', [TransactionController::class, 'printBill'])->name('print-bill'); 
+    Route::get('/print-bill/{id}', [TransactionController::class, 'printBill'])->name('print-bill');
 
     // Checkout
     Route::post('/checkout/{token}',[OrderController::class,'checkout'])->name('checkout-order');
     Route::post('/checkout/checkout-waiters/{token}',[OrderController::class,'checkoutWaiters'])->name('checkout-waiters');
 
+    // Sync
+    Route::get('/sync', function(){
+        return view('admin.sync.index');
+    })->name('sync.index');
 });
 
 
@@ -258,7 +262,7 @@ Route::middleware(['auth'])->group(function () {
 Route::prefix('mobile')->name('mobile.')->middleware(['web'])->group(function () {
     // Homepage
     Route::get('/homepage',[HomepageController::class, 'index'])->name('homepage');
-    
+
     // Category Detail
     Route::get('/category-detail/{category}',[HomepageController::class, 'detailCategory'])->name('detail-category');
 

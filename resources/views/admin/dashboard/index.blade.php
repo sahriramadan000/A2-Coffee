@@ -27,6 +27,8 @@
     </div>
 </div>
 
+<button class="btn btn-sm btn-primary" onclick="syncData()" type="button">Syncron</button>
+
 {{-- <div class="col-xl-3 col-lg-6 col-md-6  mb-4">
     <div class="card bg-primary">
         <div class="card-body pt-3">
@@ -251,3 +253,24 @@
     </div>
 </div> --}}
 @endsection
+
+@push('js')
+<script>
+    function syncData() {
+        $.ajax({
+            url: `http://localhost:3000/sync-data`,
+            type: 'POST',
+            data: {
+                _token: `{{ csrf_token() }}`,
+            },
+            success: function(data) {
+                alert('Check In successful');
+            },
+            error: function(xhr, status, error) {
+                console.error('Failed to Check In: ', error);
+                alert('Failed to Check In');
+            }
+        });
+    }
+</script>
+@endpush
