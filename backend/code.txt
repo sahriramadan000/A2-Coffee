@@ -1,0 +1,96 @@
+// async function BilliardOrderLampON() {
+//   try {
+//     const currentDate = new Date();
+//     var formattedTime = currentDate.toLocaleTimeString('en-US', { hour12: true });
+//     const query1 = `SELECT * FROM orders 
+//     WHERE date IS NOT NULL
+//     AND (time_from IS NULL OR time_from <= '${formattedTime}')
+//     AND (time_to IS NULL OR time_to >= '${formattedTime}')
+//     AND status_lamp = 'OFF'
+//     AND status_running = 'NOT START'
+//     AND status_pembayaran = 'Paid'
+//     AND date = CURRENT_DATE
+//     ORDER BY COALESCE(time_from, '00:00:00') ASC
+//     Limit 1`;
+
+//     const [result1] = await Promise.all([promisifiedQuery(query1)]);
+
+//     const orderFromSql1 = result1.rows;
+//     console.log(orderFromSql1);
+
+//     for (const element of orderFromSql1) {
+//       const formattedDate = compareDatesWithNow(element.date);
+//       const formattedTime = checkTimeRange(element.time_from, element.time_to);
+//       const statusLamp = element.status_lamp.toLowerCase();
+//       console.log(element);
+//       await lampuON (formattedDate, formattedTime, statusLamp);
+//     }
+//   } catch (error) {
+//     console.error('Error occurred:', error);
+//   }
+// }
+
+// async function lampuON (formattedDate, formattedTime, statusLamp){
+//   if (formattedDate && formattedTime && statusLamp === 'off') {
+//     const data = await promisifiedQuery(`SELECT * FROM meja_controls WHERE billiard_id = ${element.biliard_id}`);
+//     const address = data.rows[0].address;
+//     await writeCoil(address, true);
+
+//     console.log('Update Lamp ON');
+//     await promisifiedQuery(`UPDATE orders SET status_lamp = 'ON', status_running = 'START' WHERE id = ${element.id}`);
+//   }
+// }
+
+// async function BilliardOrderLampOFF() {
+//   try {
+//     const currentDate = new Date();
+//     var formattedTime = currentDate.toLocaleTimeString('en-US', { hour12: true });
+
+//     const query1 = `SELECT * FROM orders 
+//     WHERE date IS NOT NULL
+//     AND (time_from IS NULL OR time_from <= '${formattedTime}')
+//     AND (time_to IS NULL OR time_to >= '${formattedTime}')
+//     AND status_lamp = 'ON' 
+//     AND (status_running = 'START') 
+//     AND status_pembayaran = 'Paid' 
+//     AND date = CURRENT_DATE
+//     ORDER BY COALESCE(time_to, '00:00:00') ASC
+//     Limit 1`;
+
+//     const [result1] = await Promise.all([promisifiedQuery(query1)]);
+
+//     const orderFromSql1 = result1.rows;
+//     for (const element of orderFromSql1) {
+//       const formattedDate = compareDatesWithNow(element.date);
+//       const formattedTime15Minutes = isWithinTimeRange(element.time_to);
+//       const formattedLastTime = lastTime(element.time_to);
+//       const statusLamp = element.status_lamp.toLowerCase();
+//       let statusRun = element.status_running.toLowerCase();
+
+//       // Check 15 minutes
+//       // if (formattedDate && formattedTime15Minutes && statusLamp === 'on' && statusRun === 'start') {
+//       //   const data = await promisifiedQuery(`SELECT * FROM meja_controls WHERE billiard_id = ${element.biliard_id}`);
+//       //   const address = data.rows[0].address;
+
+//       //   // await writeCoil(address, false);
+//       //   // await writeCoil(address, true);
+
+//       //   console.log('Update Status Running');
+//       //   await promisifiedQuery(`UPDATE orders SET status_running = 'ALMOST' WHERE id = ${element.id}`);
+//       // }
+      
+//       // Exec Lamp OFF
+//       if (formattedDate && formattedLastTime && statusLamp === 'on' && statusRun === 'start') {
+//         const data = await promisifiedQuery(`SELECT * FROM meja_controls WHERE billiard_id = ${element.biliard_id}`);
+//         const address = data.rows[0].address;
+
+//         await writeCoil(address, false);
+
+//         console.log('Update Lamp OFF');
+//         await promisifiedQuery(`UPDATE orders SET status_lamp = 'OFF', status_running = 'DONE' WHERE id = ${element.id}`);
+//       }
+//     }
+//   } catch (error) {
+//     console.error('Error occurred:', error);
+//   }
+// }

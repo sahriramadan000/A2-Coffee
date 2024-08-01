@@ -23,6 +23,8 @@
 <script src="{{ asset('src/plugins/src/filepond/FilePondPluginImageResize.min.js') }}"></script>
 <script src="{{ asset('src/plugins/src/filepond/FilePondPluginImageTransform.min.js') }}"></script>
 <script src="{{ asset('src/plugins/src/filepond/filepondPluginFileValidateSize.min.js') }}"></script>
+<script src="{{ asset('src/plugins/src/sweetalerts2/sweetalerts2.min.js') }}"></script>
+<script src="{{ asset('src/plugins/src/sweetalerts2/custom-sweetalert.js') }}"></script>
 @stack('js-src')
 
 @stack('js')
