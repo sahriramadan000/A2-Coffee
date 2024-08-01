@@ -6,6 +6,14 @@
 
 <link href="{{ asset('src/assets/css/dark/components/modal.css') }}" rel="stylesheet" type="text/css" />
 <link href="{{ asset('src/assets/css/dark/components/tabs.css') }}" rel="stylesheet" type="text/css">
+{{-- Date Picker --}}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" integrity="sha512-mSYUmp1HYZDFaVKK//63EcZq4iFWFjxSL+Z3T/aCt4IO9Cejm03q3NKKYN6pFQzY0SBOr8h+eCIAZHPXcpZaNw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+<style>
+    .hilang{
+    display: none !important;
+  }
+</style>
 @endpush
 
 @section('breadcumbs')
@@ -19,235 +27,189 @@
 
 @section('content')
 @include('admin.components.alert')
-
-<div class="col-12">
-    <div class="alert alert-arrow-right alert-icon-right alert-light-success alert-dismissible fade show mb-4" role="alert">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-alert-circle"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12" y2="16"></line></svg>
-        <strong>Kick Start you new project with ease!</strong> Learn more about Starter Kit by refering to the <a target="_blank" href="https://designreset.com/cork/documentation/getting-started.html">Documentation</a>
-    </div>
-</div>
-
-{{-- <div class="col-xl-3 col-lg-6 col-md-6  mb-4">
-    <div class="card bg-primary">
-        <div class="card-body pt-3">
-            <h5 class="card-title mb-3">Card Title</h5>
-            <p class="card-text">Powerful CRM admin dashboard template based on Bootstrap and Sass for all kind of back-end projects.</p>
-        </div>
-        <div class="card-footer px-4 pt-0 border-0">
-            <a href="https://themeforest.net/item/cork-responsive-admin-dashboard-template/25582188" target="_blank">Visit on Themeforest.</a>
-        </div>
-    </div>
-</div>
-
-<div class="col-xl-3 col-lg-6 col-md-6  mb-4">
-    <div class="card bg-secondary">
-        <div class="card-body pt-3">
-            <h5 class="card-title mb-3">Card Title</h5>
-            <p class="card-text">Powerful CRM admin dashboard template based on Bootstrap and Sass for all kind of back-end projects.</p>
-        </div>
-        <div class="card-footer px-4 pt-0 border-0">
-            <a href="https://themeforest.net/item/cork-responsive-admin-dashboard-template/25582188" target="_blank">Visit on Themeforest.</a>
-        </div>
-    </div>
-</div>
-
-<div class="col-xl-3 col-lg-6 col-md-6  mb-4">
-    <div class="card bg-dark">
-        <div class="card-body pt-3">
-            <h5 class="card-title mb-3">Card Title</h5>
-            <p class="card-text">Powerful CRM admin dashboard template based on Bootstrap and Sass for all kind of back-end projects.</p>
-        </div>
-        <div class="card-footer px-4 pt-0 border-0">
-            <a href="https://themeforest.net/item/cork-responsive-admin-dashboard-template/25582188" target="_blank">Visit on Themeforest.</a>
-        </div>
-    </div>
-</div>
-
-<div class="col-xl-3 col-lg-6 col-md-6  mb-4">
-    <div class="card bg-danger">
-        <div class="card-body pt-3">
-            <h5 class="card-title mb-3">Card Title</h5>
-            <p class="card-text">Powerful CRM admin dashboard template based on Bootstrap and Sass for all kind of back-end projects.</p>
-        </div>
-        <div class="card-footer px-4 pt-0 border-0">
-            <a href="https://themeforest.net/item/cork-responsive-admin-dashboard-template/25582188" target="_blank">Visit on Themeforest.</a>
-        </div>
-    </div>
-</div>
-
-<div class="col-lg-12 col-md-12 layout-spacing">
-    <div class="statbox widget box box-shadow">
-        <div class="widget-header">
-            <div class="row">
-                <div class="col-xl-12 col-md-12 col-sm-12 col-12">
-                    <h4>Table</h4>
+<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
+    <form action="" method="get" class="row g-3 align-items-center">
+        {{-- <div class="row g-3 align-item-cente"> --}}
+           <div class="col-12 col-md-3">
+               <label class="form-label"> Period :</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bx bx-calendar-minus"></i></span>
+                    <select class="form-control select2" data-placeholder="Choose one" id="daterange" name="type">
+                        <option value="day" {{ (Request::get('type') == 'day') ? 'selected' : ''}}>Daily </option>
+                        <option value="monthly" {{ (Request::get('type') == 'monthly') ? 'selected' : '' }}>Monthly </option>
+                        <option value="yearly" {{ (Request::get('type') == 'yearly') ? 'selected' : '' }}>Yearly </option>
+                    </select>
+                </div>
+           </div>
+           <div class="col-12 col-md-4">
+                <div class="" id="datepicker-date-area">
+                    <label class="form-label"> Date :</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bx bx-calendar"></i></span>
+                        <input type="text" name="start_date" id="date" value="{{Request::get('start_date') ?? date('Y-m-d')}}" autocomplete="off" class="datepicker-date form-control time" required>
+                    </div>
+                </div>
+                <div class="hilang" id="datepicker-month-area">
+                    <label class="form-label"> Month :</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bx bx-calendar"></i></span>
+                        <input type="text" name="month" id="month" value="{{ Request::get('month') ?? date('Y-m') }}" autocomplete="off" class="datepicker-month form-control time" required>
+                    </div>
+                </div>
+                <div class="hilang" id="datepicker-year-area">
+                    <label class="form-label"> Year :</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bx bx-calendar"></i></span>
+                        <input type="text" name="year" id="year" value="{{ Request::get('year') ?? date('Y') }}" autocomplete="off" class="datepicker-year form-control" required>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="widget-content widget-content-area">
-            <div class="table-responsive">
-                <table class="table table-bordered mb-4">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Date</th>
-                            <th>Sale</th>
-                            <th class="text-center">Status</th>
-                            <th class="text-center">Action</th>
-                        </tr>
-                        <tr aria-hidden="true" class="mt-3 d-block table-row-hidden"></tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Shaun</td>
-                            <td>10/08/2022</td>
-                            <td>320</td>
-                            <td class="text-center"><span class="badge badge-success">Approved</span></td>
-                            <td class="text-center">
-
-                                <div class="dropdown custom-dropdown">
-                                    <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-horizontal"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
-                                    </a>
-
-                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuLink1">
-                                        <a class="dropdown-item" href="javascript:void(0);">Download</a>
-                                        <a class="dropdown-item" href="javascript:void(0);">Share</a>
-                                        <a class="dropdown-item" href="javascript:void(0);">Edit</a>
-                                        <a class="dropdown-item" href="javascript:void(0);">Delete</a>
-                                    </div>
-                                </div>
-
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Alma</td>
-                            <td>11/08/2022</td>
-                            <td>420</td>
-                            <td class="text-center"><span class="badge badge-primary">In Progress</span></td>
-                            <td class="text-center">
-
-                                <div class="dropdown custom-dropdown">
-                                    <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-horizontal"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
-                                    </a>
-
-                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuLink2">
-                                        <a class="dropdown-item" href="javascript:void(0);">Download</a>
-                                        <a class="dropdown-item" href="javascript:void(0);">Share</a>
-                                        <a class="dropdown-item" href="javascript:void(0);">Edit</a>
-                                        <a class="dropdown-item" href="javascript:void(0);">Delete</a>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Kelly</td>
-                            <td>12/08/2022</td>
-                            <td>130</td>
-                            <td class="text-center"><span class="badge badge-warning">Suspended</span></td>
-                            <td class="text-center">
-
-                                <div class="dropdown custom-dropdown">
-                                    <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-horizontal"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
-                                    </a>
-
-                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuLink3">
-                                        <a class="dropdown-item" href="javascript:void(0);">Download</a>
-                                        <a class="dropdown-item" href="javascript:void(0);">Share</a>
-                                        <a class="dropdown-item" href="javascript:void(0);">Edit</a>
-                                        <a class="dropdown-item" href="javascript:void(0);">Delete</a>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Xavier</td>
-                            <td>13/08/2022</td>
-                            <td>260</td>
-                            <td class="text-center"><span class="badge badge-danger">Blocked</span></td>
-                            <td class="text-center">
-
-                                <div class="dropdown custom-dropdown">
-                                    <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink4" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-horizontal"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
-                                    </a>
-
-                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuLink4">
-                                        <a class="dropdown-item" href="javascript:void(0);">Download</a>
-                                        <a class="dropdown-item" href="javascript:void(0);">Share</a>
-                                        <a class="dropdown-item" href="javascript:void(0);">Edit</a>
-                                        <a class="dropdown-item" href="javascript:void(0);">Delete</a>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Andy</td>
-                            <td>14/08/2022</td>
-                            <td>99</td>
-                            <td class="text-center"><span class="badge badge-secondary">On leave</span></td>
-                            <td class="text-center">
-                                <div class="dropdown custom-dropdown">
-                                    <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink5" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-horizontal"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
-                                    </a>
-
-                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuLink5">
-                                        <a class="dropdown-item" href="javascript:void(0);">Download</a>
-                                        <a class="dropdown-item" href="javascript:void(0);">Share</a>
-                                        <a class="dropdown-item" href="javascript:void(0);">Edit</a>
-                                        <a class="dropdown-item" href="javascript:void(0);">Delete</a>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Justin</td>
-                            <td>15/08/2022</td>
-                            <td>555</td>
-                            <td class="text-center"><span class="badge badge-info">Pending</span></td>
-                            <td class="text-center">
-                                <div class="dropdown custom-dropdown">
-                                    <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink6" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-horizontal"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
-                                    </a>
-
-                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuLink6">
-                                        <a class="dropdown-item" href="javascript:void(0);">Download</a>
-                                        <a class="dropdown-item" href="javascript:void(0);">Share</a>
-                                        <a class="dropdown-item" href="javascript:void(0);">Edit</a>
-                                        <a class="dropdown-item" href="javascript:void(0);">Delete</a>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Amy</td>
-                            <td>16/08/2022</td>
-                            <td>300</td>
-                            <td class="text-center"><span class="badge badge-dark">Deleted</span></td>
-                            <td class="text-center">
-
-                                <div class="dropdown custom-dropdown">
-                                    <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink7" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-horizontal"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
-                                    </a>
-
-                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuLink7">
-                                        <a class="dropdown-item" href="javascript:void(0);">Download</a>
-                                        <a class="dropdown-item" href="javascript:void(0);">Share</a>
-                                        <a class="dropdown-item" href="javascript:void(0);">Edit</a>
-                                        <a class="dropdown-item" href="javascript:void(0);">Delete</a>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="col-12 col-md-2">
+                <div class="form-group mt-4">
+                    <button  id="generate" class="btn btn-primary btn-sm p-2 w-100">
+                        Generate
+                    </button>
+                </div>
             </div>
+        {{-- </div> --}}
+    </form><!--end row-->
+    <div class="widget widget-chart-one">
+        <div class="widget-content">
+            <canvas id="analyticDashboard"></canvas>
         </div>
     </div>
-</div> --}}
+</div>
+
 @endsection
+@push('js')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js" integrity="sha512-T/tUfKSV1bihCnd+MxKD0Hm1uBBroVYBOYSk1knyvQ9VyZJpc/ALb4P0r6ubwVPSGB2GvjeoMAJJImBG12TiaQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+        var hourlyOrders = @json($hourlyOrders);
+        var labels = [];
+        var data = [];
+
+        for (var hour = 0; hour < 24; hour++) {
+            var label = hour < 10 ? '0' + hour : hour;
+            labels.push(label);
+            data.push(hourlyOrders[label] || 0);
+        }
+        console.log('data',hourlyOrders);
+
+        var ctx = document.getElementById('analyticDashboard').getContext('2d');
+        var myLineChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Orders per Hour',
+                    data: data,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1,
+                    fill: true,
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    });
+</script>
+
+<script>
+    $('.datepicker-date').datepicker({
+      format: "yyyy-mm-dd",
+        startView: 2,
+        minViewMode: 0,
+        language: "id",
+        daysOfWeekHighlighted: "0",
+        autoclose: true,
+        todayHighlight: true,
+        toggleActive: true,
+        container: '#datepicker-date-area'
+    });
+
+    $('.datepicker-month').datepicker({
+        format: "yyyy-mm",
+        startView: 2,
+        minViewMode: 1,
+        language: "id",
+        daysOfWeekHighlighted: "0",
+        autoclose: true,
+        todayHighlight: true,
+        toggleActive: true,
+        container: '#datepicker-month-area'
+    });
+
+    $('.datepicker-year').datepicker({
+        format: "yyyy",
+        startView: 2,
+        minViewMode: 2,
+        language: "id",
+        daysOfWeekHighlighted: "0",
+        autoclose: true,
+        todayHighlight: true,
+        toggleActive: true,
+        container: '#datepicker-year-area'
+    });
+
+    let rangeNow = $('#daterange').val();
+    if (rangeNow == 'day') {
+        $('#datepicker-date-area').removeClass('hilang');
+        const element = document.querySelector('#datepicker-date-area')
+        element.classList.add('animated', 'fadeIn')
+        // Hilangkan Month
+        $('#datepicker-month-area').addClass('hilang');
+        $('#datepicker-year-area').addClass('hilang');
+
+    } else if(rangeNow == 'monthly') {
+        $('#datepicker-month-area').removeClass('hilang');
+        const element = document.querySelector('#datepicker-month-area')
+        element.classList.add('animated', 'fadeIn')
+        // Hilangkan Date
+        $('#datepicker-date-area').addClass('hilang');
+        $('#datepicker-year-area').addClass('hilang');
+    } else {
+        $('#datepicker-year-area').removeClass('hilang');
+        const element = document.querySelector('#datepicker-year-area')
+        element.classList.add('animated', 'fadeIn')
+        // Hilangkan Date
+        $('#datepicker-date-area').addClass('hilang');
+        $('#datepicker-month-area').addClass('hilang');
+    }
+
+    $('#daterange').on('change', function () {
+        val = $(this).val();
+        if (val == 'day') {
+            $('#datepicker-date-area').removeClass('hilang');
+            const element = document.querySelector('#datepicker-date-area')
+            element.classList.add('animated', 'fadeIn')
+            // Hilangkan Month
+            $('#datepicker-month-area').addClass('hilang');
+            $('#datepicker-year-area').addClass('hilang');
+
+        } else if(val == 'monthly') {
+            $('#datepicker-month-area').removeClass('hilang');
+            const element = document.querySelector('#datepicker-month-area')
+            element.classList.add('animated', 'fadeIn')
+            // Hilangkan Date
+            $('#datepicker-date-area').addClass('hilang');
+            $('#datepicker-year-area').addClass('hilang');
+        } else {
+            $('#datepicker-year-area').removeClass('hilang');
+            const element = document.querySelector('#datepicker-year-area')
+            element.classList.add('animated', 'fadeIn')
+            // Hilangkan Date
+            $('#datepicker-date-area').addClass('hilang');
+            $('#datepicker-month-area').addClass('hilang');
+        }
+    })
+</script>
+@endpush

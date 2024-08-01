@@ -23,7 +23,7 @@
                             <h3 class="d-none">Hidden</h3>
                         </div>
                         <div class="view-all-second">
-                            <a href="category-page.html"><p class="view-all-txt">View all<span><img src="{{ asset('assets/svg/right-icon.svg') }}" alt="right-arrow"></span></p></a>
+                            <a href="#"><p class="view-all-txt">View all<span><img src="{{ asset('assets/svg/right-icon.svg') }}" alt="right-arrow"></span></p></a>
                         </div>
                     </div>
                 </div>
@@ -52,7 +52,7 @@
                             <h2 class="home1-txt3">Menu</h2>
                         </div>
                         <div class="view-all-second">
-                            <a href="arrivals.html"><p class="view-all-txt">View all<span><img src="{{ asset('assets/svg/right-icon.svg') }}" alt="right-arrow"></span></p></a>
+                            <a href="#"><p class="view-all-txt">View all<span><img src="{{ asset('assets/svg/right-icon.svg') }}" alt="right-arrow"></span></p></a>
                         </div>
                     </div>
                 </div>
@@ -296,11 +296,15 @@
                 },
                 data: {
                     "_token": token,
-                    "product_id":productId,
-                    "addons":addons,
-                    "quantity":quantity,
+                    "product_id": productId,
+                    "addons": addons,
+                    "quantity": quantity,
                 },
                 success: function(response) {
+                    // Get current query string
+                    let currentQueryString = window.location.search;
+                    // Redirect to homepage with the current query string
+                    window.location.href = "{{ route('mobile.homepage') }}" + currentQueryString;
                     console.log(response);
                 },
                 error: function(xhr, status, error) {
@@ -308,6 +312,7 @@
                 }
             });
         }
+
 
     </script>
 @endpush

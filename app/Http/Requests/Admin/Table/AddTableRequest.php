@@ -25,10 +25,11 @@ class AddTableRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'          => 'nullable|string',
-            'code'          => 'nullable|unique:tables,code',
-            'status'        => 'nullable|string',
-            'barcode'       => 'nullable|string'
+            'name'              => 'nullable|string',
+            'code'              => 'nullable|unique:tables,code',
+            'status'            => 'nullable|string',
+            'status_position'   => 'nullable|string',
+            'barcode'           => 'nullable|string'
         ];
     }
 

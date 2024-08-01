@@ -2,7 +2,7 @@
 
 @section('content')
 <section id="Checkout-sec" class="checkout-main">
-    <form action="{{ route('mobile.checkout.store', $token) }}" method="POST" class="">
+    <form action="{{ route('mobile.checkout.store', ['token' => $token, 'kode_meja' => Request::get('kode_meja')]) }}" method="POST" class="">
         @csrf
         <div class="container">
             @forelse ($dataCarts as $key => $dataCart)
@@ -47,13 +47,14 @@
                 </div>
             </div>
             @endforelse
-            <div class="input-group ">
+            <div class="input-group">
                 <select class="form-control coupon-txt" name="table" id="">
                     @foreach ($tables as $table)
-                        <option value="{{ $table->name }}">{{ $table->name }}</option>
+                        <option value="{{ $table->id }}">{{ $table->name }}</option>
                     @endforeach
                 </select>
             </div>
+            
             <h1 class="d-none">Checkout Page</h1>
             <div class="Checkout-sec-full">
                 <div class="Checkout-first-sec">

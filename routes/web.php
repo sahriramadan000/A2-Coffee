@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AddonController;
 use App\Http\Controllers\Admin\AttendanceController;
 use App\Http\Controllers\Admin\CouponController;
 use App\Http\Controllers\Admin\CustomerController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\MaterialController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\OtherSettingController;
@@ -45,10 +46,10 @@ Route::get('/', function () {
 
 Route::middleware(['auth'])->group(function () {
     // Dahsboard
-    Route::get('/dashboard', function () {
-        return redirect(route('attendances.index'));
-        // return view('admin.dashboard.index');
-    })->name('dashboard');
+    // Route::get('/dashboard', function () {
+    //     return view('admin.dashboard.index');
+    // })->name('dashboard');
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Users
     Route::prefix('users')->name('users.')->group(function () {
@@ -271,14 +272,15 @@ Route::prefix('mobile')->name('mobile.')->middleware(['web'])->group(function ()
     Route::post('/checkout/store/{token}',[MobileTransactionController::class,'store'])->name('checkout.store');
     Route::get('/payment/success', [MobileTransactionController::class, 'midtransCallback']);
     Route::post('/payment/success', [MobileTransactionController::class, 'midtransCallback']);
+    
+    Route::get('/success',[MobileTransactionController::class,'pesanan'])->name('pesanan');
+    // Route::get('/pesanan', function() {
+    //     return view('mobile.pesanan.index');
+    // })->name('pesanan');
 
-    Route::get('/pesanan', function() {
-        return view('mobile.pesanan.index');
-    })->name('pesanan');
-
-    Route::get('/success', function() {
-        return view('mobile.checkout.success');
-    })->name('pesanan');
+    // Route::get('/success', function() {
+    //     return view('mobile.checkout.success');
+    // })->name('pesanan');
 
     Route::get('/modal-add-product/{productId}', [HomepageController::class, 'getModalAddProduct'])->name('modal-add-product');
     Route::post('/add-item',[HomepageController::class, 'addToCart'])->name('add-item');

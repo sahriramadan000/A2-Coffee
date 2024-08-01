@@ -180,6 +180,7 @@
                     "quantity":quantity,
                 },
                 success: function(response) {
+                    window.location.reload();
                     console.log(response);
                 },
                 error: function(xhr, status, error) {

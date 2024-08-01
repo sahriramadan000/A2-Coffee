@@ -12,7 +12,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\View;
 use Yajra\DataTables\Facades\DataTables;
 use Milon\Barcode\Facades\DNS2DFacade as DNS2D;
-
+use Illuminate\Support\Facades\Crypt;
 
 class TableController extends Controller
 {
@@ -75,13 +75,20 @@ class TableController extends Controller
     public function store(AddTableRequest $request)
     {
         $dataTable = $request->validated();
-        $barcode = 'https://a2coffee.jooal.pro/mobile/homepage?kode_meja='.$dataTable['name'];
+
+         // Encrypt the name
+        $encryptedName = Crypt::encryptString($dataTable['name']);
+
+        // Generate the barcode URL with the encrypted name
+        $barcode = 'https://a2coffee.jooal.pro/mobile/homepage?kode_meja=' . urlencode($encryptedName);
+        
         try {
             $table = new Table();
-            $table->code               = $dataTable['code'];
-            $table->name               = $dataTable['name'];
-            $table->status             = $dataTable['status'];
-            $table->barcode            = $barcode;
+            $table->code                = $dataTable['code'];
+            $table->name                = $dataTable['name'];
+            $table->status              = $dataTable['status'];
+            $table->status_position     = $dataTable['status_position'];
+            $table->barcode             = $barcode;
             $table->save();
 
             $request->session()->flash('success', "Create data Table successfully!");
@@ -105,7 +112,12 @@ class TableController extends Controller
     public function update(UpdateTableRequest $request, $tableId)
     {
         $dataTable = $request->validated();
-        $barcode = 'https://a2coffee.jooal.pro/mobile/homepage?kode_meja='.$dataTable['name'];
+
+         // Encrypt the name
+         $encryptedName = Crypt::encryptString($dataTable['name']);
+
+         // Generate the barcode URL with the encrypted name
+         $barcode = 'https://a2coffee.jooal.pro/mobile/homepage?kode_meja=' . urlencode($encryptedName);
         try {
             $table = Table::find($tableId);
 
@@ -118,6 +130,7 @@ class TableController extends Controller
             $table->code               = $dataTable['code'];
             $table->name               = $dataTable['name'];
             $table->status             = $dataTable['status'];
+            $table->status_position    = $dataTable['status_position'];
             $table->barcode            = $barcode;
             $table->save();
 

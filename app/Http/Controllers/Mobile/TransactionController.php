@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Auth;
 use Darryldecode\Cart\Facades\CartFacade as Cart;
 use Midtrans;
 use Str;
+use Illuminate\Support\Facades\Crypt;
 
 
 class TransactionController extends Controller
@@ -34,6 +35,10 @@ class TransactionController extends Controller
         $order = Order::where('token', $token)->where('payment_status_midtrans', 'paid')->latest()->first();
         if ($order) {
             return redirect(route('mobile.homepage'))->with(['failed' => 'Order Failed!']);
+        }
+
+        if ($request->kode_meja == null) {
+            return redirect(route('mobile.homepage'))->with(['failed' => 'Silahkan Scan Barcode Ulang!']);
         }
         
         try {
@@ -73,7 +78,9 @@ class TransactionController extends Controller
             $data['pb01'] = $pb01;
             $data['total_price'] = $total_price;
             $data['token'] = $token;
-            $data['tables'] = Table::orderBy('name','asc')->get();
+
+            $decryptedTableName = Crypt::decryptString($request->kode_meja);
+            $data['tables'] = Table::where('name', $decryptedTableName)->get();
 
             return view('mobile.checkout.index',$data)->with('success', 'Order Telah berhasil');
 
@@ -83,7 +90,8 @@ class TransactionController extends Controller
         }
     }
 
-    public function store(Request $request,$token){
+    public function store(Request $request, $token)
+    {
         $order = Order::where('token', $token)->where('payment_status_midtrans', 'paid')->latest()->first();
         if ($order) {
             return redirect(route('mobile.homepage'))->with(['failed' => 'Order Failed!']);
@@ -93,128 +101,122 @@ class TransactionController extends Controller
             return redirect(route('mobile.homepage'))->with(['failed' => 'Silahkan Isi Meja Failed!']);
         }
 
-        $checkUrl = Order::where('token', $token)->where('payment_status_midtrans', '!=' ,'paid')->latest()->first();
+        $checkUrl = Order::where('token', $token)->where('payment_status_midtrans', '!=', 'paid')->latest()->first();
         if ($checkUrl) {
             return redirect($checkUrl->midtrans_url);
         }
 
+        if ($request->kode_meja == null) {
+            return redirect(route('mobile.homepage'))->with(['failed' => 'Silahkan Scan Qr di Meja!']);
+        }
         DB::beginTransaction();
+
+        $decryptedTableName = Crypt::decryptString($request->kode_meja);
+        $table = Table::where('name', $decryptedTableName)->first();
+        // ================ Create Data Order ==============================
         try {
             $sessionId = 'guest';
-            $session_cart   = Cart::session($sessionId)->getContent();
+            $session_cart = Cart::session($sessionId)->getContent();
 
-            $other_setting  = OtherSetting::get()->first();
-            $subTotal       = \Cart::session($sessionId)->getTotal();
-            $service        = $subTotal* $other_setting->layanan /100;
-            $pb01           = ($subTotal + $service) * $other_setting->pb01 /100 ;
-            $total_price    = $subTotal + $service + $pb01;
+            $other_setting = OtherSetting::first();
+            $subTotal = Cart::session($sessionId)->getTotal();
+            $service = $subTotal * $other_setting->layanan / 100;
+            $pb01 = ($subTotal + $service) * $other_setting->pb01 / 100;
+            $total_price = $subTotal + $service + $pb01;
 
-            // =================Create Data Order================
             $order = Order::create([
-                'no_invoice'        => $this->generateInvoice(),
-                'payment_status'    => 'Unpaid',
-                'payment_method'    => 'Midtrans',
-                'table'             => $request->table,
-
-                'total_qty'         => array_sum($request->quantity),
-                'subtotal'          => $subTotal,
-                'service'           => $service,
-                'pb01'              => $pb01,
-                'total'             => $total_price,
-                'token'             => $token,
-                'created_at'        => date('Y-m-d H:i:s'),
-                'updated_at'        => date('Y-m-d H:i:s'),
+                'no_invoice' => $this->generateInvoice(),
+                'payment_status' => 'Unpaid',
+                'payment_method' => 'Open Bill',
+                'table' => $table->name,
+                'total_qty' => array_sum($request->quantity),
+                'subtotal' => $subTotal,
+                'service' => $service,
+                'pb01' => $pb01,
+                'total' => $total_price,
+                'token' => $token,
+                'created_at' => now(),
+                'updated_at' => now(),
             ]);
-            // =================Create Data Order================
 
-            // ==============Midtrans Invoice Create=============
-            $paymentRedirect = $this->getSnapRedirect($order);
-            // ==============Midtrans Invoice Create=============
+        // ================ Create Data Order ==============================
 
-            // Order Product
-            $orderProducts = []; // Array untuk menyimpan detail produk yang telah dimasukkan ke dalam pesanan
-            $stockCheck    = []; // Array untuk menyimpan jumlah total produk berdasarkan ID produk
+        // ================ Update Table ==============================
+            $table->status_position = 'Close';
+            $table->save();
+        // ================ Update Table ==============================
+        
+            $orderProducts = [];
+            $stockCheck = [];
 
             foreach ($session_cart as $cart) {
                 $productId = $cart->attributes['product']['id'];
-                $addonIds  = array_map(function($addon) {
+                $addonIds = array_map(function ($addon) {
                     return $addon['id'];
                 }, $cart->attributes['addons']);
 
-                // Buat kunci unik berdasarkan ID produk dan ID addons
                 $uniqueKey = $productId . '-' . implode('-', $addonIds);
 
                 if (!isset($orderProducts[$uniqueKey])) {
                     $orderProducts[$uniqueKey] = [
-                        'id'                => $productId,
-                        'name'              => $cart->attributes['product']['name'],
-                        'cost_price'        => $cart->attributes['product']['cost_price'],
-                        'selling_price'     => $cart->attributes['product']['selling_price'],
-                        'is_discount'       => $cart->attributes['product']['is_discount'],
-                        'percent_discount'  => $cart->attributes['product']['percent_discount'],
-                        'price_discount'    => $cart->attributes['product']['price_discount'],
-                        'qty'               => (int) $cart->quantity,
-                        'addons'            => $cart->attributes['addons'],
+                        'id' => $productId,
+                        'name' => $cart->attributes['product']['name'],
+                        'cost_price' => $cart->attributes['product']['cost_price'],
+                        'selling_price' => $cart->attributes['product']['selling_price'],
+                        'is_discount' => $cart->attributes['product']['is_discount'],
+                        'percent_discount' => $cart->attributes['product']['percent_discount'],
+                        'price_discount' => $cart->attributes['product']['price_discount'],
+                        'qty' => (int) $cart->quantity,
+                        'addons' => $cart->attributes['addons'],
                     ];
                 } else {
                     $orderProducts[$uniqueKey]['qty'] += (int) $cart->quantity;
                 }
 
-                // Perbarui total kuantitas produk untuk pengecekan stok
                 if (!isset($stockCheck[$productId])) {
                     $stockCheck[$productId] = 0;
                 }
                 $stockCheck[$productId] += (int) $cart->quantity;
             }
 
-            // Pengecekan stok sebelum menyimpan ke tabel order_products
             foreach ($stockCheck as $productId => $totalQty) {
                 $product = Product::findOrFail($productId);
-                if ((int)$product->current_stock < $totalQty) {
+                if ((int) $product->current_stock < $totalQty) {
                     return redirect()->back()->with(['failed' => 'Stock product ' . $product->name . ' kurang - Stock tersisa ' . $product->current_stock]);
                 }
 
-                // Kurangi stok produk
                 $product->current_stock = (int) $product->current_stock - (int) $totalQty;
                 $product->save();
             }
 
-            // Simpan produk dan addons ke tabel order_products
             foreach ($orderProducts as $product) {
-                // Buat entri order_product
                 $orderProduct = OrderProduct::create([
-                    'order_id'          => $order->id,
-                    'name'              => $product['name'],
-                    'cost_price'        => $product['cost_price'],
-                    'selling_price'     => $product['selling_price'],
-                    'is_discount'       => $product['is_discount'],
-                    'percent_discount'  => $product['percent_discount'],
-                    'price_discount'    => $product['price_discount'],
-                    'qty'               => $product['qty'],
+                    'order_id' => $order->id,
+                    'name' => $product['name'],
+                    'cost_price' => $product['cost_price'],
+                    'selling_price' => $product['selling_price'],
+                    'is_discount' => $product['is_discount'],
+                    'percent_discount' => $product['percent_discount'],
+                    'price_discount' => $product['price_discount'],
+                    'qty' => $product['qty'],
                 ]);
 
-                // Simpan addons terkait ke tabel order_product_addons
                 foreach ($product['addons'] as $addon) {
                     $getAddon = Addon::findOrFail($addon['id']);
                     OrderProductAddon::create([
                         'order_product_id' => $orderProduct->id,
-                        'name'             => $getAddon->name,
-                        'price'            => $getAddon->price,
+                        'name' => $getAddon->name,
+                        'price' => $getAddon->price,
                     ]);
                 }
             }
 
-            // Jika semua operasi berhasil, lakukan commit
             DB::commit();
+            // Cart::session($sessionId)->clear();
 
-            // Hapus sesi keranjang setelah berhasil menyimpan data pesanan
-            Cart::session($sessionId)->clear();
-
-            return redirect($paymentRedirect);
+            return view('mobile.checkout.success')->with('success', 'Order Anda Telah Dibuat');
 
         } catch (\Throwable $th) {
-            //throw $th;
-            dd($th->getMessage());
             DB::rollBack();
             return redirect()->back()->with('failed', $th->getMessage());
         }
@@ -358,5 +360,13 @@ class TransactionController extends Controller
         $invoiceNumber = $formattedDate . '-' . $paddedOrderNumber;
 
         return $invoiceNumber;
+    }
+
+    public function pesanan(Request $request){
+        $decryptedTableName = Crypt::decryptString($request->kode_meja);
+        $data ['orders'] = Order::where('table',$decryptedTableName)->latest()->get()->first();
+        $data['order_products'] = OrderProduct::where('order_id',$data ['orders']->id)->get();
+
+        return view('mobile.checkout.success',$data);
     }
 }

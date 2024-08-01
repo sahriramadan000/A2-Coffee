@@ -2,7 +2,7 @@
 
 @section('content')
 <section id="cart-without-promocode">
-    <form action="{{ route('mobile.checkout', md5(strtotime("now"))) }}" method="POST" class="">
+    <form action="{{ route('mobile.checkout', ['token' => md5(strtotime("now")), 'kode_meja' => Request::get('kode_meja')]) }}" method="POST" class="">
         @csrf
         <div class="container">
             <h1 class="d-none">Cart Details</h1>
@@ -41,7 +41,7 @@
                                                 <img src="{{ asset('assets/svg/minus-icon.svg') }}" alt="minus-icon">
                                             </span>
                                         </a> --}}
-                                        <input name="quantity[]" type="text" class="product__input" value="{{ $dataCart->quantity }}">
+                                        <input readonly name="quantity[]" type="text" class="product__input" value="{{ $dataCart->quantity }}">
                                         {{-- <a href="javascript:void(0)" class="product__plus add">
                                             <span>
                                                 <img src="{{ asset('assets/svg/plus-icon.svg') }}" alt="plus-icon">
