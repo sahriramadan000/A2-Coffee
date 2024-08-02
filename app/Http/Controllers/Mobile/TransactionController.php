@@ -32,7 +32,7 @@ class TransactionController extends Controller
     }
 
     public function checkout(Request $request,$token){
-        $order = Order::where('token', $token)->where('payment_status_midtrans', 'paid')->latest()->first();
+        $order = Order::where('token', $token)->where('payment_status', 'Paid')->latest()->first();
         if ($order) {
             return redirect(route('mobile.homepage'))->with(['failed' => 'Order Failed!']);
         }
@@ -40,7 +40,7 @@ class TransactionController extends Controller
         if ($request->kode_meja == null) {
             return redirect(route('mobile.homepage'))->with(['failed' => 'Silahkan Scan Barcode Ulang!']);
         }
-        
+
         try {
             $sessionId = 'guest';
             $session_cart   = Cart::session($sessionId)->getContent();
@@ -92,18 +92,8 @@ class TransactionController extends Controller
 
     public function store(Request $request, $token)
     {
-        $order = Order::where('token', $token)->where('payment_status_midtrans', 'paid')->latest()->first();
-        if ($order) {
-            return redirect(route('mobile.homepage'))->with(['failed' => 'Order Failed!']);
-        }
-
         if ($request->table == null) {
             return redirect(route('mobile.homepage'))->with(['failed' => 'Silahkan Isi Meja Failed!']);
-        }
-
-        $checkUrl = Order::where('token', $token)->where('payment_status_midtrans', '!=', 'paid')->latest()->first();
-        if ($checkUrl) {
-            return redirect($checkUrl->midtrans_url);
         }
 
         if ($request->kode_meja == null) {
@@ -112,110 +102,23 @@ class TransactionController extends Controller
         DB::beginTransaction();
 
         $decryptedTableName = Crypt::decryptString($request->kode_meja);
-        $table = Table::where('name', $decryptedTableName)->first();
+        $table              = Table::where('name', $decryptedTableName)->first();
+        $sessionId          = 'guest';
+        $session_cart       = Cart::session($sessionId)->getContent();
+        $other_setting      = OtherSetting::first();
+        $subTotal           = Cart::session($sessionId)->getTotal();
         // ================ Create Data Order ==============================
         try {
-            $sessionId = 'guest';
-            $session_cart = Cart::session($sessionId)->getContent();
-
-            $other_setting = OtherSetting::first();
-            $subTotal = Cart::session($sessionId)->getTotal();
-            $service = $subTotal * $other_setting->layanan / 100;
-            $pb01 = ($subTotal + $service) * $other_setting->pb01 / 100;
-            $total_price = $subTotal + $service + $pb01;
-
-            $order = Order::create([
-                'no_invoice' => $this->generateInvoice(),
-                'payment_status' => 'Unpaid',
-                'payment_method' => 'Open Bill',
-                'table' => $table->name,
-                'total_qty' => array_sum($request->quantity),
-                'subtotal' => $subTotal,
-                'service' => $service,
-                'pb01' => $pb01,
-                'total' => $total_price,
-                'token' => $token,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-
-        // ================ Create Data Order ==============================
-
-        // ================ Update Table ==============================
-            $table->status_position = 'Close';
-            $table->save();
-        // ================ Update Table ==============================
-        
-            $orderProducts = [];
-            $stockCheck = [];
-
-            foreach ($session_cart as $cart) {
-                $productId = $cart->attributes['product']['id'];
-                $addonIds = array_map(function ($addon) {
-                    return $addon['id'];
-                }, $cart->attributes['addons']);
-
-                $uniqueKey = $productId . '-' . implode('-', $addonIds);
-
-                if (!isset($orderProducts[$uniqueKey])) {
-                    $orderProducts[$uniqueKey] = [
-                        'id' => $productId,
-                        'name' => $cart->attributes['product']['name'],
-                        'cost_price' => $cart->attributes['product']['cost_price'],
-                        'selling_price' => $cart->attributes['product']['selling_price'],
-                        'is_discount' => $cart->attributes['product']['is_discount'],
-                        'percent_discount' => $cart->attributes['product']['percent_discount'],
-                        'price_discount' => $cart->attributes['product']['price_discount'],
-                        'qty' => (int) $cart->quantity,
-                        'addons' => $cart->attributes['addons'],
-                    ];
-                } else {
-                    $orderProducts[$uniqueKey]['qty'] += (int) $cart->quantity;
-                }
-
-                if (!isset($stockCheck[$productId])) {
-                    $stockCheck[$productId] = 0;
-                }
-                $stockCheck[$productId] += (int) $cart->quantity;
-            }
-
-            foreach ($stockCheck as $productId => $totalQty) {
-                $product = Product::findOrFail($productId);
-                if ((int) $product->current_stock < $totalQty) {
-                    return redirect()->back()->with(['failed' => 'Stock product ' . $product->name . ' kurang - Stock tersisa ' . $product->current_stock]);
-                }
-
-                $product->current_stock = (int) $product->current_stock - (int) $totalQty;
-                $product->save();
-            }
-
-            foreach ($orderProducts as $product) {
-                $orderProduct = OrderProduct::create([
-                    'order_id' => $order->id,
-                    'name' => $product['name'],
-                    'cost_price' => $product['cost_price'],
-                    'selling_price' => $product['selling_price'],
-                    'is_discount' => $product['is_discount'],
-                    'percent_discount' => $product['percent_discount'],
-                    'price_discount' => $product['price_discount'],
-                    'qty' => $product['qty'],
-                ]);
-
-                foreach ($product['addons'] as $addon) {
-                    $getAddon = Addon::findOrFail($addon['id']);
-                    OrderProductAddon::create([
-                        'order_product_id' => $orderProduct->id,
-                        'name' => $getAddon->name,
-                        'price' => $getAddon->price,
-                    ]);
-                }
+            if ($table->status_position == 'Open') {
+                $this->updateOrder($session_cart, $other_setting, $subTotal, $table, $request, $token);
+            } else {
+                $this->newOrder($session_cart, $other_setting, $subTotal, $table, $request, $token);
             }
 
             DB::commit();
             // Cart::session($sessionId)->clear();
 
             return view('mobile.checkout.success')->with('success', 'Order Anda Telah Dibuat');
-
         } catch (\Throwable $th) {
             DB::rollBack();
             return redirect()->back()->with('failed', $th->getMessage());
@@ -368,5 +271,138 @@ class TransactionController extends Controller
         $data['order_products'] = OrderProduct::where('order_id',$data ['orders']->id)->get();
 
         return view('mobile.checkout.success',$data);
+    }
+
+    // ========================================================================================================================
+    // Void Function
+    // ========================================================================================================================
+    public function newOrder($session_cart, $other_setting, $subTotal, $table, $request, $token): void
+    {
+        $service = $subTotal * $other_setting->layanan / 100;
+        $pb01 = ($subTotal + $service) * $other_setting->pb01 / 100;
+        $total_price = $subTotal + $service + $pb01;
+
+        $order = Order::create([
+            'no_invoice' => $this->generateInvoice(),
+            'payment_status' => 'Unpaid',
+            'payment_method' => 'Open Bill',
+            'table' => $table->name,
+            'total_qty' => array_sum($request->quantity),
+            'subtotal' => $subTotal,
+            'service' => $service,
+            'pb01' => $pb01,
+            'total' => $total_price,
+            'token' => $token,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $table->status_position = 'Open';
+        $table->save();
+
+        $this->handleOrderProducts($session_cart, $order);
+    }
+
+    public function updateOrder($session_cart, $other_setting, $subTotal, $table, $request, $token): void
+    {
+        try {
+            $order = Order::where('table', $table->name)
+            ->where('payment_status', 'Unpaid')
+            ->firstOrFail();
+
+            $order->total_qty += array_sum($request->quantity);
+            $subtotal = $order->subtotal + $subTotal;
+            $service = $subtotal * $other_setting->layanan / 100;
+            $pb01 = ($subtotal + $service) * $other_setting->pb01 / 100;
+            $order->subtotal = $subtotal;
+            $order->service = $service;
+            $order->pb01 = $pb01;
+            $order->total = $subtotal + $service + $pb01;
+            $order->updated_at = now();
+            $order->save();
+
+            $this->handleOrderProducts($session_cart, $order);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            $this->newOrder($session_cart, $other_setting, $subTotal, $table, $request, $token);
+        }
+    }
+
+    private function handleOrderProducts($session_cart, $order): void
+    {
+        $orderProducts = [];
+        $stockCheck = [];
+
+        foreach ($session_cart as $cart) {
+            $productId = $cart->attributes['product']['id'];
+            $addonIds = array_map(function ($addon) {
+                return $addon['id'];
+            }, $cart->attributes['addons']);
+
+            $uniqueKey = $productId . '-' . implode('-', $addonIds);
+
+            if (!isset($orderProducts[$uniqueKey])) {
+                $orderProducts[$uniqueKey] = [
+                    'id' => $productId,
+                    'name' => $cart->attributes['product']['name'],
+                    'cost_price' => $cart->attributes['product']['cost_price'],
+                    'selling_price' => $cart->attributes['product']['selling_price'],
+                    'is_discount' => $cart->attributes['product']['is_discount'],
+                    'percent_discount' => $cart->attributes['product']['percent_discount'],
+                    'price_discount' => $cart->attributes['product']['price_discount'],
+                    'qty' => (int) $cart->quantity,
+                    'addons' => $cart->attributes['addons'],
+                ];
+            } else {
+                $orderProducts[$uniqueKey]['qty'] += (int) $cart->quantity;
+            }
+
+            if (!isset($stockCheck[$productId])) {
+                $stockCheck[$productId] = 0;
+            }
+            $stockCheck[$productId] += (int) $cart->quantity;
+        }
+
+        foreach ($stockCheck as $productId => $totalQty) {
+            $product = Product::findOrFail($productId);
+            if ((int) $product->current_stock < $totalQty) {
+                throw new \Exception('Stock product ' . $product->name . ' kurang - Stock tersisa ' . $product->current_stock);
+            }
+
+            $product->current_stock = (int) $product->current_stock - (int) $totalQty;
+            $product->save();
+        }
+
+        foreach ($orderProducts as $product) {
+            $sellingPrice = $product['selling_price'];
+
+            if ($product['is_discount']) {
+                if ($product['percent_discount'] != 0) {
+                    $discount = $sellingPrice * ($product['percent_discount'] / 100);
+                    $sellingPrice = $sellingPrice - $discount;
+                } elseif ($product['price_discount'] != 0) {
+                    $sellingPrice = $product['price_discount'];
+                }
+            }
+
+            $orderProduct = OrderProduct::create([
+                'order_id' => $order->id,
+                'name' => $product['name'],
+                'cost_price' => $product['cost_price'],
+                'selling_price' => $sellingPrice,
+                'is_discount' => $product['is_discount'],
+                'percent_discount' => $product['percent_discount'],
+                'price_discount' => $product['price_discount'],
+                'qty' => $product['qty'],
+            ]);
+
+            foreach ($product['addons'] as $addon) {
+                $getAddon = Addon::findOrFail($addon['id']);
+                OrderProductAddon::create([
+                    'order_product_id' => $orderProduct->id,
+                    'name' => $getAddon->name,
+                    'price' => $getAddon->price,
+                ]);
+            }
+        }
     }
 }

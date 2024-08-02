@@ -479,20 +479,28 @@ class TransactionController extends Controller
             $order = Order::where('id', $request->id)->first(); // Menggunakan first() untuk mengambil satu objek
             $orderProducts = OrderProduct::where('order_id', $order->id)->get();
 
-
             // Add data to cart
             foreach ($orderProducts as $orderProduct) {
-                $products = Product::where('name',$orderProduct->name)->first();
-                $orderAddOns = OrderProductAddon::where('order_product_id',$orderProduct->id)->first();
+                $products = Product::where('name', $orderProduct->name)->first();
+                $orderAddOns = OrderProductAddon::where('order_product_id', $orderProduct->id)->get();
+
+                // Calculate total price including addons
+                $totalPrice = $orderProduct->selling_price;
+                $addons = [];
+
+                foreach ($orderAddOns as $addon) {
+                    $totalPrice += $addon->price;
+                    $addons[] = $addon;
+                }
 
                 Cart::session(Auth::user()->id)->add([
                     'id' => $orderProduct->id,
                     'name' => $orderProduct->name,
-                    'price' => $orderProduct->selling_price,
+                    'price' => $totalPrice,
                     'quantity' => $orderProduct->qty,
                     'attributes' => [
                         'product' => $products,
-                        'addons' => $orderAddOns ?? [],
+                        'addons' => $addons,
                     ],
                 ]);
             }
@@ -502,10 +510,10 @@ class TransactionController extends Controller
             $orders->delete();
 
             // Set return data
-            $dataCart    = Cart::session(Auth::user()->id)->getContent();
-            $subtotal    = Cart::getTotal();
-            $service     = $subtotal * ($other_setting->layanan / 100);
-            $tax         = ($subtotal + $service) * ($other_setting->pb01 / 100);
+            $dataCart = Cart::session(Auth::user()->id)->getContent();
+            $subtotal = Cart::getTotal();
+            $service = $subtotal * ($other_setting->layanan / 100);
+            $tax = ($subtotal + $service) * ($other_setting->pb01 / 100);
             $total_price = ($subtotal + $service) + $tax;
 
             return response()->json([
@@ -521,6 +529,7 @@ class TransactionController extends Controller
             return response()->json(['error' => $th->getMessage()], 500);
         }
     }
+
 
 
      public function deleteOnholdOrder(Request $request)
@@ -671,7 +680,7 @@ class TransactionController extends Controller
                 ->get();
         } else {
             $date = $request->start_date;
-        
+
             $orders = Order::whereDate('created_at', $date)
                 ->orderBy('no_invoice', 'desc')
                 ->get();

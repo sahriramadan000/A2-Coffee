@@ -28,6 +28,7 @@
                     <th>Name</th>
                     <th>Status</th>
                     <th>Barcode</th>
+                    <th>Url</th>
                     <th class="no-content" width="10%">Action</th>
                 </tr>
             </thead>
@@ -62,7 +63,8 @@
                 {data: 'code', name:'code'},
                 {data: 'name', name:'name'},
                 {data: 'status', name:'status'},
-                {data: 'barcode', name:'barcode'},
+                {data: 'barcodes', name:'barcode'},
+                {data: 'barcode', name:'url'},
                 {data: 'action', name:'action'},
             ],
             "dom": "<'dt--top-section'<'row'<'col-12 col-sm-6 d-flex justify-content-sm-start justify-content-center'l><'col-sm-12 col-md-6 d-flex justify-content-md-end justify-content-center mt-md-0 mt-3'f<'toolbar align-self-center'>>>>" +

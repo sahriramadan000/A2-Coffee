@@ -20,7 +20,7 @@
 <nav class="breadcrumb-style-one" aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
-        <li class="breadcrumb-item active" aria-current="page">A2 Coffee 7 Eatry</li>
+        <li class="breadcrumb-item active" aria-current="page">A2 Coffee & Eatry</li>
     </ol>
 </nav>
 @endsection
@@ -81,7 +81,6 @@
 </div>
 
 @endsection
-<<<<<<< HEAD
 @push('js')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js" integrity="sha512-T/tUfKSV1bihCnd+MxKD0Hm1uBBroVYBOYSk1knyvQ9VyZJpc/ALb4P0r6ubwVPSGB2GvjeoMAJJImBG12TiaQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -212,26 +211,5 @@
             $('#datepicker-month-area').addClass('hilang');
         }
     })
-=======
-
-@push('js')
-<script>
-    function syncData() {
-        $.ajax({
-            url: `http://localhost:3000/sync-data`,
-            type: 'POST',
-            data: {
-                _token: `{{ csrf_token() }}`,
-            },
-            success: function(data) {
-                alert('Check In successful');
-            },
-            error: function(xhr, status, error) {
-                console.error('Failed to Check In: ', error);
-                alert('Failed to Check In');
-            }
-        });
-    }
->>>>>>> 00d07d110ffd2f1bd11e10c384c13c4ae518e347
 </script>
 @endpush

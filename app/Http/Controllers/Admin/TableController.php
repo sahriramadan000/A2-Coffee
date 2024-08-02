@@ -35,7 +35,7 @@ class TableController extends Controller
         if ($request->ajax()) {
             return DataTables::of(Table::query())
                 ->addIndexColumn()
-                ->addColumn('barcode', function ($row) {
+                ->addColumn('barcodes', function ($row) {
                     $barcodeURL = 'data:image/png;base64,' . DNS2D::getBarcodePNG($row->barcode, 'QRCODE');
                     return '<a download="barcode-' . strtolower(str_replace(' ', '', $row->name)) . '.jpg" class="btn btn-primary p-2 f-12" href="' . $barcodeURL . '" title="ImageName">DOWNLOAD</a>';
                 })
@@ -80,8 +80,9 @@ class TableController extends Controller
         $encryptedName = Crypt::encryptString($dataTable['name']);
 
         // Generate the barcode URL with the encrypted name
-        $barcode = 'https://a2coffee.jooal.pro/mobile/homepage?kode_meja=' . urlencode($encryptedName);
-        
+        $barcode = 'http://a2-coffee.test/mobile/homepage?kode_meja=' . urlencode($encryptedName);
+        // $barcode = 'https://a2coffee.jooal.pro/mobile/homepage?kode_meja=' . urlencode($encryptedName);
+
         try {
             $table = new Table();
             $table->code                = $dataTable['code'];
@@ -117,7 +118,8 @@ class TableController extends Controller
          $encryptedName = Crypt::encryptString($dataTable['name']);
 
          // Generate the barcode URL with the encrypted name
-         $barcode = 'https://a2coffee.jooal.pro/mobile/homepage?kode_meja=' . urlencode($encryptedName);
+         $barcode = 'http://a2-coffee.test/mobile/homepage?kode_meja=' . urlencode($encryptedName);
+        //  $barcode = 'https://a2coffee.jooal.pro/mobile/homepage?kode_meja=' . urlencode($encryptedName);
         try {
             $table = Table::find($tableId);
 
