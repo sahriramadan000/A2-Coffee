@@ -192,9 +192,12 @@
                                                     <a href="{{ route('print-customer',$item->id) }}" target="_blank" type="submit" class="btn btn-sm  w-100 btn-primary">Print</a>
                                                 </div>
 
+                                                @if ($item->payment_status != 'Paid')
+                                                    
                                                 <div class="col-lg-4 mt-4">
                                                     <button type="button" class="btn btn-sm w-100 btn-secondary" data-bs-toggle="modal" data-bs-target="#exampleModal-{{ $item->id }}">Update Payment</button>
                                                 </div>
+                                                @endif
                                                 
                                                 <div class="modal fade" id="exampleModal-{{ $item->id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                                     <div class="modal-dialog" role="document">
