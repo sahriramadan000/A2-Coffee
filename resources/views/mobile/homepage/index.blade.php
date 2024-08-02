@@ -312,7 +312,5 @@
                 }
             });
         }
-
-
     </script>
 @endpush

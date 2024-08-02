@@ -12,13 +12,13 @@
                     <h1>Payment Successful!</h1>
                     <p>Your payment has been processed successfully.</p>
                     <div class="success-track-btn">
-                        <a href="{{ route('mobile.homepage') }}">Go Home</a>
+                        <a href="{{ route('mobile.homepage', ['kode_meja' => Request::get('kode_meja')]) }}">Go Home</a>
                     </div>
                 </div>
             </div>
         </div>
-    </div>	
-    <div class="container">
+    </div>
+    {{-- <div class="container">
         @forelse ($order_products as $orderProduct)
             <div class="container">
                 <h1 class="d-none">Checkout</h1>
@@ -92,7 +92,7 @@
                 <button type="submit">Confirm Order</button>
             </div>
         </div>
-    </div>
+    </div> --}}
 </section>
 
 @endsection
