@@ -35,7 +35,7 @@ class TableController extends Controller
         if ($request->ajax()) {
             return DataTables::of(Table::query())
                 ->addIndexColumn()
-                ->addColumn('barcodes', function ($row) {
+                ->addColumn('barcode', function ($row) {
                     $barcodeURL = 'data:image/png;base64,' . DNS2D::getBarcodePNG($row->barcode, 'QRCODE');
                     return '<a download="barcode-' . strtolower(str_replace(' ', '', $row->name)) . '.jpg" class="btn btn-primary p-2 f-12" href="' . $barcodeURL . '" title="ImageName">DOWNLOAD</a>';
                 })
