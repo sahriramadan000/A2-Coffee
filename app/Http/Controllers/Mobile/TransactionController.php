@@ -116,7 +116,7 @@ class TransactionController extends Controller
             }
 
             DB::commit();
-            // Cart::session($sessionId)->clear();
+            Cart::session($sessionId)->clear();
 
             return view('mobile.checkout.success')->with('success', 'Order Anda Telah Dibuat');
         } catch (\Throwable $th) {
