@@ -80,8 +80,8 @@ class TableController extends Controller
         $encryptedName = Crypt::encryptString($dataTable['name']);
 
         // Generate the barcode URL with the encrypted name
-        $barcode = 'http://a2-coffee.test/mobile/homepage?kode_meja=' . urlencode($encryptedName);
-        // $barcode = 'https://a2coffee.jooal.pro/mobile/homepage?kode_meja=' . urlencode($encryptedName);
+        // $barcode = 'http://a2-coffee.test/mobile/homepage?kode_meja=' . urlencode($encryptedName);
+        $barcode = 'https://a2coffee.jooal.pro/mobile/homepage?kode_meja=' . urlencode($encryptedName);
 
         try {
             $table = new Table();
@@ -118,8 +118,8 @@ class TableController extends Controller
          $encryptedName = Crypt::encryptString($dataTable['name']);
 
          // Generate the barcode URL with the encrypted name
-         $barcode = 'http://a2-coffee.test/mobile/homepage?kode_meja=' . urlencode($encryptedName);
-        //  $barcode = 'https://a2coffee.jooal.pro/mobile/homepage?kode_meja=' . urlencode($encryptedName);
+        //  $barcode = 'http://a2-coffee.test/mobile/homepage?kode_meja=' . urlencode($encryptedName);
+         $barcode = 'https://a2coffee.jooal.pro/mobile/homepage?kode_meja=' . urlencode($encryptedName);
         try {
             $table = Table::find($tableId);
 
