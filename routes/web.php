@@ -232,6 +232,9 @@ Route::middleware(['auth'])->group(function () {
     // Pesanan
     Route::get('/order-pesanan', [TransactionController::class, 'orderPesanan'])->name('order-pesanan');
 
+    // Update Payment
+    Route::patch('/update-payment/{id}', [TransactionController::class, 'updatePayment'])->name('update-payment');
+
     // Print
     Route::get('/print-customer/{id}', [TransactionController::class, 'printCustomer'])->name('print-customer');
 

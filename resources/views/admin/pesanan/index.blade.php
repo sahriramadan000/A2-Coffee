@@ -191,6 +191,48 @@
                                                 <div class="col-lg-4">
                                                     <a href="{{ route('print-customer',$item->id) }}" target="_blank" type="submit" class="btn btn-sm  w-100 btn-primary">Print</a>
                                                 </div>
+
+                                                <div class="col-lg-4 mt-4">
+                                                    <button type="button" class="btn btn-sm w-100 btn-secondary" data-bs-toggle="modal" data-bs-target="#exampleModal-{{ $item->id }}">Update Payment</button>
+                                                </div>
+                                                
+                                                <div class="modal fade" id="exampleModal-{{ $item->id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                    <div class="modal-dialog" role="document">
+                                                        <form action="{{ route('update-payment', $item->id) }}" method="POST">
+                                                            @method('patch')
+                                                            @csrf
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                    <h5 class="modal-title" id="exampleModalLabel">Apakah Anda Yakin Ingin Menyelesaikan Pembayaran</h5>
+                                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                                                                        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                                                    </button>
+                                                                </div>
+                                                                <div class="modal-body">
+                                                                    <div class="form-group">
+                                                                        <h6 class="mb-3">Metode Payment</h6>
+                                                                        <select name="payment_method" class="form-control form-control-sm payment-method" data-modal-id="{{ $item->id }}">
+                                                                            <option selected value="Transfer Bank">Transfer Bank</option>
+                                                                            <option value="EDC BCA">EDC BCA</option>
+                                                                            <option value="EDC BRI">EDC BRI</option>
+                                                                            <option value="EDC BNI">EDC BNI</option>
+                                                                            <option value="Qris">Qris</option>
+                                                                            <option value="Cash">Cash</option>
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="form-group mt-2 cash-input" id="cashInput-{{ $item->id }}" style="display: none;">
+                                                                        <label for="cash" class="form-label">Cash</label>
+                                                                        <input type="text" name="cash" value="{{ old('cash') }}" class="form-control form-control-sm" placeholder="Ex:50.000" id="cash" aria-describedby="cash">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="submit" class="btn btn-primary">Save</button>
+                                                                </div>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                                
                                             </div>
                                         </li>
                                     </ul>
@@ -207,6 +249,29 @@
 @endsection
 
 @push('js')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.payment-method').forEach(selectInput => {
+            const modalId = selectInput.getAttribute('data-modal-id');
+            const cashInput = document.getElementById(`cashInput-${modalId}`);
+
+            function handleCashInputDisplay() {
+                if (selectInput.value === 'Cash') {
+                    cashInput.style.display = 'block';
+                } else {
+                    cashInput.style.display = 'none';
+                }
+            }
+
+            // Set initial state
+            handleCashInputDisplay();
+
+            // Add change event listener
+            selectInput.addEventListener('change', handleCashInputDisplay);
+        });
+    });
+</script>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js" integrity="sha512-T/tUfKSV1bihCnd+MxKD0Hm1uBBroVYBOYSk1knyvQ9VyZJpc/ALb4P0r6ubwVPSGB2GvjeoMAJJImBG12TiaQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 <script>

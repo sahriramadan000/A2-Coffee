@@ -13,6 +13,7 @@ use App\Models\OrderProductAddon;
 use App\Models\OtherSetting;
 use App\Models\Product;
 use App\Models\ProductTag;
+use App\Models\Table;
 use App\Models\Tag;
 use App\Models\User;
 use Carbon\Carbon;
@@ -702,5 +703,37 @@ class TransactionController extends Controller
         $elapsedTime = $created->diffForHumans($now);
 
         return $elapsedTime;
+    }
+
+    public function updatePayment(Request $request, $id) {
+        try {
+            $order = Order::findOrFail($id);
+            $order->payment_status = 'Paid';
+            $order->payment_method = $request->payment_method;
+            $order->cash = $request->cash ?? 0;
+            
+            if ($request->payment_method == 'Cash' && $request->cash != null) {
+                $kembalian = $order->total - $request->cash ;
+            } 
+            $order->kembalian = $request->kembalian ?? 0;
+            
+            $order->save();
+    
+            $table = Table::where('name', $order->table)->first(); // Assuming 'table_name' is the correct field
+
+            if ($table) {
+                $table->status_position = 'none';
+                $table->save();
+            }
+
+            if ($request->cash) {
+                return redirect()->back()->with('success','Uang Yang Di kembalikan '. $kembalian);
+            }else{
+                return redirect()->back()->with('success', 'Update Return');
+            }
+        } catch (\Throwable $th) {
+            // dd($th);
+            return response()->json(['failed' => true, 'message' => $th->getMessage()]);
+        }
     }
 }
