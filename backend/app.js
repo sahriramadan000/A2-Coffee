@@ -63,7 +63,7 @@ setInterval(() => {
 const promisifiedLocalQuery = util.promisify(localPool.query).bind(localPool);
 const promisifiedCloudQuery = util.promisify(cloudPool.query).bind(cloudPool);
 
-const syncOrdersForToday = async () => {
+const syncLocalToCloud = async () => {
     try {
       const today = moment().format('YYYY-MM-DD');
 
@@ -82,7 +82,7 @@ const syncOrdersForToday = async () => {
         const insertQuery = `INSERT INTO orders (${keys.join(', ')}) VALUES (${placeholders})`;
         await promisifiedCloudQuery(insertQuery, values);
       }
-      console.log('Table orders synchronized successfully.');
+      console.log('Table orders synchronized successfully from local to cloud.');
 
       // Sinkronkan tabel order_products
       const localOrderProducts = await promisifiedLocalQuery(`SELECT * FROM order_products WHERE created_at::date = $1`, [today]);
@@ -99,7 +99,7 @@ const syncOrdersForToday = async () => {
         const insertQuery = `INSERT INTO order_products (${keys.join(', ')}) VALUES (${placeholders})`;
         await promisifiedCloudQuery(insertQuery, values);
       }
-      console.log('Table order_products synchronized successfully.');
+      console.log('Table order_products synchronized successfully from local to cloud.');
 
       // Sinkronkan tabel order_product_addons
       const localOrderProductAddons = await promisifiedLocalQuery(`SELECT * FROM order_product_addons WHERE created_at::date = $1`, [today]);
@@ -116,7 +116,7 @@ const syncOrdersForToday = async () => {
         const insertQuery = `INSERT INTO order_product_addons (${keys.join(', ')}) VALUES (${placeholders})`;
         await promisifiedCloudQuery(insertQuery, values);
       }
-      console.log('Table order_product_addons synchronized successfully.');
+      console.log('Table order_product_addons synchronized successfully from local to cloud.');
 
       // Sinkronkan tabel order_coupons
       const localOrderCoupons = await promisifiedLocalQuery(`SELECT * FROM order_coupons WHERE created_at::date = $1`, [today]);
@@ -133,22 +133,89 @@ const syncOrdersForToday = async () => {
         const insertQuery = `INSERT INTO order_coupons (${keys.join(', ')}) VALUES (${placeholders})`;
         await promisifiedCloudQuery(insertQuery, values);
       }
-      console.log('Table order_coupons synchronized successfully.');
+      console.log('Table order_coupons synchronized successfully from local to cloud.');
 
     } catch (err) {
-      console.error('Error synchronizing tables:', err);
+      console.error('Error synchronizing tables from local to cloud:', err);
     }
-  };
+};
 
-app.post('/sync-data', async (req, res) => {
+const syncCloudToLocal = async () => {
     try {
-      await syncOrdersForToday();
-      console.log('test');
-      res.status(200).send('All related tables for today synchronized successfully.');
+      const today = moment().format('YYYY-MM-DD');
+
+      // Sinkronkan tabel orders terlebih dahulu
+      const cloudOrders = await promisifiedCloudQuery(`SELECT * FROM orders WHERE created_at::date = $1`, [today]);
+
+      const localOrders = await promisifiedLocalQuery(`SELECT 1 FROM orders WHERE created_at::date = $1 LIMIT 1`, [today]);
+      if (localOrders.rows.length > 0) {
+        await promisifiedLocalQuery(`DELETE FROM orders WHERE created_at::date = $1`, [today]);
+      }
+
+      for (const order of cloudOrders.rows) {
+        const keys = Object.keys(order).map(key => key === 'table' ? '"table"' : key);
+        const values = Object.values(order);
+        const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
+        const insertQuery = `INSERT INTO orders (${keys.join(', ')}) VALUES (${placeholders})`;
+        await promisifiedLocalQuery(insertQuery, values);
+      }
+      console.log('Table orders synchronized successfully from cloud to local.');
+
+      // Sinkronkan tabel order_products
+      const cloudOrderProducts = await promisifiedCloudQuery(`SELECT * FROM order_products WHERE created_at::date = $1`, [today]);
+
+      const localOrderProducts = await promisifiedLocalQuery(`SELECT 1 FROM order_products WHERE created_at::date = $1 LIMIT 1`, [today]);
+      if (localOrderProducts.rows.length > 0) {
+        await promisifiedLocalQuery(`DELETE FROM order_products WHERE created_at::date = $1`, [today]);
+      }
+
+      for (const orderProduct of cloudOrderProducts.rows) {
+        const keys = Object.keys(orderProduct).map(key => key === 'table' ? '"table"' : key);
+        const values = Object.values(orderProduct);
+        const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
+        const insertQuery = `INSERT INTO order_products (${keys.join(', ')}) VALUES (${placeholders})`;
+        await promisifiedLocalQuery(insertQuery, values);
+      }
+      console.log('Table order_products synchronized successfully from cloud to local.');
+
+      // Sinkronkan tabel order_product_addons
+      const cloudOrderProductAddons = await promisifiedCloudQuery(`SELECT * FROM order_product_addons WHERE created_at::date = $1`, [today]);
+
+      const localOrderProductAddons = await promisifiedLocalQuery(`SELECT 1 FROM order_product_addons WHERE created_at::date = $1 LIMIT 1`, [today]);
+      if (localOrderProductAddons.rows.length > 0) {
+        await promisifiedLocalQuery(`DELETE FROM order_product_addons WHERE created_at::date = $1`, [today]);
+      }
+
+      for (const orderProductAddon of cloudOrderProductAddons.rows) {
+        const keys = Object.keys(orderProductAddon).map(key => key === 'table' ? '"table"' : key);
+        const values = Object.values(orderProductAddon);
+        const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
+        const insertQuery = `INSERT INTO order_product_addons (${keys.join(', ')}) VALUES (${placeholders})`;
+        await promisifiedLocalQuery(insertQuery, values);
+      }
+      console.log('Table order_product_addons synchronized successfully from cloud to local.');
+
+      // Sinkronkan tabel order_coupons
+      const cloudOrderCoupons = await promisifiedCloudQuery(`SELECT * FROM order_coupons WHERE created_at::date = $1`, [today]);
+
+      const localOrderCoupons = await promisifiedLocalQuery(`SELECT 1 FROM order_coupons WHERE created_at::date = $1 LIMIT 1`, [today]);
+      if (localOrderCoupons.rows.length > 0) {
+        await promisifiedLocalQuery(`DELETE FROM order_coupons WHERE created_at::date = $1`, [today]);
+      }
+
+      for (const orderCoupon of cloudOrderCoupons.rows) {
+        const keys = Object.keys(orderCoupon).map(key => key === 'table' ? '"table"' : key);
+        const values = Object.values(orderCoupon);
+        const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
+        const insertQuery = `INSERT INTO order_coupons (${keys.join(', ')}) VALUES (${placeholders})`;
+        await promisifiedLocalQuery(insertQuery, values);
+      }
+      console.log('Table order_coupons synchronized successfully from cloud to local.');
+
     } catch (err) {
-      res.status(500).send('Error synchronizing related tables.');
+      console.error('Error synchronizing tables from cloud to local:', err);
     }
-  });
+};
 
 async function RealtimeDashboardOrder() {
   // Mendapatkan tanggal saat ini dalam format YYYY-MM-DD
@@ -162,7 +229,7 @@ async function RealtimeDashboardOrder() {
   AND status_realtime = 'new'
   ORDER BY created_at ASC`;
 
-  const [result1] = await Promise.all([promisifiedLocalQuery    (query1)]);
+  const [result1] = await Promise.all([promisifiedLocalQuery(query1)]);
 
   const orderFromSql1 = result1.rows;
 
@@ -191,50 +258,23 @@ async function RealtimeDashboardOrder() {
   }
 }
 
-function compareDatesWithNow(dbDate) {
-  const currentDate = new Date();
-  const dbDateObj = new Date(dbDate);
-  currentDate.setHours(0, 0, 0, 0);
-  dbDateObj.setHours(0, 0, 0, 0);
-  return currentDate.getTime() === dbDateObj.getTime();
-}
+app.post('/sync-local-to-cloud', async (req, res) => {
+    try {
+      await syncLocalToCloud();
+      res.status(200).send('All related tables for today synchronized successfully from local to cloud.');
+    } catch (err) {
+      res.status(500).send('Error synchronizing related tables from local to cloud.');
+    }
+});
 
-function checkTimeRange(timeFromDB, timeToDB) {
-  const currentTime = new Date();
-  const timeFromParts = timeFromDB.split(':');
-  const timeToParts = timeToDB.split(':');
-  const timeFrom = new Date();
-  timeFrom.setHours(parseInt(timeFromParts[0]));
-  timeFrom.setMinutes(parseInt(timeFromParts[1]));
-  const timeTo = new Date();
-  timeTo.setHours(parseInt(timeToParts[0]));
-  timeTo.setMinutes(parseInt(timeToParts[1]));
-  return !isNaN(timeFrom.getTime()) && !isNaN(timeTo.getTime()) && currentTime >= timeFrom && currentTime <= timeTo;
-}
-
-function isWithinTimeRange(timeToDB) {
-  const currentTime = new Date();
-  const timeToParts = timeToDB.split(':');
-  const targetTime = new Date();
-  targetTime.setHours(parseInt(timeToParts[0]));
-  targetTime.setMinutes(parseInt(timeToParts[1]));
-  const fifteenMinutesBeforeTarget = new Date(targetTime.getTime() - 15 * 60000);
-  return !isNaN(targetTime.getTime()) && currentTime >= fifteenMinutesBeforeTarget && currentTime <= targetTime;
-}
-
-function lastTime(timeToDB) {
-  const currentTime = new Date();
-  const timeToParts = timeToDB.split(':');
-  const targetTime = new Date();
-  targetTime.setHours(parseInt(timeToParts[0]));
-  targetTime.setMinutes(parseInt(timeToParts[1]));
-
-  return (
-    !isNaN(targetTime.getTime()) &&
-    currentTime.getHours() === targetTime.getHours() &&
-    currentTime.getMinutes() === targetTime.getMinutes()
-  );
-}
+app.post('/sync-cloud-to-local', async (req, res) => {
+    try {
+      await syncCloudToLocal();
+      res.status(200).send('All related tables for today synchronized successfully from cloud to local.');
+    } catch (err) {
+      res.status(500).send('Error synchronizing related tables from cloud to local.');
+    }
+});
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
