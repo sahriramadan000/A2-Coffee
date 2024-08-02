@@ -18,7 +18,7 @@
             </div>
         </div>
     </div>
-    <div class="container">
+    {{-- <div class="container">
         @forelse ($order_products as $orderProduct)
             <div class="container">
                 <h1 class="d-none">Checkout</h1>
@@ -92,7 +92,7 @@
                 <button type="submit">Confirm Order</button>
             </div>
         </div>
-    </div>
+    </div> --}}
 </section>
 
 @endsection
