@@ -76,14 +76,14 @@
                                         <div class="">
                                             <p class="mb-1" style="font-size:14px;"><span class="fw-medium">Customer:</span> {{ $order_paid->customer_name ?? '-' }}</p>
                                             <p class="mb-1" style="font-size:14px;"><span class="fw-medium">Date:</span> {{ date('d-m-Y H:i', strtotime($order_paid->created_at)) }}</p>
-                                            <div class="btn-group mt-2" role="group" aria-label="Basic example">
+                                            {{-- <div class="btn-group mt-2" role="group" aria-label="Basic example">
                                                 <a href="{{ route('print-customer',$order_paid->id) }}" class="btn py-1 px-2 m-0 btn-warning" type="button">
                                                     <small class="text-white">Print</small>
                                                 </a>
                                                 <a href="{{ route('print-struk',$order_paid->id) }}" class="btn py-1 px-2 m-0 btn-danger" type="button">
                                                     <small class="text-white">Print Struk</small>
                                                 </a>
-                                            </div>
+                                            </div> --}}
                                         </div>
                                     </div>
                                 </div>
