@@ -48,14 +48,14 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right"><polyline points="9 18 15 12 9 6"></polyline></svg>
                     </div>
                 </a>
-                <ul class="collapse submenu list-unstyled {{ request()->routeIs('dashboard') ? 'show' : '' }}" id="dashboard" data-bs-parent="#accordionExample">
+                {{-- <ul class="collapse submenu list-unstyled {{ request()->routeIs('dashboard') ? 'show' : '' }}" id="dashboard" data-bs-parent="#accordionExample">
                     <li class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
                         <a href="{{ route('dashboard') }}"> Analytics </a>
                     </li>
                     <li>
                         <a href="#!"> Sales </a>
                     </li>
-                </ul>
+                </ul> --}}
             </li>
 
             <li class="menu {{ (request()->routeIs('suppliers.index') || request()->routeIs('materials.index')) ? 'active' : '' }}">
