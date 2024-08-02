@@ -319,6 +319,7 @@ class TransactionController extends Controller
             $order->pb01 = $pb01;
             $order->total = $subtotal + $service + $pb01;
             $order->updated_at = now();
+            $order->status_realtime = 'new';
             $order->save();
 
             $this->handleOrderProducts($session_cart, $order);
