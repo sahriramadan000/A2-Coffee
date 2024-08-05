@@ -3,10 +3,8 @@
 @push('style-link')
 <link href="{{ asset('src/assets/css/light/components/modal.css') }}" rel="stylesheet" type="text/css" />
 <link href="{{ asset('src/assets/css/light/components/tabs.css') }}" rel="stylesheet" type="text/css">
-
 <link href="{{ asset('src/assets/css/dark/components/modal.css') }}" rel="stylesheet" type="text/css" />
 <link href="{{ asset('src/assets/css/dark/components/tabs.css') }}" rel="stylesheet" type="text/css">
-
 <link href="{{ asset('src/assets/css/light/dashboard/dash_1.css') }}" rel="stylesheet" type="text/css" />
 <link href="{{ asset('src/assets/css/dark/dashboard/dash_1.css') }}" rel="stylesheet" type="text/css" />
 
@@ -26,11 +24,10 @@
 @endsection
 
 @section('content')
-<div class="col-xl-12 col-lg-12 col-sm-12  layout-spacing">
+<div class="col-xl-12 col-lg-12 col-sm-12 layout-spacing">
     @include('admin.components.alert')
     <div class="widget widget-card-one">
         <div class="widget-content">
-
             <div class="media">
                 <div class="w-img">
                     <img src="../src/assets/img/profile-19.jpeg" alt="avatar">
@@ -38,8 +35,7 @@
                 <div class="media-body d-flex justify-content-between align-items-center ms-2">
                     <div class="">
                         <h5 class="fw-bold mb-0 pb-0">{{ Auth::user()->fullname }}</h5>
-                        <p class="meta-date-time">{{ str_replace(['-', '_'], ' ',Auth::user()->getRoleNames()[0]) }}</p>
-
+                        <p class="meta-date-time">{{ str_replace(['-', '_'], ' ', Auth::user()->getRoleNames()[0]) }}</p>
                         <ul class="list-group mt-3">
                             <li class="list-group-item bg-transparent border-0 p-0">
                                 <div class="d-flex justify-content-center align-items-center">
@@ -64,12 +60,12 @@
                         </ul>
                     </div>
                     <div class="">
-                        <button class="btn btn-success btn-custom" id="attendanceButton">Check In</button>
+                        <button class="btn btn-success btn-custom attendances-add" data-bs-target="#passwordModal">Absensi</button>
                     </div>
                 </div>
             </div>
 
-            <div class="col-xl-12 col-lg-12 col-sm-12  layout-spacing bg-transparent">
+            <div class="col-xl-12 col-lg-12 col-sm-12 layout-spacing bg-transparent">
                 @include('admin.components.alert')
                 <div class="widget-content widget-content-area br-8 border-0" style="background: transparent !important; box-shadow:none;">
                     <table id="attendances-table" class="table dt-table-hover" style="width:100%">
@@ -96,78 +92,49 @@
 @push('js')
 <script>
     $(document).ready(function() {
-        let attendanceData = null;
-
-        $.ajax({
-            url: `{{ route('attendances.check') }}`,
-            type: 'GET',
-            success: function(data) {
-                if (data.code == 404) {
-                    $('#attendanceButton')
-                        .removeClass('btn-danger')
-                        .addClass('btn-success')
-                        .text('Check In')
-                        .off('click')
-                        .on('click', function() {
-                            postCheckIn();
-                        });
-                } else if (data.code == 200 && data.data.check_out == null && data.data.check_in) {
-                    attendanceData = data.data;
-                    $('#attendanceButton')
-                        .removeClass('btn-success')
-                        .addClass('btn-danger')
-                        .text('Check Out')
-                        .off('click')
-                        .on('click', function() {
-                            postCheckOut(attendanceData.id);
-                        });
-                } else {
-                    $('#attendanceButton')
-                        .removeClass('btn-danger')
-                        .addClass('btn-success')
-                        .addClass('disabled')
-                        .text('Check In');
+        function absensi(password) {
+            Swal.fire({
+                title: 'Processing',
+                text: 'Please wait...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
                 }
-            },
-            error: function(xhr, status, error) {
-                console.error('Failed to absensi: ', error);
-            }
-        });
+            });
 
-        function postCheckIn() {
             $.ajax({
                 url: `{{ route('attendances.store') }}`,
                 type: 'POST',
                 data: {
                     _token: `{{ csrf_token() }}`,
+                    password: password,
                     check_in: getIndonesiaTime(),
                 },
                 success: function(data) {
-                    alert('Check In successful');
-                    location.reload(); // Reload the page to refresh the button state
+                    Swal.close();
+                    if (data.code === 200) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: data.message,
+                        }).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: data.message,
+                        });
+                    }
                 },
                 error: function(xhr, status, error) {
+                    Swal.close();
                     console.error('Failed to Check In: ', error);
-                    alert('Failed to Check In');
-                }
-            });
-        }
-
-        function postCheckOut(attendanceId) {
-            $.ajax({
-                url: `{{ route('attendances.update', '') }}/${attendanceId}`,
-                type: 'PUT',
-                data: {
-                    _token: `{{ csrf_token() }}`,
-                    check_out: getIndonesiaTime(),
-                },
-                success: function(data) {
-                    alert('Check Out successful');
-                    location.reload(); // Reload the page to refresh the button state
-                },
-                error: function(xhr, status, error) {
-                    console.error('Failed to Check Out: ', error);
-                    alert('Failed to Check Out');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Failed to Check In',
+                        text: 'An error occurred while trying to check in. Please try again.',
+                    });
                 }
             });
         }
@@ -198,9 +165,9 @@
         // getData
         $('#attendances-table').DataTable({
             processing: true,
-            serverSide:true,
+            serverSide: true,
             ajax: {
-            url: "{{ route('attendances.get-data') }}",
+                url: "{{ route('attendances.get-data') }}",
                 error: function(xhr, textStatus, errorThrown) {
                     $('#attendances-table').DataTable().clear().draw(); // Bersihkan tabel
                     console.log(xhr.responseText); // Tampilkan pesan kesalahan di konsol browser
@@ -209,13 +176,13 @@
             },
             columns: [
                 {
-                        "data": 'DT_RowIndex',
-                        orderable: false,
-                        searchable: false
+                    "data": 'DT_RowIndex',
+                    orderable: false,
+                    searchable: false
                 },
-                {data: 'date', name:'date'},
-                {data: 'check_in', name:'check_in'},
-                {data: 'check_out', name:'check_out'},
+                { data: 'date', name: 'date' },
+                { data: 'check_in', name: 'check_in' },
+                { data: 'check_out', name: 'check_out' },
                 {
                     data: 'status',
                     render: function(data) {
@@ -228,14 +195,14 @@
                 },
             ],
             "dom": "<'dt--top-section'<'row'<'col-12 col-sm-6 d-flex justify-content-sm-start justify-content-center'l><'col-sm-12 col-md-6 d-flex justify-content-md-end justify-content-center mt-md-0 mt-3'f<'toolbar align-self-center'>>>>" +
-            "<'table-responsive'tr>" +
-            "<'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pages-count  mb-sm-0 mb-3'i><'dt--pagination'p>>",
+                "<'table-responsive'tr>" +
+                "<'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pages-count  mb-sm-0 mb-3'i><'dt--pagination'p>>",
             "oLanguage": {
                 "oPaginate": { "sPrevious": '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>', "sNext": '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>' },
                 "sInfo": "Showing page _PAGE_ of _PAGES_",
                 "sSearch": '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>',
                 "sSearchPlaceholder": "Search...",
-            "sLengthMenu": "Results :  _MENU_",
+                "sLengthMenu": "Results :  _MENU_",
             },
             "stripeClasses": [],
             "lengthMenu": [10, 20, 50],
@@ -249,6 +216,21 @@
             $.get("{{ route('attendances.modal-add') }}", function(data) {
                 $('#modalContainer').html(data);
                 $(`${getTarget}`).modal('show');
+                $(`${getTarget}`).on('shown.bs.modal', function () {
+                    $('#passwordForm').on('submit', function(event) {
+                        event.preventDefault();
+                        const password = $('#password').val();
+                        if (password) {
+                            absensi(password);
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Silahkan masukan password akun anda.',
+                            });
+                        }
+                    });
+                });
             });
         });
     });

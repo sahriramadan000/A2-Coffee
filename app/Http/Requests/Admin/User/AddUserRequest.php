@@ -32,6 +32,7 @@ class AddUserRequest extends FormRequest
             'avatar'    => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'phone'     => 'nullable|string|regex:/^[0-9]{10,15}$/',
             'address'   => 'nullable|string',
+            'role_id'       => 'required|exists:roles,id',
         ];
     }
 

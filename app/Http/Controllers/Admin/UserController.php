@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\View;
 use Yajra\DataTables\Facades\DataTables;
 use Intervention\Image\Facades\Image;
+use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
@@ -47,7 +48,10 @@ class UserController extends Controller
 
     public function getModalAdd()
     {
-        return View::make('admin.user.modal-add');
+        $roles = Role::orderby('id', 'asc')->get();
+        return View::make('admin.user.modal-add')->with([
+            'roles' => $roles
+        ]);
     }
 
     public function store(AddUserRequest $request)
@@ -82,12 +86,13 @@ class UserController extends Controller
                 $resizedImage->save(public_path('images/users/' . $imageName));
                 $user->avatar = $imageName;
             }
+            $user->assignRole([$dataUser['role_id']]);
+
             $user->save();
 
             $request->session()->flash('success', "Create data user successfully!");
             return redirect(route('users.index'));
         } catch (\Throwable $th) {
-            dd($th->getMessage());
             $request->session()->flash('failed', "Failed to create data user!");
             return redirect(route('users.index'));
         }
@@ -96,7 +101,11 @@ class UserController extends Controller
     public function getModalEdit($userId)
     {
         $user = User::findOrFail($userId);
-        return View::make('admin.user.modal-edit')->with('user', $user);
+        $roles = Role::orderby('id', 'asc')->get();
+        return View::make('admin.user.modal-edit')->with([
+            'user'  => $user,
+            'roles' => $roles
+        ]);
     }
 
 
@@ -142,6 +151,7 @@ class UserController extends Controller
                 $resizedImage->save(public_path('images/users/' . $imageName));
                 $user->avatar = $imageName;
             }
+            $user->syncRoles($dataUser['role_id']);
             $user->save();
 
             $request->session()->flash('success', "Update data user successfully!");

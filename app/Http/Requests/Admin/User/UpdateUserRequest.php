@@ -38,10 +38,11 @@ class UpdateUserRequest extends FormRequest
                 },
             ],
             'new_password'  => 'nullable|string|min:8|different:old_password',
-            'email' => 'required|email|unique:users,email'. ($userId ? ','.$userId : ''),
+            'email'         => 'required|email|unique:users,email'. ($userId ? ','.$userId : ''),
             'avatar'        => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'phone'         => 'nullable|string|regex:/^[0-9]{10,15}$/',
             'address'       => 'nullable|string',
+            'role_id'       => 'required|exists:roles,id',
         ];
     }
 

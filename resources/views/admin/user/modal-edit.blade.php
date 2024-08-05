@@ -77,6 +77,21 @@
                                 </div>
 
                                 <div class="col-12">
+                                    <div class="form-group mb-3">
+                                        <label for="role_id">Role</label>
+                                        <select class="form-control form-control-sm" name="role_id" id="role_id">
+                                            @foreach($roles as $key => $role)
+                                            <option value="{{ $role->id }}" {{ $role->name == ($user->getRoleNames()[0] ?? '') ? 'selected' : '' }}>{{ $role->name }}</option>
+                                            @endforeach
+                                        </select>
+
+                                        @if($errors->has('role_id'))
+                                            <p class="text-danger">{{ $errors->first('role_id') }}</p>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
                                     <div class="form-group">
                                         <label for="address">Address</label>
                                         <textarea name="address" id="address" class="form-control" cols="30" rows="5">{{ $user->address ?? old('address') }}</textarea>

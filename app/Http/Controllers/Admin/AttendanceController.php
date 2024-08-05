@@ -5,11 +5,14 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Attendance\AddAttendanceRequest;
 use App\Models\Attendance;
+use App\Models\OtherSetting;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\View;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -32,7 +35,8 @@ class AttendanceController extends Controller
     public function getAttendances(Request $request)
     {
         if ($request->ajax()) {
-            return DataTables::of(Attendance::query())
+            $attendances = Attendance::where('user_id', Auth::id());
+            return DataTables::of($attendances)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
                     $btn = '<button type="button" class="btn btn-sm btn-warning attendance-edit-table" data-bs-target="#tabs-' . $row->id . '-edit-attendance">Edit</button>';
@@ -44,100 +48,94 @@ class AttendanceController extends Controller
         }
     }
 
+    public function getModalAdd()
+    {
+        return View::make('admin.attendance.modal-add');
+    }
+
     public function store(Request $request)
     {
         try {
-            $attendance = new Attendance();
-            $attendance->user_id    = Auth::id();
-            $attendance->date       = Carbon::today()->toDateString();
-            $attendance->check_in   = $request->check_in;
-            $attendance->status     = $this->determineStatus($request->check_in);
+            // Mendapatkan semua pengguna dengan kolom yang diperlukan
+            $users = User::select('id', 'password', 'fullname')->get();
 
-            $attendance->save();
+            // Mencari pengguna yang cocok dengan password yang di-hash
+            $getUser = null;
+            foreach ($users as $user) {
+                if (Hash::check($request->password, $user->password)) {
+                    $getUser = $user;
+                    break;
+                }
+            }
 
-            return response()->json([
-                'code' => 200,
-                'message' => 'Check In successful',
-                'data' => $attendance
-            ], 200);
-        } catch (\Throwable $th) {
-            return response()->json([
-                'code' => 500,
-                'message' => 'Failed to create attendance data',
-                'data' => []
-            ], 500);
-        }
-    }
-
-    public function update(Request $request, $id)
-    {
-        try {
-            $attendance = Attendance::find($id);
-
-            if (!$attendance) {
+            if (!$getUser) {
                 return response()->json([
-                    'code' => 404,
-                    'message' => 'Attendance not found',
+                    'code' => 500,
+                    'message' => 'Akun tidak ditemukan!',
                     'data' => []
-                ], 404);
+                ], 200);
             }
 
-            $attendance->check_out = $request->check_out;
-            $attendance->save();
+            // Cek apakah user sudah check-in hari ini
+            $existingAttendance = Attendance::where('user_id', $getUser->id)
+                ->whereDate('date', Carbon::today())
+                ->first();
 
-            return response()->json([
-                'code' => 200,
-                'message' => 'Check Out successful',
-                'data' => $attendance
-            ], 200);
+            if ($existingAttendance) {
+                if ($existingAttendance->check_out) {
+                    // Jika sudah check-out, kembalikan pesan bahwa absensi sudah dilakukan
+                    return response()->json([
+                        'code' => 200,
+                        'message' => 'Anda telah melakukan absensi hari ini, ' . $getUser->fullname,
+                        'data' => $existingAttendance
+                    ], 200);
+                } else {
+                    // Jika belum check-out, lakukan check-out
+                    $existingAttendance->check_out = $request->check_in;
+                    $existingAttendance->save();
+
+                    return response()->json([
+                        'code' => 200,
+                        'message' => 'Check Out successful, ' . $getUser->fullname,
+                        'data' => $existingAttendance
+                    ], 200);
+                }
+            } else {
+                // Jika belum check-in, buat data check-in baru
+                $attendance = new Attendance();
+                $attendance->user_id = $getUser->id;
+                $attendance->date = Carbon::today()->toDateString();
+                $attendance->check_in = $request->check_in;
+                $attendance->status = $this->determineStatus($request->check_in);
+
+                $attendance->save();
+
+                return response()->json([
+                    'code' => 200,
+                    'message' => 'Check In successful, ' . $getUser->fullname,
+                    'data' => $attendance
+                ], 200);
+            }
         } catch (\Throwable $th) {
             return response()->json([
                 'code' => 500,
-                'message' => 'Failed to update attendance data',
+                'message' => 'Failed to create or update attendance data',
                 'data' => []
             ], 500);
         }
     }
 
-    public function checkAbsensi()
-    {
-        try {
-            // Menggunakan Carbon untuk mendapatkan tanggal hari ini
-            $today = Carbon::today();
-
-            // Mencari data kehadiran berdasarkan tanggal hari ini dan ID pengguna yang sedang login
-            $attendance = Attendance::whereDate('date', $today)->where('user_id', Auth::user()->id)->first();
-
-            if (!$attendance) {
-                $response = [
-                    'code'    => 404,
-                    'message' => 'User not found!',
-                    'data'    => []
-                ];
-                return response()->json($response, 200);
-            }
-
-            $response = [
-                'code'    => 200,
-                'message' => 'Get data attendance successfully!',
-                'data'    => $attendance
-            ];
-            return response()->json($response, 200);
-        } catch (\Throwable $th) {
-            $response = [
-                'code'    => 500,
-                'message' => 'Internal server error',
-                'data'    => []
-            ];
-            return response()->json($response, 500);
-        }
-    }
 
     private function determineStatus($checkInTime)
     {
-        $standardCheckInTime = Carbon::createFromTime(9, 0, 0);
-        $checkIn = Carbon::parse($checkInTime);
+        $other_settings = OtherSetting::orderBy('id', 'ASC')->get()->first();
+        $onTime = Carbon::createFromTimeString($other_settings->time_start, 'Asia/Jakarta');
+        $checkIn = Carbon::createFromFormat('Y-m-d H:i:s', $checkInTime, 'Asia/Jakarta');
 
-        return $checkIn->lessThanOrEqualTo($standardCheckInTime) ? 'on_time' : 'late';
+        if ($checkIn->lessThanOrEqualTo($onTime)) {
+            return 'on_time';
+        } else {
+            return 'late';
+        }
     }
 }
