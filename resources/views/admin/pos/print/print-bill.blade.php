@@ -148,7 +148,7 @@
 
         <div class="invoiceNumber">
             <div style="margin-left: 2px;">
-                Datetime:
+                Waktu:
                 <span style="float: right; margin-right: 15px;">{{ $orders->created_at }}</span>
             </div>
         </div>
@@ -163,8 +163,15 @@
 
         <div class="invoiceNumber">
             <div style="margin-left: 2px;">
-                Kasir:
-                <span style="float: right; margin-right: 15px;">{{ $orders->cashier_name ?? '-' }} </span>
+                Order:
+                <span style="float: right; margin-right: 15px;">{{ $orders->inputer ?? '-' }} </span>
+            </div>
+        </div>
+
+        <div class="invoiceNumber">
+            <div style="margin-left: 2px;">
+                Table:
+                <span style="float: right; margin-right: 15px;">{{ $orders->table ?? '-' }} </span>
             </div>
         </div>
 
@@ -231,10 +238,13 @@
                     <td class="total" style="text-align: right">Rp.{{ number_format($orders->pb01,0) }}</td>
                 </tr>
 
+                @if ($orders->kembalian != 0)
+                    
                 <tr>
                     <td class="pb01" style="text-align: left" colspan="2">Kembalian</td>
                     <td class="total" style="text-align: right">Rp.{{ number_format($orders->kembalian,0) }}</td>
                 </tr>
+                @endif
                 <tr>
                     <td class="pb01" style="text-align: left" colspan="2">Total</td>
                     <td class="total" style="text-align: right">Rp.{{ number_format($orders->total,0) }}</td>
@@ -250,7 +260,7 @@
         </table>
 
         <div class="line"></div>
-        <p class="centered" style="margin-top: 10px; font-weight: 600;">Bill</p>
+        <p class="centered" style="margin-top: 10px; font-weight: 600;">Bill Belum Terbayar</p>
         <p class="centered" style="margin-top: 10px; font-weight: 600;">Terimakasih Atas Kunjungan Anda </p>
         <p class="centered" style="margin-top: 10px; font-weight: 600;">Silahkan Datang Kembali!</p>
         <div class="line"></div>

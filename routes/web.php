@@ -158,6 +158,9 @@ Route::middleware(['auth'])->group(function () {
 
             Route::get('payment-method', [ReportController::class, 'paymentMethod'])->name('payment-method');
             Route::get('payment-method-data', [ReportController::class, 'getReportPayment'])->name('get-payment-method');
+
+            Route::get('refund', [ReportController::class, 'refund'])->name('refund');
+            Route::get('refund-data', [ReportController::class, 'getReportRefund'])->name('get-return');
         });
     });
 
@@ -243,6 +246,9 @@ Route::middleware(['auth'])->group(function () {
 
     // Print Bill
     Route::get('/print-bill/{id}', [TransactionController::class, 'printBill'])->name('print-bill');
+
+    // Retrun Order
+    Route::patch('/return/{id}', [TransactionController::class, 'returnOrder'])->name('return-order');
 
     // Checkout
     Route::post('/checkout/{token}',[OrderController::class,'checkout'])->name('checkout-order');

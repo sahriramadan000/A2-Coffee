@@ -28,6 +28,7 @@
 @endsection
 
 @section('content')
+@include('admin.components.alert')
 <div class="col-xl-12 col-lg-12 col-sm-12  layout-spacing">
     <div class="card">
         <div class="card-body">
@@ -93,6 +94,8 @@
                         <button class="accordion-button collapsed bg-success" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne-{{ $item->id }}" aria-expanded="false" aria-controls="collapseOne-{{ $item->id }}">
                     @elseif ($item->payment_status == "Unpaid" && $item->payment_method == "Open Bill")
                         <button class="accordion-button collapsed bg-warning" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne-{{ $item->id }}" aria-expanded="false" aria-controls="collapseOne-{{ $item->id }}">
+                    @else
+                        <button class="accordion-button collapsed bg-danger" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne-{{ $item->id }}" aria-expanded="false" aria-controls="collapseOne-{{ $item->id }}">
                     @endif
 
                         <div class="ms-3 d-block">
@@ -183,22 +186,46 @@
                                         <li class="list-group-item">
                                             <div class="row">
                                                 <div class="col-lg-4">
-                                                    <a href="{{ route('print-bill',$item->id) }}" target="_blank" type="submit" class="btn btn-sm  w-100 btn-danger">Print Bill</a>
+                                                    <a href="{{ route('print-bill', $item->id) }}" target="_blank" type="submit" class="btn btn-sm w-100 btn-primary">Print Bill</a>
                                                 </div>
                                                 <div class="col-lg-4">
-                                                    <a href="{{ route('print-struk',$item->id) }}" target="_blank" type="submit" class="btn btn-sm  w-100 btn-warning">Print Struk</a>
+                                                    <a href="{{ route('print-struk', $item->id) }}" target="_blank" type="submit" class="btn btn-sm w-100 btn-warning">Print Struk</a>
                                                 </div>
                                                 <div class="col-lg-4">
-                                                    <a href="{{ route('print-customer',$item->id) }}" target="_blank" type="submit" class="btn btn-sm  w-100 btn-primary">Print</a>
+                                                    <button type="button" class="btn btn-sm w-100 btn-danger" data-bs-toggle="modal" data-bs-target="#return-{{ $item->id }}">Refund</button>
                                                 </div>
-
+                                                <div class="modal fade" id="return-{{ $item->id }}" tabindex="-1" role="dialog" aria-labelledby="returnLabel" aria-hidden="true">
+                                                    <div class="modal-dialog" role="document">
+                                                        <form action="{{ route('return-order', $item->id) }}" method="POST">
+                                                            @method('patch')
+                                                            @csrf
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                    <h5 class="modal-title" id="returnLabel">Apakah Anda Yakin Ingin Menyelesaikan Pembayaran</h5>
+                                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                                                                        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x">
+                                                                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                                                                        </svg>
+                                                                    </button>
+                                                                </div>
+                                                                <div class="modal-body">
+                                                                    <p>Apakah Anda Yakin Ingin Retun Order Ini?!</p>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="submit" class="btn btn-primary">Save</button>
+                                                                </div>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                        
                                                 @if ($item->payment_status != 'Paid')
-                                                    
-                                                <div class="col-lg-4 mt-4">
+                                                <div class="col-lg-6 mx-auto mt-4">
                                                     <button type="button" class="btn btn-sm w-100 btn-secondary" data-bs-toggle="modal" data-bs-target="#exampleModal-{{ $item->id }}">Update Payment</button>
                                                 </div>
                                                 @endif
-                                                
+                                        
                                                 <div class="modal fade" id="exampleModal-{{ $item->id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                                     <div class="modal-dialog" role="document">
                                                         <form action="{{ route('update-payment', $item->id) }}" method="POST">
@@ -208,7 +235,10 @@
                                                                 <div class="modal-header">
                                                                     <h5 class="modal-title" id="exampleModalLabel">Apakah Anda Yakin Ingin Menyelesaikan Pembayaran</h5>
                                                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-                                                                        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                                                        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x">
+                                                                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                                                                        </svg>
                                                                     </button>
                                                                 </div>
                                                                 <div class="modal-body">
@@ -235,9 +265,9 @@
                                                         </form>
                                                     </div>
                                                 </div>
-                                                
                                             </div>
                                         </li>
+                                            
                                     </ul>
                                 </div>
                             </div>
@@ -246,7 +276,6 @@
                 </div>
             </div>
         </div>
-    </div>
     @endforeach
 </div>
 @endsection

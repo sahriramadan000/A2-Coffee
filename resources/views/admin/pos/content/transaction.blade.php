@@ -120,21 +120,21 @@
                                         </div>
                                         <div class="col-12">
                                             <div class="btn-group w-100 p-3 pt-0" role="group" aria-label="Grouping Button">
-                                                <button type="button" class="btn btn-lg btn-success fw-bold w-25 p-3" data-bs-toggle="modal" data-bs-target="#modalPayment">
+                                                {{-- <button type="button" class="btn btn-lg btn-success fw-bold w-25 p-3" data-bs-toggle="modal" data-bs-target="#modalPayment">
                                                     <h6 class="mb-0 text-white">
-                                                        PAY
+                                                        SIMPAN ORDER
+                                                    </h6>
+                                                </button> --}}
+                                                <button type="button" class="btn btn-lg btn-success fw-bold w-25 p-3" data-bs-toggle="modal" data-bs-target="#modalOpenBill">
+                                                    <h6 class="mb-0 text-white">
+                                                        SIMPAN ORDER
                                                     </h6>
                                                 </button>
-                                                <button type="button" class="btn btn-lg btn-warning fw-bold w-25 p-3" data-bs-toggle="modal" data-bs-target="#modalOpenBill">
-                                                    <h6 class="mb-0 text-white">
-                                                        OPEN BILL
-                                                    </h6>
-                                                </button>
-                                                <button type="button" class="btn btn-lg btn-primary fw-bold w-25 p-3" onclick="onHoldOrder('{{ route('on-hold-order') }}', '{{ csrf_token() }}')">
+                                                {{-- <button type="button" class="btn btn-lg btn-primary fw-bold w-25 p-3" onclick="onHoldOrder('{{ route('on-hold-order') }}', '{{ csrf_token() }}')">
                                                     <h6 class="mb-0 text-white">
                                                         ON HOLD
                                                     </h6>
-                                                </button>
+                                                </button> --}}
                                                 <button type="button" class="btn btn-lg btn-white fw-bold w-25 p-3" onclick="ModalAddDiscount('{{ route('modal-add-discount') }}', '{{ route('update-cart-by-discount') }}', '{{ csrf_token() }}')" data-bs-target="#modal-add-discount">
                                                     <h6 class="mb-0 text-dark">
                                                         DISCOUNT
@@ -192,8 +192,16 @@
 												<div class="modal-body">
                                                     <div class="modal-body p-0">
                                                         <div class="form-group mt-2">
-                                                            <label for="name_open_bill" class="form-label">Customer Name</label>
-                                                            <input type="text" name="name_open_bill" value="{{ old('name_open_bill') }}" class="form-control form-control-sm" placeholder="Enter Customer Name....." id="name_open_bill" aria-describedby="name_open_bill">
+                                                            <label for="inputer" class="form-label">Inputer</label>
+                                                            <input type="text" name="inputer" value="{{ old('inputer') }}" class="form-control form-control-sm" placeholder="Enter Inputer Name....." id="inputer" aria-describedby="inputer">
+                                                        </div>
+                                                        <div class="form-group mt-2">
+                                                            <label class="form-label">Table</label>
+                                                            <select class="form-select mr-sm-2 @error('table') is-invalid @enderror" id="table" name="table" style="width:100%">
+                                                                @foreach ($tables as $table)
+                                                                    <option value="{{ $table->name }}">{{ $table->name }}</option>
+                                                                @endforeach
+                                                            </select>
                                                         </div>
                                                     </div>
                                                 </div>

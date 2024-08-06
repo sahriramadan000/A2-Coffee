@@ -163,8 +163,8 @@
 
         <div class="invoiceNumber">
             <div style="margin-left: 2px;">
-                Kasir:
-                <span style="float: right; margin-right: 15px;">{{ $orders->cashier_name ?? '-' }} </span>
+                Order:
+                <span style="float: right; margin-right: 15px;">{{ $orders->inputer ?? '-' }} </span>
             </div>
         </div>
 

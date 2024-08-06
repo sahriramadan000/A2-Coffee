@@ -107,6 +107,9 @@
                     <li class="{{ request()->routeIs('report.sales.payment-method') ? 'active' : '' }}">
                         <a href="{{ route('report.sales.payment-method') }}"> Payment Method </a>
                     </li>
+                    <li class="{{ request()->routeIs('report.sales.refund') ? 'active' : '' }}">
+                        <a href="{{ route('report.sales.refund') }}"> Report Refund </a>
+                    </li>
                     <li class="{{ request()->routeIs('materials.index') ? 'active' : '' }}">
                         <a href="{{ route('materials.index') }}"> Absensi </a>
                     </li>

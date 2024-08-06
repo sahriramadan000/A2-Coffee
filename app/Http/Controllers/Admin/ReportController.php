@@ -163,4 +163,80 @@ class ReportController extends Controller
                 ->make(true);
         }
     }
+
+    public function refund(){
+        $data ['page_title'] = 'Report Refund';
+        $data['account_users'] = User::get();
+
+        return view('admin.report.sales.refund',$data);
+    }
+
+    public function getReportRefund(Request $request)
+    {
+        $page_title = 'Report Refund';
+        $account_users = User::get();
+
+        $type = $request->input('type', 'day');
+        $cashierName = $request->user_id;
+        $date = $request->input('start_date', date('Y-m-d'));
+
+        // Initialize $orders as an empty collection
+        $orders = collect();
+
+        if ($type == 'day') {
+            if ($cashierName == 'All') {
+                $orders = Order::where('payment_status', 'Unpaid')
+                            ->where('payment_method', 'Return')
+                            ->whereDate('created_at', $date)
+                            ->orderBy('id', 'desc')
+                            ->get();
+            } else {
+                $orders = Order::where('cashier_name', $cashierName)
+                            ->where('payment_status', 'Unpaid')
+                            ->where('payment_method', 'Return')
+                            ->whereDate('created_at', $date)
+                            ->orderBy('id', 'desc')
+                            ->get();
+            }
+        } elseif ($type == 'monthly') {
+            $month = $request->input('month', date('m'));
+            $monthPart = date('m', strtotime($month)); // Ensures the input is in 'm' format
+            $orders = Order::whereMonth('created_at', $monthPart)
+                        ->when($cashierName != 'All', function ($query) use ($cashierName) {
+                            return $query->where('cashier_name', $cashierName);
+                        })
+                        ->where('payment_status', 'Paid')
+                        ->orderBy('id', 'desc')
+                        ->get();
+        } elseif ($type == 'yearly') {
+            $year = $request->input('year', date('Y'));
+            $orders = Order::whereYear('created_at', $year)
+                        ->when($cashierName != 'All', function ($query) use ($cashierName) {
+                            return $query->where('cashier_name', $cashierName);
+                        })
+                        ->where('payment_status', 'Paid')
+                        ->orderBy('id', 'desc')
+                        ->get();
+        }
+
+        if ($request->ajax()) {
+            // $query = Order::with(['orderProducts.orderProductAddons'])->select('orders.*');
+            return DataTables::of($orders)
+                ->addIndexColumn()
+                ->addColumn('order_products', function($row) {
+                    return $row->orderProducts->map(function($product) {
+                        $addons = $product->orderProductAddons->map(function($addon) {
+                            return $addon->name;
+                        })->implode(', ');
+
+                        return $product->name . ' (' . $addons . ')';
+                    })->implode('<br>');
+                })
+                ->addColumn('action', function($row) {
+                    return '<a href="#" class="btn btn-sm btn-primary">View</a>';
+                })
+                ->rawColumns(['order_products', 'action'])
+                ->make(true);
+        }
+    }
 }

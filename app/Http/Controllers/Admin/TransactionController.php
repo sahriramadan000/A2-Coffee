@@ -33,6 +33,7 @@ class TransactionController extends Controller
         $data['data_items']     = Cart::session(Auth::user()->id)->getContent();
         $data['products']       = Product::orderby('id', 'asc')->get();
         $data['other_setting']  = OtherSetting::get()->first();
+        $data['tables']         = Table::get();
         $service                = $data['other_setting']->layanan / 100;
         $subtotal               = Cart::getTotal();
         // dd($data['data_items']);
@@ -731,6 +732,32 @@ class TransactionController extends Controller
             }else{
                 return redirect()->back()->with('success', 'Update Return');
             }
+        } catch (\Throwable $th) {
+            // dd($th);
+            return response()->json(['failed' => true, 'message' => $th->getMessage()]);
+        }
+    }
+
+    public function returnOrder(Request $request, $id) {
+        try {
+            $order = Order::findOrFail($id);
+            $order->payment_status = 'Unpaid';
+            $order->payment_method = 'Return';
+            $order->save();
+    
+            // Find the associated OrderProduct records
+            $order_products = OrderProduct::where('order_id', $id)->get();
+    
+            foreach ($order_products as $order_product) {
+                $products = Product::where('name', $order_product->name)->get();
+                
+                foreach ($products as $product) {
+                    $product->current_stock += $order_product->qty;
+                    $product->save();
+                }
+            }
+    
+            return redirect()->back()->with('success', 'Update Return');
         } catch (\Throwable $th) {
             // dd($th);
             return response()->json(['failed' => true, 'message' => $th->getMessage()]);

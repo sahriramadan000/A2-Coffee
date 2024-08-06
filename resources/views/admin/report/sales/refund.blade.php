@@ -13,16 +13,6 @@
     .hilang{
     display: none !important;
   }
-
-  .dt-buttons {
-    margin-top: 10px;
-    margin-bottom: 10px;
-}
-
-.dt-buttons .btn {
-    margin-right: 5px;
-}
-
 </style>
 @endpush
 
@@ -135,164 +125,127 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js" integrity="sha512-T/tUfKSV1bihCnd+MxKD0Hm1uBBroVYBOYSk1knyvQ9VyZJpc/ALb4P0r6ubwVPSGB2GvjeoMAJJImBG12TiaQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 
-<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
-<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.flash.min.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
-<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
-<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"></script>
-
 <script>
     $(document).ready(function() {
-    $('#report-gross-table').DataTable({
-        processing: true,
-        serverSide: true,
-        ajax: {
-            url: "{{ route('report.sales.get-report-gross') }}",
-            data: function(d) {
-                d.type = $('#daterange').val(); 
-                d.user_id = $('#user').val(); 
-                d.start_date = $('#date').val(); 
-                d.month = $('#month').val(); 
-                d.year = $('#year').val(); 
-            },
-            error: function(xhr, textStatus, errorThrown) {
-                $('#report-gross-table').DataTable().clear().draw();
-                console.log(xhr.responseText);
-                alert('There was an error fetching data. Please try again later.');
-            }
-        },
-        columns: [
-            {
-                "data": 'DT_RowIndex',
-                orderable: false,
-                searchable: false
-            },
-            {data: 'no_invoice', name: 'no_invoice'},
-            {
-                data: 'created_at',
-                render: function(data) {
-                    return moment(data).format('YYYY-MM-DD HH:mm:ss');
+        // getData
+        $('#report-gross-table').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: "{{ route('report.sales.get-return') }}",
+                data: function(d) {
+                    console.log(d);
+                    d.type = $('#daterange').val(); 
+                    d.user_id = $('#user').val(); 
+                    d.start_date = $('#date').val(); 
+                    d.month = $('#month').val(); 
+                    d.year = $('#year').val(); 
                 },
-                name: 'created_at'
-            },
-            {data: 'cashier_name', name: 'cashier_name'},
-            {data: 'customer_name', name: 'customer_name'},
-            {data: 'order_products', name: 'order_products', orderable: false, searchable: false},
-            {data: 'payment_method', name: 'payment_method'},
-            {
-                data: 'subtotal',
-                render: function(data) {
-                    if (data) {
-                        return 'Rp. ' + formatRupiah(data);
-                    } else {
-                        return '-';
-                    }
+                error: function(xhr, textStatus, errorThrown) {
+                    $('#report-gross-table').DataTable().clear().draw();
+                    console.log(xhr.responseText);
+                    alert('There was an error fetching data. Please try again later.');
                 }
             },
-            {data: 'type_discount', name: 'type_discount'},
-            {
-                data: 'price_discount',
-                render: function(data) {
-                    if (data) {
-                        return 'Rp. ' + formatRupiah(data);
-                    } else {
-                        return '-';
+            columns: [
+                {
+                    "data": 'DT_RowIndex',
+                    orderable: false,
+                    searchable: false
+                },
+                {data: 'no_invoice', name: 'no_invoice'},
+                {
+                    data: 'created_at',
+                    render: function(data) {
+                        return moment(data).format('YYYY-MM-DD HH:mm:ss');
+                    },
+                    name: 'created_at'
+                },
+                {data: 'cashier_name', name: 'cashier_name'},
+                {data: 'customer_name', name: 'customer_name'},
+                {data: 'order_products', name: 'order_products', orderable: false, searchable: false},
+                {data: 'payment_method', name: 'payment_method'},
+                {
+                    data: 'subtotal',
+                    render: function(data) {
+                        if (data) {
+                            return 'Rp. ' + formatRupiah(data);
+                        } else {
+                            return '-';
+                        }
                     }
-                }
-            },
-            {
-                data: 'percent_discount',
-                render: function(data) {
-                    if (data) {
-                        return data + '%';
-                    } else {
-                        return '-';
+                },
+                {data: 'type_discount', name: 'type_discount'},
+                {
+                    data: 'price_discount',
+                    render: function(data) {
+                        if (data) {
+                            return 'Rp. ' + formatRupiah(data);
+                        } else {
+                            return '-';
+                        }
                     }
-                }
-            },
-            {
-                data: 'service',
-                render: function(data) {
-                    if (data) {
-                        return 'Rp. ' + formatRupiah(data);
-                    } else {
-                        return '-';
+                },
+                {
+                    data: 'percent_discount',
+                    render: function(data) {
+                        if (data) {
+                            return data + '%';
+                        } else {
+                            return '-';
+                        }
                     }
-                }
-            },
-            {
-                data: 'pb01',
-                render: function(data) {
-                    if (data) {
-                        return 'Rp. ' + formatRupiah(data);
-                    } else {
-                        return '-';
+                },
+                {
+                    data: 'service',
+                    render: function(data) {
+                        if (data) {
+                            return 'Rp. ' + formatRupiah(data);
+                        } else {
+                            return '-';
+                        }
                     }
-                }
-            },
-            {
-                data: 'total',
-                render: function(data) {
-                    if (data) {
-                        return 'Rp. ' + formatRupiah(data);
-                    } else {
-                        return '-';
+                },
+                {
+                    data: 'pb01',
+                    render: function(data) {
+                        if (data) {
+                            return 'Rp. ' + formatRupiah(data);
+                        } else {
+                            return '-';
+                        }
                     }
-                }
+                },
+                {
+                    data: 'total',
+                    render: function(data) {
+                            if (data) {
+                                return 'Rp. ' + formatRupiah(data);
+                            } else {
+                                return '-';
+                            }
+                        }
+                },
+                {data: 'action', name: 'action', orderable: false, searchable: false},
+            ],
+            "dom": "<'dt--top-section'<'row'<'col-12 col-sm-6 d-flex justify-content-sm-start justify-content-center'l><'col-sm-12 col-md-6 d-flex justify-content-md-end justify-content-center mt-md-0 mt-3'f<'toolbar align-self-center'>>>>" +
+            "<'table-responsive'tr>" +
+            "<'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pages-count mb-sm-0 mb-3'i><'dt--pagination'p>>",
+            "oLanguage": {
+                "oPaginate": {
+                    "sPrevious": '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>',
+                    "sNext": '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y1="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>'
+                },
+                "sInfo": "Showing page _PAGE_ of _PAGES_",
+                "sSearch": '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>',
+                "sSearchPlaceholder": "Search...",
+                "sLengthMenu": "Results :  _MENU_",
             },
-            {data: 'action', name: 'action', orderable: false, searchable: false},
-        ],
-        dom: "<'dt--top-section'<'row'<'col-12 col-sm-6 d-flex justify-content-sm-start justify-content-center'l><'col-sm-12 col-md-6 d-flex justify-content-md-end justify-content-center mt-md-0 mt-3'f<'toolbar align-self-center'>>>>" +
-             "<'table-responsive'tr>" +
-             "<'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pages-count mb-sm-0 mb-3'i><'dt--pagination'p>>" +
-             "<'dt-buttons'B>",
-        buttons: [
-            {
-                extend: 'excelHtml5',
-                text: 'Export to Excel',
-                className: 'btn btn-success'
-            },
-            // {
-            //     extend: 'pdfHtml5',
-            //     text: 'Export to PDF',
-            //     className: 'btn btn-danger'
-            // }
-        ],
-        oLanguage: {
-            oPaginate: {
-                sPrevious: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>',
-                sNext: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>'
-            },
-            sInfo: "Showing page _PAGE_ of _PAGES_",
-            sSearch: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>',
-            sSearchPlaceholder: "Search...",
-            sLengthMenu: "Results :  _MENU_",
-        },
-        stripeClasses: [],
-        lengthMenu: [10, 20, 50],
-        pageLength: 10
+            "stripeClasses": [],
+            "lengthMenu": [10, 20, 50],
+            "pageLength": 10
+        });
     });
-});
-
-// Function to format numbers as Rupiah
-function formatRupiah(angka) {
-    var number_string = angka.toString(),
-        split = number_string.split(','),
-        sisa = split[0].length % 3,
-        rupiah = split[0].substr(0, sisa),
-        ribuan = split[0].substr(sisa).match(/\d{3}/gi);
-
-    if (ribuan) {
-        separator = sisa ? '.' : '';
-        rupiah += separator + ribuan.join('.');
-    }
-
-    rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
-    return rupiah;
-}
-
 </script>
 <script>
     $('.datepicker-date').datepicker({

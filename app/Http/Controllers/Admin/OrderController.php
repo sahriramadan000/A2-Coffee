@@ -22,6 +22,7 @@ class OrderController extends Controller
 {
     public function checkout(Request $request, $token)
     {
+        // dd($request->all());
         DB::beginTransaction();
         try {
             $session_cart   = Cart::session(Auth::user()->id)->getContent();
@@ -87,13 +88,15 @@ class OrderController extends Controller
             } 
             
             // =================Create Data Order================
-            if ($request->name_open_bill == null) {
+            if ($request->inputer == null) {
                 $order = Order::create([
                     'no_invoice'        => $this->generateInvoice(),
                     'cashier_name'      => Auth::user()->fullname,
                     'customer_name'     => $customer->name ?? null,
+                    'inputer'           => $request->inputer ?? '-',
                     'customer_email'    => $customer->email ?? null,
                     'customer_phone'    => $customer->phone ?? null,
+                    'table'             => $request->table ?? null,
                     'payment_status'    => 'Paid',
                     'payment_method'    => $request->payment_method,
     
@@ -118,8 +121,10 @@ class OrderController extends Controller
                     'no_invoice'        => $this->generateInvoice(),
                     'cashier_name'      => Auth::user()->fullname,
                     'customer_name'     => $customer->name ?? null,
+                    'inputer'           => $request->inputer ?? '-',
                     'customer_email'    => $customer->email ?? null,
                     'customer_phone'    => $customer->phone ?? null,
+                    'table'             => $request->table ?? null,
                     'payment_status'    => 'Unpaid',
                     'payment_method'    => 'Open Bill',
     
