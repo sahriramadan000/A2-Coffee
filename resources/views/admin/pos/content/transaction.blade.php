@@ -12,11 +12,13 @@
                                 <div class="row">
                                     <div class="fm-search col-lg-12 px-4 mt-3">
                                         <div class="mb-0">
+                                            @can('coupon')
                                             <div class="input-group">
                                                 {{-- <button class="btn btn-outline-secondary text-dark" type="button" style="font-size:14px;"><i class='bx bx-comment-detail me-0' style="font-size:16px;"></i> <small>Comments</small></button> --}}
                                                 <button class="btn btn-success d-flex align-items-center" type="button" style="font-size:14px;" onclick="ModalAddCoupon('{{ route('modal-add-coupon') }}', '{{ route('update-cart-by-coupon') }}', '{{ csrf_token() }}')" data-bs-target="#modal-add-coupon"><i class='bx bx-tag me-1' style="font-size:1.2rem;"></i> <span id="coupon-info">Coupon</span></button>
                                                 <input type="text" class="form-control" placeholder="" disabled>
                                             </div>
+                                            @endcan
                                         </div>
                                     </div>
                                 </div>
@@ -93,10 +95,12 @@
                                                         </td>
                                                         <td style="border-top: 1px solid #060818 !important; border-left: 1px solid #060818 !important;" colspan="2">
                                                             <div class="d-flex justify-content-between">
+                                                                @can('discount')
                                                                 <span style="font-size: 12px;" class="text-white opacity-75">Discount<small id="type-discount"></small></span>
                                                                 <a href="#!" type="button" onclick="ModalAddDiscount('{{ route('modal-add-discount') }}', '{{ route('update-cart-by-discount') }}', '{{ csrf_token() }}')" class="cursor-pointer" data-bs-target="#modal-add-discount" style="border-bottom: 1px dashed #bfbfbf;font-size:14px;">
                                                                     <small id="discount-price" class="text-white opacity-75">Rp.0</small>
                                                                 </a>
+                                                                @endcan
                                                             </div>
                                                             <input type="hidden" name="type_discount" value="">
                                                             <input type="hidden" name="discount_price" value="">
@@ -135,16 +139,20 @@
                                                         ON HOLD
                                                     </h6>
                                                 </button> --}}
+                                                @can('discount')
                                                 <button type="button" class="btn btn-lg btn-white fw-bold w-25 p-3" onclick="ModalAddDiscount('{{ route('modal-add-discount') }}', '{{ route('update-cart-by-discount') }}', '{{ csrf_token() }}')" data-bs-target="#modal-add-discount">
                                                     <h6 class="mb-0 text-dark">
                                                         DISCOUNT
                                                     </h6>
                                                 </button>
+                                                @endcan
+                                                @can('void')
                                                 <button type="button" class="btn btn-lg btn-danger fw-bold w-25 p-3" onclick="voidCart('{{ route('void-cart') }}', '{{ csrf_token() }}')">
                                                     <h6 class="mb-0 text-white">
                                                         VOID
                                                     </h6>
                                                 </button>
+                                                @endcan
                                             </div>
                                         </div>
                                     </div>

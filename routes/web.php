@@ -11,6 +11,8 @@ use App\Http\Controllers\Admin\OtherSettingController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\SettlementController;
+use App\Http\Controllers\Admin\StoreController;
 use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\TableController;
 use App\Http\Controllers\Admin\TagController;
@@ -138,6 +140,19 @@ Route::middleware(['auth'])->group(function () {
         Route::get('check-absensi', [AttendanceController::class, 'checkAbsensi'])->name('check');
     });
 
+    // Store
+    Route::prefix('stores')->name('stores.')->group(function () {
+        Route::get('/', [StoreController::class, 'index'])->name('index');
+        Route::get('get-data', [StoreController::class, 'getAttendances'])->name('get-data');
+        Route::get('modal-add', [StoreController::class, 'getModalAdd'])->name('modal-add');
+        Route::post('store', [StoreController::class, 'store'])->name('store');
+        Route::get('modal-edit/{attendanceId}', [StoreController::class, 'getModalEdit'])->name('modal-edit');
+        Route::put('update/{attendanceId}', [StoreController::class, 'update'])->name('update');
+        Route::get('modal-delete/{attendanceId}', [StoreController::class, 'getModalDelete'])->name('modal-delete');
+        Route::delete('delete/{attendanceId}', [StoreController::class, 'destroy'])->name('destroy');
+        Route::get('check-absensi', [StoreController::class, 'checkAbsensi'])->name('check');
+    });
+
     // Product
     Route::prefix('products')->name('products.')->group(function () {
         Route::get('/', [ProductController::class, 'index'])->name('index');
@@ -162,6 +177,13 @@ Route::middleware(['auth'])->group(function () {
             Route::get('refund', [ReportController::class, 'refund'])->name('refund');
             Route::get('refund-data', [ReportController::class, 'getReportRefund'])->name('get-return');
         });
+    });
+
+    // settlement
+    Route::prefix('settlements')->name('settlements.')->group(function () {
+        Route::get('/', [SettlementController::class, 'index'])->name('index');
+        Route::get('get-data', [SettlementController::class, 'getSettlement'])->name('get-data');
+        Route::get('print', [SettlementController::class, 'printSettlement'])->name('print-settlement');
     });
 
     // Tag

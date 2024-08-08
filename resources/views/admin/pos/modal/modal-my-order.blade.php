@@ -8,13 +8,13 @@
             <div class="modal-body p-0 m-0">
                 <div class="container p-3">
                     <ul class="nav nav-pills justify-content-center mb-3" role="tablist">
-                        <li class="nav-item w-50" role="presentation">
+                        {{-- <li class="nav-item w-50" role="presentation">
                             <a class="nav-link active" data-bs-toggle="pill" href="#primary-pills-home" role="tab" aria-selected="false" tabindex="-1">
                                 <div class="text-center">
                                     <div class="tab-title">On Hold</div>
                                 </div>
                             </a>
-                        </li>
+                        </li> --}}
                         <li class="nav-item w-50" role="presentation">
                             <a class="nav-link" data-bs-toggle="pill" href="#primary-pills-profile" role="tab" aria-selected="true">
                                 <div class="text-center">
