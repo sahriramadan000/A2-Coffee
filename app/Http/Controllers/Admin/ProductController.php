@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\View;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Str;
 use Intervention\Image\Facades\Image;
+use App\Helpers\CloudConnectionHelper;
 
 class ProductController extends Controller
 {
@@ -115,6 +116,11 @@ class ProductController extends Controller
 
             $product->save();
 
+            // Gunakan helper untuk cek koneksi ke cloud
+            // if (CloudConnectionHelper::isConnectedToCloud()) {
+            //     DB::connection('pgsql_cloud')->table('products')->insert($product->toArray());
+            // }
+
             if ($request->has('tag_id')) {
                 $product->tags()->sync($dataProduct['tag_id']);
             } else {
@@ -200,6 +206,13 @@ class ProductController extends Controller
 
             $product->save();
 
+            // Cek koneksi sebelum memperbarui ke cloud
+            // if (CloudConnectionHelper::isConnectedToCloud()) {
+            //     DB::connection('pgsql_cloud')->table('products')
+            //         ->where('id', $product->id)
+            //         ->update($product->toArray());
+            // }
+
             if ($request->has('tag_id')) {
                 $product->tags()->sync($dataProduct['tag_id']);
             } else {
@@ -235,6 +248,13 @@ class ProductController extends Controller
         try {
             $product = Product::findOrFail($productId);
             $product->delete();
+
+            // Cek koneksi sebelum menghapus dari cloud
+            // if (CloudConnectionHelper::isConnectedToCloud()) {
+            //     DB::connection('pgsql_cloud')->table('products')
+            //         ->where('id', $product->id)
+            //         ->delete();
+            // }
 
             $request->session()->flash('success', "Delete data product successfully!");
 

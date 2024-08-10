@@ -78,6 +78,19 @@ return [
             'sslmode' => 'prefer',
         ],
 
+        'pgsql_cloud' => [
+            'driver' => 'pgsql',
+            'host' => env('DB_CLOUD_HOST', 'cloud-db-host'),
+            'port' => env('DB_CLOUD_PORT', '5432'),
+            'database' => env('DB_CLOUD_DATABASE', 'forge'),
+            'username' => env('DB_CLOUD_USERNAME', 'forge'),
+            'password' => env('DB_CLOUD_PASSWORD', ''),
+            'charset' => 'utf8',
+            'prefix' => '',
+            'schema' => 'public',
+            'sslmode' => 'prefer',
+        ],
+
         'sqlsrv' => [
             'driver' => 'sqlsrv',
             'url' => env('DATABASE_URL'),
