@@ -503,13 +503,15 @@ class TransactionController extends Controller
                     'attributes' => [
                         'product' => $products,
                         'addons' => $addons,
+                        'inputer' => $request->inputer,
+                        'table' => $request->table,
                     ],
                 ]);
             }
 
             // Delete Cache after add to cart
-            $orders = Order::findOrFail($request->id);
-            $orders->delete();
+            // $orders = Order::findOrFail($request->id);
+            // $orders->delete();
 
             // Set return data
             $dataCart = Cart::session(Auth::user()->id)->getContent();
@@ -748,14 +750,14 @@ class TransactionController extends Controller
             // Find the associated OrderProduct records
             $order_products = OrderProduct::where('order_id', $id)->get();
     
-            foreach ($order_products as $order_product) {
-                $products = Product::where('name', $order_product->name)->get();
+            // foreach ($order_products as $order_product) {
+            //     $products = Product::where('name', $order_product->name)->get();
                 
-                foreach ($products as $product) {
-                    $product->current_stock += $order_product->qty;
-                    $product->save();
-                }
-            }
+            //     foreach ($products as $product) {
+            //         $product->current_stock += $order_product->qty;
+            //         $product->save();
+            //     }
+            // }
     
             return redirect()->back()->with('success', 'Update Return');
         } catch (\Throwable $th) {

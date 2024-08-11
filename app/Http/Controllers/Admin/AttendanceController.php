@@ -20,10 +20,10 @@ class AttendanceController extends Controller
 {
     function __construct()
     {
-        // $this->middleware('permission:attendance-list', ['only' => ['index', 'getAttendances']]);
-        // $this->middleware('permission:attendance-create', ['only' => ['getModalAdd','store']]);
-        // $this->middleware('permission:attendance-edit', ['only' => ['getModalEdit','update']]);
-        // $this->middleware('permission:attendance-delete', ['only' => ['getModalDelete','destroy']]);
+        $this->middleware('permission:attendance-list', ['only' => ['index', 'getAttendances']]);
+        $this->middleware('permission:attendance-create', ['only' => ['getModalAdd','store']]);
+        $this->middleware('permission:attendance-edit', ['only' => ['getModalEdit','update']]);
+        $this->middleware('permission:attendance-delete', ['only' => ['getModalDelete','destroy']]);
     }
 
     public function index()

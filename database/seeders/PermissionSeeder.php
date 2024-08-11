@@ -35,6 +35,18 @@ class PermissionSeeder extends Seeder
             'supplier-edit',
             'supplier-delete',
 
+            // Attendance Permission
+            'attendance-list',
+            'attendance-create',
+            'attendance-edit',
+            'attendance-delete',
+
+            // Order Pesanan Permission
+            'order-pesanan',
+
+            // Settlement Permission
+            'settlement',
+
             // Material Permission
             'material-list',
             'material-create',
@@ -79,6 +91,13 @@ class PermissionSeeder extends Seeder
             'table-create',
             'table-edit',
             'table-delete',
+
+            // POS
+            'discount',
+            'void',
+            'coupon',
+            'delete-product-in-cart',
+
         ];
 
         foreach ($permissions as $permission) {

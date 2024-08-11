@@ -101,6 +101,40 @@
         </div>
     </div>
 </div>
+
+<div class="row mt-3" style="z-index: -99999999">
+    <div class="col-12 col-md-4 col-lg-6">
+        <div class="card radius-10 bg-danger">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div>
+                        <p class="mb-0 text-white">Gross Sales(Kotor)</p>
+                        <h4 class="my-1 text-white">Rp. {{ number_format($total_price,0) }}</h4>
+                    </div>
+                    <div class="widgets-icons bg-white text-danger ms-auto">
+                        <i class="bx bx-dollar"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-4 col-lg-6">
+        <div class="card radius-10 bg-success">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div>
+                        <p class="mb-0 text-white">Nett Sales(Bersih)</p>
+                        <h4 class="my-1 text-white">Rp. {{ number_format($nett_sales,0) }}</h4>
+                    </div>
+                    <div class="widgets-icons bg-white text-success ms-auto">
+                        <i class="bx bx-dollar"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="col-xl-12 col-lg-12 col-sm-12 layout-spacing">
     @include('admin.components.alert')
     <div class="widget-content widget-content-area br-8">
