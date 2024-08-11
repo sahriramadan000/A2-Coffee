@@ -405,26 +405,35 @@ class TransactionController extends Controller
         $discount_price     = (int) str_replace('.', '', $request->discount_price);
         $discount_percent   = (int) $request->discount_percent;
         $discount_type      = $request->discount_type;
-        $service            = $other_setting->layanan / 100;
+        $service_percentage = $other_setting->layanan / 100;
         $biaya_layanan      = 0;
         $subtotal           = Cart::getTotal();
+        $discount_amount    = 0;
 
+        // Hitung diskon berdasarkan jenisnya (persentase atau harga tetap)
         if ($discount_type == 'percent') {
             $discount_amount = $subtotal * $discount_percent / 100;
         } else {
             $discount_amount = $discount_price;
         }
 
-        // Check Layanan
+        // Kurangi subtotal dengan diskon
+        $subtotal_after_discount = $subtotal - $discount_amount;
+
+        // Hitung biaya layanan (jika ada)
         if ($other_setting->layanan != 0) {
-            $biaya_layanan  = ($subtotal - $discount_amount) * $service;
-            $temp_total     = $subtotal + $biaya_layanan;
-        }else{
-            $temp_total     = (($subtotal - $discount_amount) ?? 0);
+            $biaya_layanan = $subtotal_after_discount * $service_percentage;
         }
 
-        $tax    = $temp_total * ($other_setting->pb01 / 100);
-        $total  = $temp_total + $tax;
+        // Hitung subtotal setelah biaya layanan
+        $subtotal_with_service = $subtotal_after_discount + $biaya_layanan;
+
+        // Hitung pajak (pb01)
+        $tax_percentage = $other_setting->pb01 / 100;
+        $tax = $subtotal_with_service * $tax_percentage;
+
+        // Hitung total keseluruhan
+        $total = $subtotal_with_service + $tax;
 
         return response()->json([
             'success'           => 'Discount berhasil ditambahkan!',
@@ -433,7 +442,7 @@ class TransactionController extends Controller
             'discount_type'     => $discount_type,
             'discount_amount'   => $discount_amount,
             'service'           => $biaya_layanan,
-            'subtotal'          => $subtotal,
+            'subtotal'          => $subtotal_after_discount,
             'tax'               => $tax,
             'total'             => $total,
         ], 200);
