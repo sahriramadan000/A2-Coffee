@@ -20,10 +20,10 @@ class AttendanceController extends Controller
 {
     function __construct()
     {
-        $this->middleware('permission:attendance-list', ['only' => ['index', 'getAttendances']]);
-        $this->middleware('permission:attendance-create', ['only' => ['getModalAdd','store']]);
-        $this->middleware('permission:attendance-edit', ['only' => ['getModalEdit','update']]);
-        $this->middleware('permission:attendance-delete', ['only' => ['getModalDelete','destroy']]);
+        // $this->middleware('permission:attendance-list', ['only' => ['index', 'getAttendances']]);
+        // $this->middleware('permission:attendance-create', ['only' => ['getModalAdd','store']]);
+        // $this->middleware('permission:attendance-edit', ['only' => ['getModalEdit','update']]);
+        // $this->middleware('permission:attendance-delete', ['only' => ['getModalDelete','destroy']]);
     }
 
     public function index()
@@ -35,17 +35,26 @@ class AttendanceController extends Controller
     public function getAttendances(Request $request)
     {
         if ($request->ajax()) {
-            $attendances = Attendance::where('user_id', Auth::id());
+            // Check if the user is a super-admin or cashier
+            if (Auth::user()->hasRole('super-admin') || Auth::user()->hasRole('cashier')) {
+                // If the user is a super-admin or cashier, show all attendance data
+                $attendances = Attendance::query();
+            } else {
+                // Otherwise, show only the attendance data for the logged-in user
+                $attendances = Attendance::where('user_id', Auth::id());
+            }
+        
             return DataTables::of($attendances)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
                     $btn = '<button type="button" class="btn btn-sm btn-warning attendance-edit-table" data-bs-target="#tabs-' . $row->id . '-edit-attendance">Edit</button>';
-                    $btn = $btn . ' <button type="button" class="btn btn-sm btn-danger attendance-delete-table" data-bs-target="#tabs-' . $row->id . '-delete-attendance">Delete</button>';
+                    $btn .= ' <button type="button" class="btn btn-sm btn-danger attendance-delete-table" data-bs-target="#tabs-' . $row->id . '-delete-attendance">Delete</button>';
                     return $btn;
                 })
                 ->rawColumns(['action'])
                 ->make(true);
         }
+        
     }
 
     public function getModalAdd()
