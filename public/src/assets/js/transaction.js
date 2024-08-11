@@ -544,7 +544,6 @@ function ModalEditQtyCart(url = '/modal-edit-qty-cart', key, token) {
     });
 }
 
-
 function updateCartQuantity(key, quantity, url, token, modalSelector) {
     $.ajax({
         url: url,
@@ -560,6 +559,11 @@ function updateCartQuantity(key, quantity, url, token, modalSelector) {
             console.log(response);
             $('#cart-product').empty();
             $.each(response.data, function(index, cart) {
+                var deleteButton = response.canDelete 
+                    ? `<a href="/delete-item/${index}" class="" style="border-bottom: 1px dashed red;">`+
+                      `<i class='bx bx-trash font-14 text-danger'></i></a>`
+                    : '';
+
                 var addList = `<tr class="table-cart text-white">`+
                                     `<td class="td-cart">`+
                                         `<div class="d-flex justify-content-between">`+
@@ -569,9 +573,7 @@ function updateCartQuantity(key, quantity, url, token, modalSelector) {
                                                 `</p>`+
                                             `</div>`+
                                             `<div>`+
-                                                `<a href="/delete-item/${index}" class="" style="border-bottom: 1px dashed red;">`+
-                                                    `<i class='bx bx-trash font-14 text-danger'></i>`+
-                                                `</a>`+
+                                                deleteButton +
                                             `</div>`+
                                         `</div>`+
                                     `</td>`+
@@ -586,10 +588,10 @@ function updateCartQuantity(key, quantity, url, token, modalSelector) {
                 $('#cart-product').append(addList);
             });
 
-            $('#subtotal-cart').text(`Rp.${formatRupiah(response.subtotal)}`)
-            $('#tax-cart').text(`Rp.${formatRupiah(response.tax)}`)
+            $('#subtotal-cart').text(`Rp.${formatRupiah(response.subtotal)}`);
+            $('#tax-cart').text(`Rp.${formatRupiah(response.tax)}`);
             $('#service-cart').text(`Rp.${formatRupiah(response.service)}`);
-            $('#total-cart').text(`Rp.${formatRupiah(response.total)}`)
+            $('#total-cart').text(`Rp.${formatRupiah(response.total)}`);
             // Close the modal
             $(modalSelector).modal('hide');
         },
@@ -598,6 +600,7 @@ function updateCartQuantity(key, quantity, url, token, modalSelector) {
         }
     });
 }
+
 
 function ModalAddCustomer(urlModal, urlGetDataCust, token) {
     var getTarget = `#modal-add-customer`;

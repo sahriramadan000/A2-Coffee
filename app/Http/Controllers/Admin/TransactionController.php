@@ -313,6 +313,8 @@ class TransactionController extends Controller
                 $tax           = (($subtotal + $service) * $other_setting->pb01 / 100);
                 $totalPayment  = ($subtotal + $service) + $tax;
 
+                $canDelete = Auth::user()->can('delete-product-in-cart');
+
                 return response()->json([
                     'success'   => 'Cart item updated successfully!',
                     'data'      => Cart::session(Auth::user()->id)->getContent()->toArray(),
@@ -320,6 +322,7 @@ class TransactionController extends Controller
                     'tax'       => $tax,
                     'subtotal'  => $subtotal,
                     'total'     => $totalPayment,
+                    'canDelete' => $canDelete,
                 ], 200);
             } else {
                 return response()->json(['failed' => 'Cart item not found!'], 404);
