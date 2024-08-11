@@ -22,7 +22,6 @@ class OrderController extends Controller
 {
     public function checkout(Request $request, $token)
     {
-        // dd($request->all());
         DB::beginTransaction();
         try {
             $session_cart   = Cart::session(Auth::user()->id)->getContent();
@@ -88,15 +87,15 @@ class OrderController extends Controller
             } 
             
             // =================Create Data Order================
-            if ($request->inputer == null) {
+            if ($request->button == 'simpan-order') {
                 $order = Order::create([
                     'no_invoice'        => $this->generateInvoice(),
                     'cashier_name'      => Auth::user()->fullname,
                     'customer_name'     => $customer->name ?? null,
-                    'inputer'           => $request->inputer ?? '-',
                     'customer_email'    => $customer->email ?? null,
                     'customer_phone'    => $customer->phone ?? null,
                     'table'             => $request->table ?? null,
+                    'inputer'           => $request->inputer ?? '',
                     'payment_status'    => 'Paid',
                     'payment_method'    => $request->payment_method,
     
@@ -116,15 +115,14 @@ class OrderController extends Controller
                 ]);
 
             }else{
-                // dd($request->all());
                 $order = Order::create([
                     'no_invoice'        => $this->generateInvoice(),
                     'cashier_name'      => Auth::user()->fullname,
                     'customer_name'     => $customer->name ?? null,
-                    'inputer'           => $request->inputer ?? '-',
                     'customer_email'    => $customer->email ?? null,
                     'customer_phone'    => $customer->phone ?? null,
                     'table'             => $request->table ?? null,
+                    'inputer'           => $request->inputer ?? '-',
                     'payment_status'    => 'Unpaid',
                     'payment_method'    => 'Open Bill',
     
@@ -239,16 +237,16 @@ class OrderController extends Controller
             }
 
             // Pengecekan stok sebelum menyimpan ke tabel order_products
-            foreach ($stockCheck as $productId => $totalQty) {
-                $product = Product::findOrFail($productId);
-                if ((int)$product->current_stock < $totalQty) {
-                    return redirect()->back()->with(['failed' => 'Stock product ' . $product->name . ' kurang - Stock tersisa ' . $product->current_stock]);
-                }
+            // foreach ($stockCheck as $productId => $totalQty) {
+            //     $product = Product::findOrFail($productId);
+            //     if ((int)$product->current_stock < $totalQty) {
+            //         return redirect()->back()->with(['failed' => 'Stock product ' . $product->name . ' kurang - Stock tersisa ' . $product->current_stock]);
+            //     }
 
-                // Kurangi stok produk
-                $product->current_stock = (int) $product->current_stock - (int) $totalQty;
-                $product->save();
-            }
+            //     // Kurangi stok produk
+            //     $product->current_stock = (int) $product->current_stock - (int) $totalQty;
+            //     $product->save();
+            // }
 
             // Simpan produk dan addons ke tabel order_products
             foreach ($orderProducts as $product) {

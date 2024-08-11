@@ -28,6 +28,7 @@
                 </a>
             </li>
 
+            @can('attendance-list')
             <li class="menu {{ request()->routeIs('attendances.index') ? 'active' : '' }}">
                 <a href="{{ route('attendances.index') }}" aria-expanded="false" class="dropdown-toggle">
                     <div class="">
@@ -36,6 +37,7 @@
                     </div>
                 </a>
             </li>
+            @endcan
 
             <li class="menu {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                 <a href="#dashboard" data-bs-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
@@ -72,7 +74,7 @@
                     <li class="{{ request()->routeIs('suppliers.index') ? 'active' : '' }}">
                         <a href="{{ route('suppliers.index') }}"> Suppliers </a>
                     </li>
-                    <li class="{{ request()->routeIs('store.index') ? 'active' : '' }}">
+                    <li class="{{ request()->routeIs('stores.index') ? 'active' : '' }}">
                         <a href="{{ route('stores.index') }}"> Store </a>
                     </li>
                     <li class="{{ request()->routeIs('materials.index') ? 'active' : '' }}">
@@ -119,6 +121,7 @@
                 </ul>
             </li>
 
+            @can('coupon-list')
             <li class="menu {{ request()->routeIs('coupons.index') ? 'active' : '' }}">
                 <a href="{{ route('coupons.index') }}" aria-expanded="false" class="dropdown-toggle">
                     <div class="">
@@ -127,7 +130,9 @@
                     </div>
                 </a>
             </li>
+            @endcan
 
+            @can('order-pesanan')
             <li class="menu {{ request()->routeIs('order-pesanan') ? 'active' : '' }}">
                 <a href="{{ route('order-pesanan') }}" aria-expanded="false" class="dropdown-toggle">
                     <div class="">
@@ -136,7 +141,9 @@
                     </div>
                 </a>
             </li>
+            @endcan
 
+            @can('settlement')
             <li class="menu {{ request()->routeIs('settlements.index') ? 'active' : '' }}">
                 <a href="{{ route('settlements.index') }}" aria-expanded="false" class="dropdown-toggle">
                     <div class="">
@@ -145,6 +152,7 @@
                     </div>
                 </a>
             </li>
+            @endcan
 
             <li class="menu {{ request()->routeIs('customers.index') ? 'active' : '' }}">
                 <a href="{{ route('customers.index') }}" aria-expanded="false" class="dropdown-toggle">
@@ -155,6 +163,7 @@
                 </a>
             </li>
 
+            @can('user-list')
             <li class="menu {{ request()->routeIs('users.index') ? 'active' : '' }}">
                 <a href="{{ route('users.index') }}" aria-expanded="false" class="dropdown-toggle">
                     <div class="">
@@ -163,7 +172,9 @@
                     </div>
                 </a>
             </li>
+            @endcan
 
+            @can('role-list')
             <li class="menu {{ request()->routeIs('roles.index') ? 'active' : '' }}">
                 <a href="{{ route('roles.index') }}" aria-expanded="false" class="dropdown-toggle">
                     <div class="">
@@ -172,6 +183,7 @@
                     </div>
                 </a>
             </li>
+            @endcan
 
             <li class="menu {{ request()->routeIs('sync.index') ? 'active' : '' }}">
                 <a href="{{ route('sync.index') }}" aria-expanded="false" class="dropdown-toggle">

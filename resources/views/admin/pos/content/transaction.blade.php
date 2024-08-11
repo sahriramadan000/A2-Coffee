@@ -38,6 +38,11 @@
 											</thead>
 											<tbody id="cart-product">
 												@forelse ($data_items as $key => $item)
+                                                @php
+                                                    $inputer    = $item->attributes['inputer'] ?? '';
+                                                    $table      = $item->attributes['table'] ?? '';
+                                                @endphp
+
                                                     <tr class="table-cart text-white">
                                                         <td class="td-cart">
                                                             <div class="d-flex justify-content-between">
@@ -48,11 +53,13 @@
                                                                     {{-- <small>Unit: {{ $item->conditions }}</small> --}}
                                                                 </div>
 
+                                                                @can('delete-product-in-cart')
                                                                 <div class="">
                                                                     <a href="{{ route('delete-item', $key)}}" class="" style="border-bottom: 1px dashed red;">
                                                                         <i class='bx bx-trash font-14 text-danger'></i>
                                                                     </a>
                                                                 </div>
+                                                                @endcan
                                                             </div>
                                                         </td>
                                                         <td class="td-cart">
@@ -67,11 +74,14 @@
                                                     <tr class="table-cart">
                                                         <td colspan="3" class="text-center" style="border-bottom: 1px solid #060818d0">No products added</td>
                                                     </tr>
+                                                    @php
+                                                        $inputer = '';
+                                                        $table = '';
+                                                    @endphp
                                                 @endforelse
 											</tbody>
 										</table>
 									</div>
-
                                     <div class="row my-action align-items-end align-content-end">
                                         <div class="col-12">
                                             <table width="100%" class="table">
@@ -128,12 +138,14 @@
                                         </div>
                                         <div class="col-12">
                                             <div class="btn-group w-100 p-3 pt-0" role="group" aria-label="Grouping Button">
-                                                <button type="button" class="btn btn-lg btn-success fw-bold w-25 p-3" data-bs-toggle="modal" data-bs-target="#modalPayment">
+                                                <input type="hidden" name="button" id="buttonValue" value="">
+                                                <button type="button" class="btn btn-lg btn-success fw-bold w-25 p-3" data-bs-toggle="modal" data-bs-target="#modalPayment" onclick="setButtonValue('simpan-order')">
                                                     <h6 class="mb-0 text-white">
                                                         SIMPAN ORDER
                                                     </h6>
                                                 </button>
-                                                <button type="button" class="btn btn-lg btn-warning fw-bold w-25 p-3" data-bs-toggle="modal" data-bs-target="#modalOpenBill">
+
+                                                <button type="button" class="btn btn-lg btn-warning fw-bold w-25 p-3" data-bs-toggle="modal" data-bs-target="#modalOpenBill" onclick="setButtonValue('simpan-bill')">
                                                     <h6 class="mb-0 text-white">
                                                         SIMPAN BILL
                                                     </h6>
@@ -160,70 +172,70 @@
                                             </div>
                                         </div>
                                     </div>
-									<div class="modal fade" id="modalPayment" tabindex="-1" aria-labelledby="modalPaymentLabel" aria-hidden="true">
-										<div class="modal-dialog">
-											<div class="modal-content">
-												<div class="modal-header">
-													<h5 class="modal-title" id="modalPaymentLabel">PAYMENT</h5>
-													<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-												</div>
-												<div class="modal-body">
-                                                    <div class="modal-body p-0">
-                                                        <div class="form-group">
-                                                            <h6 class="mb-3">Metode Payment</h6>
-                                                            <select name="payment_method" id="payment_method" class="form-control form-control-sm">
-                                                                <option selected value="Transfer Bank">Transfer Bank</option>
-                                                                <option value="EDC BCA">EDC BCA</option>
-                                                                <option value="EDC BRI">EDC BRI</option>
-                                                                <option value="EDC BNI">EDC BNI</option>
-                                                                <option value="Qris">Qris</option>
-                                                                <option value="Cash">Cash</option>
-                                                            </select>
-                                                        </div>
-
-                                                        <div class="form-group mt-2" id="cashInput" style="display: none;">
-                                                            <label for="cash" class="form-label">Cash</label>
-                                                            <input type="text" name="cash" value="{{ old('cash') }}" class="form-control form-control-sm" placeholder="Ex:50.000" id="cash" aria-describedby="cash">
-                                                        </div>
+                                    <div class="modal fade" id="modalPayment" tabindex="-1" aria-labelledby="modalPaymentLabel" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="modalPaymentLabel">PAYMENT</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="form-group">
+                                                        <h6 class="mb-3">Metode Payment</h6>
+                                                        <select name="payment_method" id="payment_method" class="form-control form-control-sm">
+                                                            <option selected disabled value="">Pilih Metode Pembayaran</option>
+                                                            <option value="Transfer Bank">Transfer Bank</option>
+                                                            <option value="EDC BCA">EDC BCA</option>
+                                                            <option value="EDC BRI">EDC BRI</option>
+                                                            <option value="EDC BNI">EDC BNI</option>
+                                                            <option value="Qris">Qris</option>
+                                                            <option value="Cash">Cash</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="form-group mt-2" id="cashInput" style="display: none;">
+                                                        <label for="cash" class="form-label">Cash</label>
+                                                        <input type="text" name="cash" value="{{ old('cash') }}" class="form-control form-control-sm" placeholder="Ex:50.000" id="cash" aria-describedby="cash">
                                                     </div>
                                                 </div>
-												<div class="modal-footer">
-													<button type="button" class="btn btn-danger" data-bs-dismiss="modal">CLOSE</button>
-                                                    <button type="submit" class="btn btn-primary">PAY</button>
-												</div>
-											</div>
-										</div>
-									</div>
-									<div class="modal fade" id="modalOpenBill" tabindex="-1" aria-labelledby="modalOpenBillLabel" aria-hidden="true">
-										<div class="modal-dialog">
-											<div class="modal-content">
-												<div class="modal-header">
-													<h5 class="modal-title" id="modalOpenBillLabel">PAYMENT</h5>
-													<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-												</div>
-												<div class="modal-body">
-                                                    <div class="modal-body p-0">
-                                                        <div class="form-group mt-2">
-                                                            <label for="inputer" class="form-label">Inputer</label>
-                                                            <input type="text" name="inputer" value="{{ old('inputer') }}" class="form-control form-control-sm" placeholder="Enter Inputer Name....." id="inputer" aria-describedby="inputer">
-                                                        </div>
-                                                        <div class="form-group mt-2">
-                                                            <label class="form-label">Table</label>
-                                                            <select class="form-select mr-sm-2 @error('table') is-invalid @enderror" id="table" name="table" style="width:100%">
-                                                                @foreach ($tables as $table)
-                                                                    <option value="{{ $table->name }}">{{ $table->name }}</option>
-                                                                @endforeach
-                                                            </select>
-                                                        </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">CLOSE</button>
+                                                    <button type="submit" class="btn btn-primary" onclick="setButtonValue('simpan-order')">PAY</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                
+                                    <!-- Modal Open Bill -->
+                                    <div class="modal fade" id="modalOpenBill" tabindex="-1" aria-labelledby="modalOpenBillLabel" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="modalOpenBillLabel">PAYMENT</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="form-group mt-2">
+                                                        <label for="inputer" class="form-label">Inputer</label>
+                                                        <input type="text" name="inputer" value="{{ old('inputer', $inputer) }}" class="form-control form-control-sm" placeholder="Enter Inputer Name....." id="inputer" aria-describedby="inputer">
+                                                    </div>
+                                                    <div class="form-group mt-2">
+                                                        <label class="form-label">Table</label>
+                                                        <select class="form-select mr-sm-2 @error('table') is-invalid @enderror" id="table" name="table" style="width:100%">
+                                                            @foreach ($tables as $tableOption)
+                                                                <option value="{{ $tableOption->name }}" {{ $tableOption->name == old('table', $table) ? 'selected' : '' }}>
+                                                                    {{ $tableOption->name }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
                                                     </div>
                                                 </div>
-												<div class="modal-footer">
-													<button type="button" class="btn btn-danger" data-bs-dismiss="modal">CLOSE</button>
-                                                    <button type="submit" class="btn btn-primary">SUBMIT</button>
-												</div>
-											</div>
-										</div>
-									</div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">CLOSE</button>
+                                                    <button type="submit" class="btn btn-primary" onclick="setButtonValue('simpan-bill')">SUBMIT</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
 								</form>
 							</div>
 						</div>
@@ -279,5 +291,11 @@
         }
     });
 
+</script>
+
+<script>
+    function setButtonValue(value) {
+        document.getElementById('buttonValue').value = value;
+    }
 </script>
 
