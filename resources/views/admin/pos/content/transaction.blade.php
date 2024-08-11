@@ -33,7 +33,7 @@
 												<tr>
 													<th width="60%">Product</th>
 													<th width="15%">Quantity</th>
-													<th width="25%">Price</th>
+													{{-- <th width="25%">Price</th> --}}
 												</tr>
 											</thead>
 											<tbody id="cart-product">
@@ -57,7 +57,7 @@
                                                         </td>
                                                         <td class="td-cart">{{ $item->quantity }}</td>
                                                         <input type="hidden" name="qty[]" id="quantityInput" readonly class="min-width-40 flex-grow-0 border border-success text-success fs-4 fw-semibold form-control text-center qty" min="0" style="width: 15%"  value="{{ $item->quantity }}">
-                                                        <td class="td-cart">Rp.{{ number_format($item->price, 0, ',', '.') }}</td>
+                                                        {{-- <td class="td-cart">Rp.{{ number_format($item->price, 0, ',', '.') }}</td> --}}
                                                     </tr>
                                                 @empty
                                                     <tr class="table-cart">
@@ -124,14 +124,14 @@
                                         </div>
                                         <div class="col-12">
                                             <div class="btn-group w-100 p-3 pt-0" role="group" aria-label="Grouping Button">
-                                                {{-- <button type="button" class="btn btn-lg btn-success fw-bold w-25 p-3" data-bs-toggle="modal" data-bs-target="#modalPayment">
+                                                <button type="button" class="btn btn-lg btn-success fw-bold w-25 p-3" data-bs-toggle="modal" data-bs-target="#modalPayment">
                                                     <h6 class="mb-0 text-white">
                                                         SIMPAN ORDER
                                                     </h6>
-                                                </button> --}}
-                                                <button type="button" class="btn btn-lg btn-success fw-bold w-25 p-3" data-bs-toggle="modal" data-bs-target="#modalOpenBill">
+                                                </button>
+                                                <button type="button" class="btn btn-lg btn-warning fw-bold w-25 p-3" data-bs-toggle="modal" data-bs-target="#modalOpenBill">
                                                     <h6 class="mb-0 text-white">
-                                                        SIMPAN ORDER
+                                                        SIMPAN BILL
                                                     </h6>
                                                 </button>
                                                 {{-- <button type="button" class="btn btn-lg btn-primary fw-bold w-25 p-3" onclick="onHoldOrder('{{ route('on-hold-order') }}', '{{ csrf_token() }}')">

@@ -41,7 +41,7 @@ const options = {
 const localPool = new Pool({
     host: 'localhost',
     port: 5432,
-    database: 'controlindo-pos',
+    database: 'a2',
     user: 'postgres',
     password: 'root',
   });
