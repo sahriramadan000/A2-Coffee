@@ -236,6 +236,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/modal-add-cart/{productId}', [TransactionController::class, 'modalAddCart'])->name('modal-add-cart');
     Route::get('/modal-add-customer', [TransactionController::class, 'modalAddCustomer'])->name('modal-add-customer');
     Route::post('/get-data-customers', [TransactionController::class, 'getDataCustomers'])->name('get-data-customers');
+    Route::get('/modal-edit-qty-cart/{key}', [TransactionController::class, 'modalEditQtyCart'])->name('modal-edit-qty-cart');
     Route::get('/modal-search-product', [TransactionController::class, 'modalSearchProduct'])->name('modal-search-product');
     Route::post('/search-product', [TransactionController::class, 'searchProduct'])->name('search-product');
     // Route::get('/modal-add-ongkir', [TransactionController::class, 'modalAddOngkir'])->name('modal-add-ongkir');
@@ -243,6 +244,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/modal-add-coupon', [TransactionController::class, 'modalAddCoupon'])->name('modal-add-coupon');
     Route::get('/modal-my-order', [TransactionController::class, 'modalMyOrder'])->name('modal-my-order');
     Route::post('/add-item',[TransactionController::class, 'addToCart'])->name('add-item');
+    Route::post('/update-cart-qty',[TransactionController::class, 'updateCartQuantity'])->name('update-cart-qty');
     Route::post('/add-item-barcode',[TransactionController::class, 'addToCartBarcode'])->name('add-item-barcode');
     Route::post('/update-cart-by-discount',[TransactionController::class, 'updateCartByDiscount'])->name('update-cart-by-discount');
     // Route::post('/update-cart-ongkir',[TransactionController::class, 'updateCartOngkir'])->name('update-cart-ongkir');
@@ -307,7 +309,7 @@ Route::prefix('mobile')->name('mobile.')->middleware(['web'])->group(function ()
     Route::post('/checkout/store/{token}',[MobileTransactionController::class,'store'])->name('checkout.store');
     Route::get('/payment/success', [MobileTransactionController::class, 'midtransCallback']);
     Route::post('/payment/success', [MobileTransactionController::class, 'midtransCallback']);
-    
+
     Route::get('/success',[MobileTransactionController::class,'pesanan'])->name('pesanan');
     // Route::get('/pesanan', function() {
     //     return view('mobile.pesanan.index');

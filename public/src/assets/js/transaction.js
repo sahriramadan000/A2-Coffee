@@ -202,9 +202,12 @@ function openOnholdOrder(url, key, token) {
                                             `</div>`+
                                         `</div>`+
                                     `</td>`+
-                                    `<td class="td-cart">${cart.quantity}</td>`+
+                                    `<td class="td-cart">`+
+                                        `<a href="#!" type="button" onclick="ModalEditQtyCart('/modal-edit-qty-cart/${index}', '${index}', '${$('meta[name="csrf-token"]').attr('content')}')" class="cursor-pointer" style="border-bottom: 1px dashed #bfbfbf; font-size:12px;">`+
+                                            `<small id="data-qty" style="font-size: 12px;" class="text-white opacity-75">${cart.quantity}</small>`+
+                                        `</a>`+
+                                    `</td>`+
                                     `<input type="hidden" name="qty[]" id="quantityInput" class="form-control qty" min="0"  value="${cart.quantity}">`+
-                                    `<td class="td-cart">Rp.${numberFormat(cart.price)}</td>`+
                                 `</tr>`;
 
                 $('#cart-product').append(addList);
@@ -254,9 +257,12 @@ function openBillOrder(url, id, token) {
                                             `</div>`+
                                         `</div>`+
                                     `</td>`+
-                                    `<td class="td-cart">${cart.quantity}</td>`+
+                                    `<td class="td-cart">`+
+                                        `<a href="#!" type="button" onclick="ModalEditQtyCart('/modal-edit-qty-cart/${index}', '${index}', '${$('meta[name="csrf-token"]').attr('content')}')" class="cursor-pointer" style="border-bottom: 1px dashed #bfbfbf; font-size:12px;">`+
+                                            `<small id="data-qty" style="font-size: 12px;" class="text-white opacity-75">${cart.quantity}</small>`+
+                                        `</a>`+
+                                    `</td>`+
                                     `<input type="hidden" name="qty[]" id="quantityInput" class="form-control qty" min="0"  value="${cart.quantity}">`+
-                                    `<td class="td-cart">Rp.${numberFormat(cart.price)}</td>`+
                                 `</tr>`;
 
                 $('#cart-product').append(addList);
@@ -490,6 +496,109 @@ function ModalAddToCart(productId, url = '/modal-add-cart') {
     });
 }
 
+function ModalEditQtyCart(url = '/modal-edit-qty-cart', key, token) {
+    var getTarget = `#modal-edit-qty-cart-${key}`;
+    $.ajax({
+        url: url, // Menggunakan key untuk URL
+        type: 'GET',
+        success: function(data) {
+            $('#modalContainer').html(data);
+            $(getTarget).modal('show');
+            $(getTarget).on('shown.bs.modal', function () {
+                // Fungsi untuk menangani penambahan nilai ketika tombol + ditekan
+                $("#btn-add").on("click", function() {
+                    var input = $(this).siblings("input[type='number']");
+                    var value = parseInt(input.val());
+
+                    input.val(value + 1);
+                });
+
+                // Fungsi untuk menangani pengurangan nilai ketika tombol - ditekan
+                $("#btn-min").on("click", function() {
+                    var input = $(this).siblings("input[type='number']");
+                    var value = parseInt(input.val());
+                    if (value > 0) {
+                        input.val(value - 1);
+                    }
+                });
+
+                // Memastikan nilai input tidak kurang dari 0
+                $(".qty-add").on("change", function() {
+                    if ($(this).val() < 0) {
+                        $(this).val(0);
+                    }
+                });
+
+                $('#updateQtyCartButton').on('click', function() {
+                    const quantity = $('#qty-add').val();
+                    const route = $(this).data('route');
+                    const token = $(this).data('token');
+
+                    updateCartQuantity(key, quantity, route, token, getTarget); // Memanggil fungsi update cart quantity
+                });
+            });
+        },
+        error: function(xhr, status, error) {
+            console.error('Failed to load Product: ', error);
+        }
+    });
+}
+
+
+function updateCartQuantity(key, quantity, url, token, modalSelector) {
+    $.ajax({
+        url: url,
+        type: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': token,
+        },
+        data: {
+            "key": key,
+            "quantity": quantity,
+        },
+        success: function(response) {
+            console.log(response);
+            $('#cart-product').empty();
+            $.each(response.data, function(index, cart) {
+                var addList = `<tr class="table-cart text-white">`+
+                                    `<td class="td-cart">`+
+                                        `<div class="d-flex justify-content-between">`+
+                                            `<div class="">`+
+                                                `<p class="p-0 m-0 text-white">`+
+                                                    `${cart.name}`+
+                                                `</p>`+
+                                            `</div>`+
+                                            `<div>`+
+                                                `<a href="/delete-item/${index}" class="" style="border-bottom: 1px dashed red;">`+
+                                                    `<i class='bx bx-trash font-14 text-danger'></i>`+
+                                                `</a>`+
+                                            `</div>`+
+                                        `</div>`+
+                                    `</td>`+
+                                    `<td class="td-cart">`+
+                                        `<a href="#!" type="button" onclick="ModalEditQtyCart('/modal-edit-qty-cart/${index}', '${index}', '${$('meta[name="csrf-token"]').attr('content')}')" class="cursor-pointer" style="border-bottom: 1px dashed #bfbfbf; font-size:12px;">`+
+                                            `<small id="data-qty" style="font-size: 12px;" class="text-white opacity-75">${cart.quantity}</small>`+
+                                        `</a>`+
+                                    `</td>`+
+                                    `<input type="hidden" name="qty[]" id="quantityInput" class="form-control qty" min="0"  value="${cart.quantity}">`+
+                                `</tr>`;
+
+                $('#cart-product').append(addList);
+            });
+
+            $('#subtotal-cart').text(`Rp.${formatRupiah(response.subtotal)}`)
+            $('#tax-cart').text(`Rp.${formatRupiah(response.tax)}`)
+            $('#service-cart').text(`Rp.${formatRupiah(response.service)}`);
+            $('#total-cart').text(`Rp.${formatRupiah(response.total)}`)
+            // Close the modal
+            $(modalSelector).modal('hide');
+        },
+        error: function(xhr, status, error) {
+            console.error('Failed to update cart item: ', error);
+        }
+    });
+}
+
 function ModalAddCustomer(urlModal, urlGetDataCust, token) {
     var getTarget = `#modal-add-customer`;
     $.ajax({
@@ -695,9 +804,12 @@ function addToCart(productId, addons, quantity, url, token) {
                                             `</div>`+
                                         `</div>`+
                                     `</td>`+
-                                    `<td class="td-cart">${cart.quantity}</td>`+
+                                    `<td class="td-cart">`+
+                                        `<a href="#!" type="button" onclick="ModalEditQtyCart('/modal-edit-qty-cart/${index}', '${index}', '${$('meta[name="csrf-token"]').attr('content')}')" class="cursor-pointer" style="border-bottom: 1px dashed #bfbfbf; font-size:12px;">`+
+                                            `<small id="data-qty" style="font-size: 12px;" class="text-white opacity-75">${cart.quantity}</small>`+
+                                        `</a>`+
+                                    `</td>`+
                                     `<input type="hidden" name="qty[]" id="quantityInput" class="form-control qty" min="0"  value="${cart.quantity}">`+
-                                    `<td class="td-cart">Rp.${numberFormat(cart.price)}</td>`+
                                 `</tr>`;
 
                 $('#cart-product').append(addList);

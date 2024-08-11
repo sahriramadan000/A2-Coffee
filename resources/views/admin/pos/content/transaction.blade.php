@@ -55,7 +55,11 @@
                                                                 </div>
                                                             </div>
                                                         </td>
-                                                        <td class="td-cart">{{ $item->quantity }}</td>
+                                                        <td class="td-cart">
+                                                            <a href="#!" type="button" onclick="ModalEditQtyCart('{{ route('modal-edit-qty-cart', $key) }}', '{{ $key }}', '{{ csrf_token() }}')" class="cursor-pointer" data-bs-target="#modal-add-customer" style="border-bottom: 1px dashed #bfbfbf; font-size:12px;">
+                                                                <small id="data-qty" style="font-size: 12px;" class="text-white opacity-75">{{ $item->quantity }}</small>
+                                                            </a>
+                                                        </td>
                                                         <input type="hidden" name="qty[]" id="quantityInput" readonly class="min-width-40 flex-grow-0 border border-success text-success fs-4 fw-semibold form-control text-center qty" min="0" style="width: 15%"  value="{{ $item->quantity }}">
                                                         {{-- <td class="td-cart">Rp.{{ number_format($item->price, 0, ',', '.') }}</td> --}}
                                                     </tr>

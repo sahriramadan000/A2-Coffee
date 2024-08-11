@@ -77,6 +77,22 @@ class TransactionController extends Controller
          return View::make('admin.pos.modal.modal-add-customer');
      }
 
+     // Modal edit QTY Cart
+     public function modalEditQtyCart($key)
+    {
+        // Ambil item dari cart berdasarkan key
+        $cartItem = Cart::session(Auth::user()->id)->get($key);
+
+        if (!$cartItem) {
+            return response()->json(['failed' => 'Cart item not found!'], 404);
+        }
+
+        return View::make('admin.pos.modal.modal-edit-qty-cart')->with([
+            'key'      => $key,
+            'quantity' => $cartItem->quantity, // Passing quantity ke view
+        ]);
+    }
+
      // Modal Search
     public function modalSearchProduct()
     {
@@ -265,6 +281,51 @@ class TransactionController extends Controller
             ], 200);
         } catch (\Throwable $th) {
             return response()->json(['failed' => 'Product '.$product->name.' gagal masuk cart!'. $th->getMessage()], 500);
+        }
+    }
+
+    public function updateCartQuantity(Request $request)
+    {
+        try {
+            $cartItemKey = $request->key;
+            $newQuantity = $request->quantity;
+
+            // Cek apakah key dan quantity diberikan
+            if ($cartItemKey == null || $newQuantity == null) {
+                return response()->json(['failed' => 'Please provide a valid cart item key and quantity!'], 400);
+            }
+
+            // Cek apakah item dengan key tersebut ada di dalam cart
+            $cartItem = Cart::session(Auth::user()->id)->get($cartItemKey);
+
+            if ($cartItem) {
+                // Update quantity dengan mengatur secara absolut ke nilai baru
+                Cart::session(Auth::user()->id)->update($cartItemKey, [
+                    'quantity' => [
+                        'relative' => false,
+                        'value' => $newQuantity
+                    ],
+                ]);
+
+                $other_setting = OtherSetting::select(['pb01', 'layanan'])->first();
+                $subtotal      = (Cart::getTotal() ?? '0');
+                $service       = $subtotal * ($other_setting->layanan / 100);
+                $tax           = (($subtotal + $service) * $other_setting->pb01 / 100);
+                $totalPayment  = ($subtotal + $service) + $tax;
+
+                return response()->json([
+                    'success'   => 'Cart item updated successfully!',
+                    'data'      => Cart::session(Auth::user()->id)->getContent()->toArray(),
+                    'service'   => $service,
+                    'tax'       => $tax,
+                    'subtotal'  => $subtotal,
+                    'total'     => $totalPayment,
+                ], 200);
+            } else {
+                return response()->json(['failed' => 'Cart item not found!'], 404);
+            }
+        } catch (\Throwable $th) {
+            return response()->json(['failed' => 'Failed to update cart item! ' . $th->getMessage()], 500);
         }
     }
 
@@ -712,14 +773,14 @@ class TransactionController extends Controller
             $order->payment_status = 'Paid';
             $order->payment_method = $request->payment_method;
             $order->cash = $request->cash ?? 0;
-            
+
             if ($request->payment_method == 'Cash' && $request->cash != null) {
                 $kembalian = $order->total - $request->cash ;
-            } 
+            }
             $order->kembalian = $request->kembalian ?? 0;
-            
+
             $order->save();
-    
+
             $table = Table::where('name', $order->table)->first(); // Assuming 'table_name' is the correct field
 
             if ($table) {
@@ -744,19 +805,19 @@ class TransactionController extends Controller
             $order->payment_status = 'Unpaid';
             $order->payment_method = 'Return';
             $order->save();
-    
+
             // Find the associated OrderProduct records
             $order_products = OrderProduct::where('order_id', $id)->get();
-    
+
             foreach ($order_products as $order_product) {
                 $products = Product::where('name', $order_product->name)->get();
-                
+
                 foreach ($products as $product) {
                     $product->current_stock += $order_product->qty;
                     $product->save();
                 }
             }
-    
+
             return redirect()->back()->with('success', 'Update Return');
         } catch (\Throwable $th) {
             // dd($th);
