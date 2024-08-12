@@ -54,7 +54,7 @@
         });
 
         $.ajax({
-            url: `http://localhost:3001/${endpoint}`,
+            url: `http://localhost:3000/${endpoint}`,
             type: 'POST',
             data: {
                 _token: `{{ csrf_token() }}`,

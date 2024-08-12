@@ -57,7 +57,7 @@ const cloudPool = new Pool({
 
 setInterval(() => {
     RealtimeDashboardOrder()
-    // syncAllOrdersAndRelatedTables()
+    syncAllOrdersAndRelatedTables()
 }, 1000);
 
 const promisifiedLocalQuery = util.promisify(localPool.query).bind(localPool);
