@@ -35,17 +35,17 @@ class AttendanceController extends Controller
     public function getAttendances(Request $request)
     {
         if ($request->ajax()) {
-            // Check if the user is a super-admin or cashier
             if (Auth::user()->hasRole('super-admin') || Auth::user()->hasRole('cashier')) {
-                // If the user is a super-admin or cashier, show all attendance data
-                $attendances = Attendance::query();
+                $attendances = Attendance::with('user')->select('attendances.*');
             } else {
-                // Otherwise, show only the attendance data for the logged-in user
-                $attendances = Attendance::where('user_id', Auth::id());
+                $attendances = Attendance::with('user')->where('user_id', Auth::id())->select('attendances.*');
             }
         
             return DataTables::of($attendances)
                 ->addIndexColumn()
+                ->addColumn('name', function ($row) {
+                    return $row->user->username; // Access the related user's name
+                })
                 ->addColumn('action', function ($row) {
                     $btn = '<button type="button" class="btn btn-sm btn-warning attendance-edit-table" data-bs-target="#tabs-' . $row->id . '-edit-attendance">Edit</button>';
                     $btn .= ' <button type="button" class="btn btn-sm btn-danger attendance-delete-table" data-bs-target="#tabs-' . $row->id . '-delete-attendance">Delete</button>';
@@ -54,6 +54,7 @@ class AttendanceController extends Controller
                 ->rawColumns(['action'])
                 ->make(true);
         }
+        
         
     }
 

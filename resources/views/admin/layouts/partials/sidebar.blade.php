@@ -113,8 +113,8 @@
                     <li class="{{ request()->routeIs('report.sales.refund') ? 'active' : '' }}">
                         <a href="{{ route('report.sales.refund') }}"> Report Refund </a>
                     </li>
-                    <li class="{{ request()->routeIs('materials.index') ? 'active' : '' }}">
-                        <a href="{{ route('materials.index') }}"> Absensi </a>
+                    <li class="{{ request()->routeIs('report.sales.report-absensi') ? 'active' : '' }}">
+                        <a href="{{ route('report.sales.report-absensi') }}"> Absensi </a>
                     </li>
                 </ul>
             </li>

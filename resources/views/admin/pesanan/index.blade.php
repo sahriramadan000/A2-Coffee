@@ -186,10 +186,10 @@
                                         <li class="list-group-item">
                                             <div class="row">
                                                 <div class="col-lg-4">
-                                                    <a href="{{ route('print-bill', $item->id) }}" target="_blank" type="submit" class="btn btn-sm w-100 btn-primary">Print Bill</a>
+                                                    <a href="{{ route('print-bill', $item->id) }}" type="submit" class="btn btn-sm w-100 btn-primary">Print Bill</a>
                                                 </div>
                                                 <div class="col-lg-4">
-                                                    <a href="{{ route('print-struk', $item->id) }}" target="_blank" type="submit" class="btn btn-sm w-100 btn-warning">Print Struk</a>
+                                                    <a href="{{ route('print-struk', $item->id) }}" type="submit" class="btn btn-sm w-100 btn-warning">Print Struk</a>
                                                 </div>
                                                 <div class="col-lg-4">
                                                     <button type="button" class="btn btn-sm w-100 btn-danger" data-bs-toggle="modal" data-bs-target="#return-{{ $item->id }}">Refund</button>

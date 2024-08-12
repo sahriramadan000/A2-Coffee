@@ -170,14 +170,18 @@ Route::middleware(['auth'])->group(function () {
         Route::prefix('sales')->name('sales.')->group(function () {
             Route::get('gross', [ReportController::class, 'reportGross'])->name('report-gross');
             Route::get('gross-data', [ReportController::class, 'getReportGross'])->name('get-report-gross');
-
+            
             Route::get('payment-method', [ReportController::class, 'paymentMethod'])->name('payment-method');
             Route::get('payment-method-data', [ReportController::class, 'getReportPayment'])->name('get-payment-method');
-
+            
             Route::get('refund', [ReportController::class, 'refund'])->name('refund');
             Route::get('refund-data', [ReportController::class, 'getReportRefund'])->name('get-return');
+    
+            Route::get('absensi', [ReportController::class, 'reportAbsensi'])->name('report-absensi');
+            Route::get('absensi-data', [ReportController::class, 'getReportAbsensi'])->name('get-report-absensi'); // Changed URI to 'absensi-data'
         });
     });
+    
 
     // settlement
     Route::prefix('settlements')->name('settlements.')->group(function () {
