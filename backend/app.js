@@ -87,14 +87,17 @@ async function syncAllOrdersAndRelatedTables() {
                 // Jika data sudah ada, cek apakah ada perubahan dan update jika perlu
                 const localOrder = localOrderResult.rows[0];
                 let isDifferent = false;
+
+                // Periksa perubahan pada setiap kolom, kecuali `status_input`
                 for (const key in order) {
-                    if (order[key] !== localOrder[key]) {
+                    if (key !== 'status_input' && order[key] !== localOrder[key]) {
                         isDifferent = true;
                         break;
                     }
                 }
 
-                if (isDifferent) {
+                // Jika ada perubahan dan status_input adalah 'cloud', lakukan pembaruan
+                if (isDifferent && order.status_input === 'cloud') {
                     const keys = Object.keys(order).map(key => key === 'table' ? '"table"' : key);
                     const values = Object.values(order);
                     const updateSet = keys.map((key, index) => `${key} = $${index + 1}`).join(', ');
@@ -123,14 +126,15 @@ async function syncAllOrdersAndRelatedTables() {
             } else {
                 const localOrderProduct = localOrderProductResult.rows[0];
                 let isDifferent = false;
+
                 for (const key in orderProduct) {
-                    if (orderProduct[key] !== localOrderProduct[key]) {
+                    if (key !== 'status_input' && orderProduct[key] !== localOrderProduct[key]) {
                         isDifferent = true;
                         break;
                     }
                 }
 
-                if (isDifferent) {
+                if (isDifferent && orderProduct.status_input === 'cloud') {
                     const keys = Object.keys(orderProduct).map(key => key === 'table' ? '"table"' : key);
                     const values = Object.values(orderProduct);
                     const updateSet = keys.map((key, index) => `${key} = $${index + 1}`).join(', ');
@@ -159,14 +163,15 @@ async function syncAllOrdersAndRelatedTables() {
             } else {
                 const localOrderProductAddon = localOrderProductAddonResult.rows[0];
                 let isDifferent = false;
+
                 for (const key in orderProductAddon) {
-                    if (orderProductAddon[key] !== localOrderProductAddon[key]) {
+                    if (key !== 'status_input' && orderProductAddon[key] !== localOrderProductAddon[key]) {
                         isDifferent = true;
                         break;
                     }
                 }
 
-                if (isDifferent) {
+                if (isDifferent && orderProductAddon.status_input === 'cloud') {
                     const keys = Object.keys(orderProductAddon).map(key => key === 'table' ? '"table"' : key);
                     const values = Object.values(orderProductAddon);
                     const updateSet = keys.map((key, index) => `${key} = $${index + 1}`).join(', ');
@@ -195,14 +200,15 @@ async function syncAllOrdersAndRelatedTables() {
             } else {
                 const localOrderCoupon = localOrderCouponResult.rows[0];
                 let isDifferent = false;
+
                 for (const key in orderCoupon) {
-                    if (orderCoupon[key] !== localOrderCoupon[key]) {
+                    if (key !== 'status_input' && orderCoupon[key] !== localOrderCoupon[key]) {
                         isDifferent = true;
                         break;
                     }
                 }
 
-                if (isDifferent) {
+                if (isDifferent && orderCoupon.status_input === 'cloud') {
                     const keys = Object.keys(orderCoupon).map(key => key === 'table' ? '"table"' : key);
                     const values = Object.values(orderCoupon);
                     const updateSet = keys.map((key, index) => `${key} = $${index + 1}`).join(', ');
@@ -217,6 +223,7 @@ async function syncAllOrdersAndRelatedTables() {
         console.error('Error syncing orders and related tables:', error);
     }
 }
+
 
 const syncLocalToCloud = async () => {
     const today = moment().format('YYYY-MM-DD');
