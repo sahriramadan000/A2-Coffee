@@ -775,11 +775,18 @@ const syncCloudToLocal = async () => {
         const cloudRoleHasPermissions = await promisifiedCloudQuery(`SELECT * FROM role_has_permissions`);
         await promisifiedLocalQuery(`DELETE FROM role_has_permissions`);
         for (const rolePermission of cloudRoleHasPermissions.rows) {
-            const keys = Object.keys(rolePermission).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-            const values = Object.values(rolePermission).filter((_, index) => Object.keys(rolePermission)[index] !== 'id');
-            const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
-            const insertQuery = `INSERT INTO role_has_permissions (${keys.join(', ')}) VALUES (${placeholders})`;
-            await promisifiedLocalQuery(insertQuery, values);
+            // Validasi apakah permission_id ada di tabel permissions
+            const permissionExists = await promisifiedLocalQuery(`SELECT 1 FROM permissions WHERE id = $1 LIMIT 1`, [rolePermission.permission_id]);
+
+            if (permissionExists.rows.length > 0) {
+                const keys = Object.keys(rolePermission).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
+                const values = Object.values(rolePermission).filter((_, index) => Object.keys(rolePermission)[index] !== 'id');
+                const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
+                const insertQuery = `INSERT INTO role_has_permissions (${keys.join(', ')}) VALUES (${placeholders})`;
+                await promisifiedLocalQuery(insertQuery, values);
+            } else {
+                console.log(`Skipping role_permission with invalid permission_id ${rolePermission.permission_id}`);
+            }
         }
         console.log('Table role_has_permissions synchronized successfully from cloud to local.');
 
