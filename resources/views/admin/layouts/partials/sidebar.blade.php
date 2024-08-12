@@ -28,7 +28,6 @@
                 </a>
             </li>
 
-            @can('attendance-list')
             <li class="menu {{ request()->routeIs('attendances.index') ? 'active' : '' }}">
                 <a href="{{ route('attendances.index') }}" aria-expanded="false" class="dropdown-toggle">
                     <div class="">
@@ -37,7 +36,6 @@
                     </div>
                 </a>
             </li>
-            @endcan
 
             <li class="menu {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                 <a href="{{ route('dashboard') }}" aria-expanded="false" class="dropdown-toggle">
