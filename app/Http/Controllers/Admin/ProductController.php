@@ -94,6 +94,7 @@ class ProductController extends Controller
             $product->percent_discount = $dataProduct['percent_discount'];
             $product->price_discount   = (int) str_replace('.', '', $dataProduct['price_discount']);
             $product->stock_per_day    = $dataProduct['stock_per_day'];
+            $product->current_stock    = $dataProduct['stock_per_day'];
             $product->minimum_stock    = $dataProduct['stock_per_day'];
             $product->status           = $dataProduct['status'];
 
@@ -185,6 +186,7 @@ class ProductController extends Controller
             $product->percent_discount = $dataProduct['percent_discount'];
             $product->price_discount   = (int) str_replace('.', '', $dataProduct['price_discount']);
             $product->stock_per_day    = $dataProduct['stock_per_day'];
+            $product->current_stock    = $dataProduct['stock_per_day'];
             $product->minimum_stock    = $dataProduct['stock_per_day'];
             $product->status           = $dataProduct['status'];
 

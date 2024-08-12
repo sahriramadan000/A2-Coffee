@@ -900,7 +900,7 @@ class TransactionController extends Controller
         try {
             $order = Order::findOrFail($id);
             $order->payment_status  = 'Paid';
-            $order->status_input    = 'cloud';
+            $order->status_input    = 'local';
             $order->payment_method  = $request->payment_method;
             $order->cash = $request->cash ?? 0;
 

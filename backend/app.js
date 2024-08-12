@@ -87,11 +87,12 @@ async function syncAllOrdersAndRelatedTables() {
                 // Jika data sudah ada, cek apakah ada perubahan dan update jika perlu
                 const localOrder = localOrderResult.rows[0];
                 let isDifferent = false;
-
+                
                 // Periksa perubahan pada setiap kolom, kecuali `status_input`
                 for (const key in order) {
-                    if (key !== 'status_input' && order[key] !== localOrder[key]) {
-                        isDifferent = true;
+                  if (localOrder['status_input'] == 'cloud' && order[key] !== localOrder[key] && key !== 'created_at' && key !== 'updated_at') {
+                      // console.log(key, order[key], localOrder[key], order['status_input']);  
+                      isDifferent = true;
                         break;
                     }
                 }
@@ -128,7 +129,7 @@ async function syncAllOrdersAndRelatedTables() {
                 let isDifferent = false;
 
                 for (const key in orderProduct) {
-                    if (key !== 'status_input' && orderProduct[key] !== localOrderProduct[key]) {
+                    if (orderProduct[key] !== localOrderProduct[key] && key !== 'created_at' && key !== 'updated_at') {
                         isDifferent = true;
                         break;
                     }
@@ -165,7 +166,7 @@ async function syncAllOrdersAndRelatedTables() {
                 let isDifferent = false;
 
                 for (const key in orderProductAddon) {
-                    if (key !== 'status_input' && orderProductAddon[key] !== localOrderProductAddon[key]) {
+                    if (orderProductAddon[key] !== localOrderProductAddon[key] && key !== 'created_at' && key !== 'updated_at') {
                         isDifferent = true;
                         break;
                     }
@@ -202,7 +203,7 @@ async function syncAllOrdersAndRelatedTables() {
                 let isDifferent = false;
 
                 for (const key in orderCoupon) {
-                    if (key !== 'status_input' && orderCoupon[key] !== localOrderCoupon[key]) {
+                    if (orderCoupon[key] !== localOrderCoupon[key] && key !== 'created_at' && key !== 'updated_at') {
                         isDifferent = true;
                         break;
                     }
@@ -852,7 +853,7 @@ async function RealtimeDashboardOrder() {
           return null;
         });
 
-        promisifiedLocalQuery(`UPDATE orders SET status_realtime = 'Success Print' WHERE id = ${element.id}`);
+        promisifiedLocalQuery(`UPDATE orders SET status_realtime = 'Success Print', status_input = 'local' WHERE id = ${element.id}`);
 
     } catch (error) {
       console.log(error);
