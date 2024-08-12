@@ -899,8 +899,9 @@ class TransactionController extends Controller
     public function updatePayment(Request $request, $id) {
         try {
             $order = Order::findOrFail($id);
-            $order->payment_status = 'Paid';
-            $order->payment_method = $request->payment_method;
+            $order->payment_status  = 'Paid';
+            $order->status_input    = 'cloud';
+            $order->payment_method  = $request->payment_method;
             $order->cash = $request->cash ?? 0;
 
             if ($request->payment_method == 'Cash' && $request->cash != null) {

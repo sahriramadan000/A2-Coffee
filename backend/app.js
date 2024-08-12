@@ -100,7 +100,7 @@ async function syncAllOrdersAndRelatedTables() {
                     const updateSet = keys.map((key, index) => `${key} = $${index + 1}`).join(', ');
                     const updateQuery = `UPDATE orders SET ${updateSet} WHERE id = $${keys.length + 1}`;
                     await promisifiedLocalQuery(updateQuery, [...values, id]);
-                    console.log(`Updated order ID ${id} in local orders table.`);
+                    console.log(`Updated order ID ${id} in local orders table. ${updateSet}`);
                 }
             }
         }
