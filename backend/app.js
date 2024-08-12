@@ -76,9 +76,9 @@ async function syncAllOrdersAndRelatedTables() {
             const localOrderResult = await promisifiedLocalQuery(localOrderQuery, [id]);
 
             if (localOrderResult.rows.length === 0) {
-                // Jika data belum ada di lokal, insert data baru tanpa id
-                const keys = Object.keys(order).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-                const values = Object.values(order).filter((_, index) => Object.keys(order)[index] !== 'id');
+                // Jika data belum ada di lokal, insert data baru
+                const keys = Object.keys(order).map(key => key === 'table' ? '"table"' : key);
+                const values = Object.values(order);
                 const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
                 const insertQuery = `INSERT INTO orders (${keys.join(', ')}) VALUES (${placeholders})`;
                 await promisifiedLocalQuery(insertQuery, values);
@@ -114,8 +114,8 @@ async function syncAllOrdersAndRelatedTables() {
             const localOrderProductResult = await promisifiedLocalQuery(localOrderProductQuery, [id]);
 
             if (localOrderProductResult.rows.length === 0) {
-                const keys = Object.keys(orderProduct).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-                const values = Object.values(orderProduct).filter((_, index) => Object.keys(orderProduct)[index] !== 'id');
+                const keys = Object.keys(orderProduct).map(key => key === 'table' ? '"table"' : key);
+                const values = Object.values(orderProduct);
                 const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
                 const insertQuery = `INSERT INTO order_products (${keys.join(', ')}) VALUES (${placeholders})`;
                 await promisifiedLocalQuery(insertQuery, values);
@@ -150,8 +150,8 @@ async function syncAllOrdersAndRelatedTables() {
             const localOrderProductAddonResult = await promisifiedLocalQuery(localOrderProductAddonQuery, [id]);
 
             if (localOrderProductAddonResult.rows.length === 0) {
-                const keys = Object.keys(orderProductAddon).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-                const values = Object.values(orderProductAddon).filter((_, index) => Object.keys(orderProductAddon)[index] !== 'id');
+                const keys = Object.keys(orderProductAddon).map(key => key === 'table' ? '"table"' : key);
+                const values = Object.values(orderProductAddon);
                 const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
                 const insertQuery = `INSERT INTO order_product_addons (${keys.join(', ')}) VALUES (${placeholders})`;
                 await promisifiedLocalQuery(insertQuery, values);
@@ -186,8 +186,8 @@ async function syncAllOrdersAndRelatedTables() {
             const localOrderCouponResult = await promisifiedLocalQuery(localOrderCouponQuery, [id]);
 
             if (localOrderCouponResult.rows.length === 0) {
-                const keys = Object.keys(orderCoupon).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-                const values = Object.values(orderCoupon).filter((_, index) => Object.keys(orderCoupon)[index] !== 'id');
+                const keys = Object.keys(orderCoupon).map(key => key === 'table' ? '"table"' : key);
+                const values = Object.values(orderCoupon);
                 const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
                 const insertQuery = `INSERT INTO order_coupons (${keys.join(', ')}) VALUES (${placeholders})`;
                 await promisifiedLocalQuery(insertQuery, values);
@@ -226,8 +226,8 @@ const syncLocalToCloud = async () => {
         const localPermissions = await promisifiedLocalQuery(`SELECT * FROM permissions`);
         await promisifiedCloudQuery(`DELETE FROM permissions`);
         for (const permission of localPermissions.rows) {
-            const keys = Object.keys(permission).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-            const values = Object.values(permission).filter((_, index) => Object.keys(permission)[index] !== 'id');
+            const keys = Object.keys(permission).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(permission);
             const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
             const insertQuery = `INSERT INTO permissions (${keys.join(', ')}) VALUES (${placeholders})`;
             await promisifiedCloudQuery(insertQuery, values);
@@ -238,8 +238,8 @@ const syncLocalToCloud = async () => {
         const localRoles = await promisifiedLocalQuery(`SELECT * FROM roles`);
         await promisifiedCloudQuery(`DELETE FROM roles`);
         for (const role of localRoles.rows) {
-            const keys = Object.keys(role).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-            const values = Object.values(role).filter((_, index) => Object.keys(role)[index] !== 'id');
+            const keys = Object.keys(role).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(role);
             const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
             const insertQuery = `INSERT INTO roles (${keys.join(', ')}) VALUES (${placeholders})`;
             await promisifiedCloudQuery(insertQuery, values);
@@ -250,8 +250,8 @@ const syncLocalToCloud = async () => {
         const localUsers = await promisifiedLocalQuery(`SELECT * FROM users`);
         await promisifiedCloudQuery(`DELETE FROM users`);
         for (const user of localUsers.rows) {
-            const keys = Object.keys(user).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-            const values = Object.values(user).filter((_, index) => Object.keys(user)[index] !== 'id');
+            const keys = Object.keys(user).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(user);
             const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
             const insertQuery = `INSERT INTO users (${keys.join(', ')}) VALUES (${placeholders})`;
             await promisifiedCloudQuery(insertQuery, values);
@@ -262,8 +262,8 @@ const syncLocalToCloud = async () => {
         const localSuppliers = await promisifiedLocalQuery(`SELECT * FROM suppliers`);
         await promisifiedCloudQuery(`DELETE FROM suppliers`);
         for (const supplier of localSuppliers.rows) {
-            const keys = Object.keys(supplier).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-            const values = Object.values(supplier).filter((_, index) => Object.keys(supplier)[index] !== 'id');
+            const keys = Object.keys(supplier).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(supplier);
             const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
             const insertQuery = `INSERT INTO suppliers (${keys.join(', ')}) VALUES (${placeholders})`;
             await promisifiedCloudQuery(insertQuery, values);
@@ -274,8 +274,8 @@ const syncLocalToCloud = async () => {
         const localProducts = await promisifiedLocalQuery(`SELECT * FROM products`);
         await promisifiedCloudQuery(`DELETE FROM products`);
         for (const product of localProducts.rows) {
-            const keys = Object.keys(product).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-            const values = Object.values(product).filter((_, index) => Object.keys(product)[index] !== 'id');
+            const keys = Object.keys(product).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(product);
             const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
             const insertQuery = `INSERT INTO products (${keys.join(', ')}) VALUES (${placeholders})`;
             await promisifiedCloudQuery(insertQuery, values);
@@ -286,8 +286,8 @@ const syncLocalToCloud = async () => {
         const localMaterials = await promisifiedLocalQuery(`SELECT * FROM materials`);
         await promisifiedCloudQuery(`DELETE FROM materials`);
         for (const material of localMaterials.rows) {
-            const keys = Object.keys(material).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-            const values = Object.values(material).filter((_, index) => Object.keys(material)[index] !== 'id');
+            const keys = Object.keys(material).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(material);
             const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
             const insertQuery = `INSERT INTO materials (${keys.join(', ')}) VALUES (${placeholders})`;
             await promisifiedCloudQuery(insertQuery, values);
@@ -301,8 +301,8 @@ const syncLocalToCloud = async () => {
             await promisifiedCloudQuery(`DELETE FROM orders WHERE created_at::date = $1`, [today]);
         }
         for (const order of localOrders.rows) {
-            const keys = Object.keys(order).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-            const values = Object.values(order).filter((_, index) => Object.keys(order)[index] !== 'id');
+            const keys = Object.keys(order).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(order);
             const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
             const insertQuery = `INSERT INTO orders (${keys.join(', ')}) VALUES (${placeholders})`;
             await promisifiedCloudQuery(insertQuery, values);
@@ -316,8 +316,8 @@ const syncLocalToCloud = async () => {
             await promisifiedCloudQuery(`DELETE FROM order_products WHERE created_at::date = $1`, [today]);
         }
         for (const orderProduct of localOrderProducts.rows) {
-            const keys = Object.keys(orderProduct).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-            const values = Object.values(orderProduct).filter((_, index) => Object.keys(orderProduct)[index] !== 'id');
+            const keys = Object.keys(orderProduct).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(orderProduct);
             const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
             const insertQuery = `INSERT INTO order_products (${keys.join(', ')}) VALUES (${placeholders})`;
             await promisifiedCloudQuery(insertQuery, values);
@@ -331,8 +331,8 @@ const syncLocalToCloud = async () => {
             await promisifiedCloudQuery(`DELETE FROM order_product_addons WHERE created_at::date = $1`, [today]);
         }
         for (const orderProductAddon of localOrderProductAddons.rows) {
-            const keys = Object.keys(orderProductAddon).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-            const values = Object.values(orderProductAddon).filter((_, index) => Object.keys(orderProductAddon)[index] !== 'id');
+            const keys = Object.keys(orderProductAddon).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(orderProductAddon);
             const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
             const insertQuery = `INSERT INTO order_product_addons (${keys.join(', ')}) VALUES (${placeholders})`;
             await promisifiedCloudQuery(insertQuery, values);
@@ -346,8 +346,8 @@ const syncLocalToCloud = async () => {
             await promisifiedCloudQuery(`DELETE FROM order_coupons WHERE created_at::date = $1`, [today]);
         }
         for (const orderCoupon of localOrderCoupons.rows) {
-            const keys = Object.keys(orderCoupon).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-            const values = Object.values(orderCoupon).filter((_, index) => Object.keys(orderCoupon)[index] !== 'id');
+            const keys = Object.keys(orderCoupon).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(orderCoupon);
             const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
             const insertQuery = `INSERT INTO order_coupons (${keys.join(', ')}) VALUES (${placeholders})`;
             await promisifiedCloudQuery(insertQuery, values);
@@ -358,8 +358,8 @@ const syncLocalToCloud = async () => {
         const localAddons = await promisifiedLocalQuery(`SELECT * FROM addons`);
         await promisifiedCloudQuery(`DELETE FROM addons`);
         for (const addon of localAddons.rows) {
-            const keys = Object.keys(addon).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-            const values = Object.values(addon).filter((_, index) => Object.keys(addon)[index] !== 'id');
+            const keys = Object.keys(addon).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(addon);
             const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
             const insertQuery = `INSERT INTO addons (${keys.join(', ')}) VALUES (${placeholders})`;
             await promisifiedCloudQuery(insertQuery, values);
@@ -370,8 +370,8 @@ const syncLocalToCloud = async () => {
         const localProductAddons = await promisifiedLocalQuery(`SELECT * FROM product_addons`);
         await promisifiedCloudQuery(`DELETE FROM product_addons`);
         for (const productAddon of localProductAddons.rows) {
-            const keys = Object.keys(productAddon).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-            const values = Object.values(productAddon).filter((_, index) => Object.keys(productAddon)[index] !== 'id');
+            const keys = Object.keys(productAddon).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(productAddon);
             const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
             const insertQuery = `INSERT INTO product_addons (${keys.join(', ')}) VALUES (${placeholders})`;
             await promisifiedCloudQuery(insertQuery, values);
@@ -382,8 +382,8 @@ const syncLocalToCloud = async () => {
         const localTags = await promisifiedLocalQuery(`SELECT * FROM tags`);
         await promisifiedCloudQuery(`DELETE FROM tags`);
         for (const tag of localTags.rows) {
-            const keys = Object.keys(tag).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-            const values = Object.values(tag).filter((_, index) => Object.keys(tag)[index] !== 'id');
+            const keys = Object.keys(tag).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(tag);
             const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
             const insertQuery = `INSERT INTO tags (${keys.join(', ')}) VALUES (${placeholders})`;
             await promisifiedCloudQuery(insertQuery, values);
@@ -394,8 +394,8 @@ const syncLocalToCloud = async () => {
         const localProductTags = await promisifiedLocalQuery(`SELECT * FROM product_tags`);
         await promisifiedCloudQuery(`DELETE FROM product_tags`);
         for (const productTag of localProductTags.rows) {
-            const keys = Object.keys(productTag).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-            const values = Object.values(productTag).filter((_, index) => Object.keys(productTag)[index] !== 'id');
+            const keys = Object.keys(productTag).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(productTag);
             const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
             const insertQuery = `INSERT INTO product_tags (${keys.join(', ')}) VALUES (${placeholders})`;
             await promisifiedCloudQuery(insertQuery, values);
@@ -406,8 +406,8 @@ const syncLocalToCloud = async () => {
         const localCustomers = await promisifiedLocalQuery(`SELECT * FROM customers`);
         await promisifiedCloudQuery(`DELETE FROM customers`);
         for (const customer of localCustomers.rows) {
-            const keys = Object.keys(customer).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-            const values = Object.values(customer).filter((_, index) => Object.keys(customer)[index] !== 'id');
+            const keys = Object.keys(customer).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(customer);
             const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
             const insertQuery = `INSERT INTO customers (${keys.join(', ')}) VALUES (${placeholders})`;
             await promisifiedCloudQuery(insertQuery, values);
@@ -418,8 +418,8 @@ const syncLocalToCloud = async () => {
         const localCoupons = await promisifiedLocalQuery(`SELECT * FROM coupons`);
         await promisifiedCloudQuery(`DELETE FROM coupons`);
         for (const coupon of localCoupons.rows) {
-            const keys = Object.keys(coupon).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-            const values = Object.values(coupon).filter((_, index) => Object.keys(coupon)[index] !== 'id');
+            const keys = Object.keys(coupon).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(coupon);
             const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
             const insertQuery = `INSERT INTO coupons (${keys.join(', ')}) VALUES (${placeholders})`;
             await promisifiedCloudQuery(insertQuery, values);
@@ -430,8 +430,8 @@ const syncLocalToCloud = async () => {
         const localCacheOnholdControls = await promisifiedLocalQuery(`SELECT * FROM cache_onhold_controls`);
         await promisifiedCloudQuery(`DELETE FROM cache_onhold_controls`);
         for (const cacheControl of localCacheOnholdControls.rows) {
-            const keys = Object.keys(cacheControl).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-            const values = Object.values(cacheControl).filter((_, index) => Object.keys(cacheControl)[index] !== 'id');
+            const keys = Object.keys(cacheControl).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(cacheControl);
             const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
             const insertQuery = `INSERT INTO cache_onhold_controls (${keys.join(', ')}) VALUES (${placeholders})`;
             await promisifiedCloudQuery(insertQuery, values);
@@ -442,8 +442,8 @@ const syncLocalToCloud = async () => {
         const localStores = await promisifiedLocalQuery(`SELECT * FROM stores`);
         await promisifiedCloudQuery(`DELETE FROM stores`);
         for (const store of localStores.rows) {
-            const keys = Object.keys(store).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-            const values = Object.values(store).filter((_, index) => Object.keys(store)[index] !== 'id');
+            const keys = Object.keys(store).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(store);
             const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
             const insertQuery = `INSERT INTO stores (${keys.join(', ')}) VALUES (${placeholders})`;
             await promisifiedCloudQuery(insertQuery, values);
@@ -454,8 +454,8 @@ const syncLocalToCloud = async () => {
         const localTables = await promisifiedLocalQuery(`SELECT * FROM tables`);
         await promisifiedCloudQuery(`DELETE FROM tables`);
         for (const table of localTables.rows) {
-            const keys = Object.keys(table).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-            const values = Object.values(table).filter((_, index) => Object.keys(table)[index] !== 'id');
+            const keys = Object.keys(table).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(table);
             const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
             const insertQuery = `INSERT INTO tables (${keys.join(', ')}) VALUES (${placeholders})`;
             await promisifiedCloudQuery(insertQuery, values);
@@ -466,8 +466,8 @@ const syncLocalToCloud = async () => {
         const localOtherSettings = await promisifiedLocalQuery(`SELECT * FROM other_settings`);
         await promisifiedCloudQuery(`DELETE FROM other_settings`);
         for (const setting of localOtherSettings.rows) {
-            const keys = Object.keys(setting).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-            const values = Object.values(setting).filter((_, index) => Object.keys(setting)[index] !== 'id');
+            const keys = Object.keys(setting).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(setting);
             const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
             const insertQuery = `INSERT INTO other_settings (${keys.join(', ')}) VALUES (${placeholders})`;
             await promisifiedCloudQuery(insertQuery, values);
@@ -478,8 +478,8 @@ const syncLocalToCloud = async () => {
         const localRoleHasPermissions = await promisifiedLocalQuery(`SELECT * FROM role_has_permissions`);
         await promisifiedCloudQuery(`DELETE FROM role_has_permissions`);
         for (const rolePermission of localRoleHasPermissions.rows) {
-            const keys = Object.keys(rolePermission).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-            const values = Object.values(rolePermission).filter((_, index) => Object.keys(rolePermission)[index] !== 'id');
+            const keys = Object.keys(rolePermission).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(rolePermission);
             const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
             const insertQuery = `INSERT INTO role_has_permissions (${keys.join(', ')}) VALUES (${placeholders})`;
             await promisifiedCloudQuery(insertQuery, values);
@@ -490,8 +490,8 @@ const syncLocalToCloud = async () => {
         const localModelHasPermissions = await promisifiedLocalQuery(`SELECT * FROM model_has_permissions`);
         await promisifiedCloudQuery(`DELETE FROM model_has_permissions`);
         for (const modelPermission of localModelHasPermissions.rows) {
-            const keys = Object.keys(modelPermission).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-            const values = Object.values(modelPermission).filter((_, index) => Object.keys(modelPermission)[index] !== 'id');
+            const keys = Object.keys(modelPermission).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(modelPermission);
             const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
             const insertQuery = `INSERT INTO model_has_permissions (${keys.join(', ')}) VALUES (${placeholders})`;
             await promisifiedCloudQuery(insertQuery, values);
@@ -502,8 +502,8 @@ const syncLocalToCloud = async () => {
         const localModelHasRoles = await promisifiedLocalQuery(`SELECT * FROM model_has_roles`);
         await promisifiedCloudQuery(`DELETE FROM model_has_roles`);
         for (const modelRole of localModelHasRoles.rows) {
-            const keys = Object.keys(modelRole).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-            const values = Object.values(modelRole).filter((_, index) => Object.keys(modelRole)[index] !== 'id');
+            const keys = Object.keys(modelRole).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(modelRole);
             const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
             const insertQuery = `INSERT INTO model_has_roles (${keys.join(', ')}) VALUES (${placeholders})`;
             await promisifiedCloudQuery(insertQuery, values);
@@ -523,8 +523,8 @@ const syncCloudToLocal = async () => {
         const cloudPermissions = await promisifiedCloudQuery(`SELECT * FROM permissions`);
         await promisifiedLocalQuery(`DELETE FROM permissions`);
         for (const permission of cloudPermissions.rows) {
-            const keys = Object.keys(permission).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-            const values = Object.values(permission).filter((_, index) => Object.keys(permission)[index] !== 'id');
+            const keys = Object.keys(permission).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(permission);
             const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
             const insertQuery = `INSERT INTO permissions (${keys.join(', ')}) VALUES (${placeholders})`;
             await promisifiedLocalQuery(insertQuery, values);
@@ -535,8 +535,8 @@ const syncCloudToLocal = async () => {
         const cloudRoles = await promisifiedCloudQuery(`SELECT * FROM roles`);
         await promisifiedLocalQuery(`DELETE FROM roles`);
         for (const role of cloudRoles.rows) {
-            const keys = Object.keys(role).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-            const values = Object.values(role).filter((_, index) => Object.keys(role)[index] !== 'id');
+            const keys = Object.keys(role).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(role);
             const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
             const insertQuery = `INSERT INTO roles (${keys.join(', ')}) VALUES (${placeholders})`;
             await promisifiedLocalQuery(insertQuery, values);
@@ -547,8 +547,8 @@ const syncCloudToLocal = async () => {
         const cloudUsers = await promisifiedCloudQuery(`SELECT * FROM users`);
         await promisifiedLocalQuery(`DELETE FROM users`);
         for (const user of cloudUsers.rows) {
-            const keys = Object.keys(user).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-            const values = Object.values(user).filter((_, index) => Object.keys(user)[index] !== 'id');
+            const keys = Object.keys(user).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(user);
             const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
             const insertQuery = `INSERT INTO users (${keys.join(', ')}) VALUES (${placeholders})`;
             await promisifiedLocalQuery(insertQuery, values);
@@ -559,8 +559,8 @@ const syncCloudToLocal = async () => {
         const cloudSuppliers = await promisifiedCloudQuery(`SELECT * FROM suppliers`);
         await promisifiedLocalQuery(`DELETE FROM suppliers`);
         for (const supplier of cloudSuppliers.rows) {
-            const keys = Object.keys(supplier).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-            const values = Object.values(supplier).filter((_, index) => Object.keys(supplier)[index] !== 'id');
+            const keys = Object.keys(supplier).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(supplier);
             const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
             const insertQuery = `INSERT INTO suppliers (${keys.join(', ')}) VALUES (${placeholders})`;
             await promisifiedLocalQuery(insertQuery, values);
@@ -571,8 +571,8 @@ const syncCloudToLocal = async () => {
         const cloudProducts = await promisifiedCloudQuery(`SELECT * FROM products`);
         await promisifiedLocalQuery(`DELETE FROM products`);
         for (const product of cloudProducts.rows) {
-            const keys = Object.keys(product).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-            const values = Object.values(product).filter((_, index) => Object.keys(product)[index] !== 'id');
+            const keys = Object.keys(product).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(product);
             const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
             const insertQuery = `INSERT INTO products (${keys.join(', ')}) VALUES (${placeholders})`;
             await promisifiedLocalQuery(insertQuery, values);
@@ -583,8 +583,8 @@ const syncCloudToLocal = async () => {
         const cloudMaterials = await promisifiedCloudQuery(`SELECT * FROM materials`);
         await promisifiedLocalQuery(`DELETE FROM materials`);
         for (const material of cloudMaterials.rows) {
-            const keys = Object.keys(material).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-            const values = Object.values(material).filter((_, index) => Object.keys(material)[index] !== 'id');
+            const keys = Object.keys(material).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(material);
             const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
             const insertQuery = `INSERT INTO materials (${keys.join(', ')}) VALUES (${placeholders})`;
             await promisifiedLocalQuery(insertQuery, values);
@@ -598,8 +598,8 @@ const syncCloudToLocal = async () => {
             await promisifiedLocalQuery(`DELETE FROM orders WHERE created_at::date = $1`, [today]);
         }
         for (const order of cloudOrders.rows) {
-            const keys = Object.keys(order).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-            const values = Object.values(order).filter((_, index) => Object.keys(order)[index] !== 'id');
+            const keys = Object.keys(order).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(order);
             const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
             const insertQuery = `INSERT INTO orders (${keys.join(', ')}) VALUES (${placeholders})`;
             await promisifiedLocalQuery(insertQuery, values);
@@ -613,8 +613,8 @@ const syncCloudToLocal = async () => {
             await promisifiedLocalQuery(`DELETE FROM order_products WHERE created_at::date = $1`, [today]);
         }
         for (const orderProduct of cloudOrderProducts.rows) {
-            const keys = Object.keys(orderProduct).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-            const values = Object.values(orderProduct).filter((_, index) => Object.keys(orderProduct)[index] !== 'id');
+            const keys = Object.keys(orderProduct).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(orderProduct);
             const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
             const insertQuery = `INSERT INTO order_products (${keys.join(', ')}) VALUES (${placeholders})`;
             await promisifiedLocalQuery(insertQuery, values);
@@ -628,8 +628,8 @@ const syncCloudToLocal = async () => {
             await promisifiedLocalQuery(`DELETE FROM order_product_addons WHERE created_at::date = $1`, [today]);
         }
         for (const orderProductAddon of cloudOrderProductAddons.rows) {
-            const keys = Object.keys(orderProductAddon).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-            const values = Object.values(orderProductAddon).filter((_, index) => Object.keys(orderProductAddon)[index] !== 'id');
+            const keys = Object.keys(orderProductAddon).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(orderProductAddon);
             const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
             const insertQuery = `INSERT INTO order_product_addons (${keys.join(', ')}) VALUES (${placeholders})`;
             await promisifiedLocalQuery(insertQuery, values);
@@ -643,8 +643,8 @@ const syncCloudToLocal = async () => {
             await promisifiedLocalQuery(`DELETE FROM order_coupons WHERE created_at::date = $1`, [today]);
         }
         for (const orderCoupon of cloudOrderCoupons.rows) {
-            const keys = Object.keys(orderCoupon).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-            const values = Object.values(orderCoupon).filter((_, index) => Object.keys(orderCoupon)[index] !== 'id');
+            const keys = Object.keys(orderCoupon).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(orderCoupon);
             const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
             const insertQuery = `INSERT INTO order_coupons (${keys.join(', ')}) VALUES (${placeholders})`;
             await promisifiedLocalQuery(insertQuery, values);
@@ -655,8 +655,8 @@ const syncCloudToLocal = async () => {
         const cloudAddons = await promisifiedCloudQuery(`SELECT * FROM addons`);
         await promisifiedLocalQuery(`DELETE FROM addons`);
         for (const addon of cloudAddons.rows) {
-            const keys = Object.keys(addon).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-            const values = Object.values(addon).filter((_, index) => Object.keys(addon)[index] !== 'id');
+            const keys = Object.keys(addon).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(addon);
             const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
             const insertQuery = `INSERT INTO addons (${keys.join(', ')}) VALUES (${placeholders})`;
             await promisifiedLocalQuery(insertQuery, values);
@@ -667,8 +667,8 @@ const syncCloudToLocal = async () => {
         const cloudProductAddons = await promisifiedCloudQuery(`SELECT * FROM product_addons`);
         await promisifiedLocalQuery(`DELETE FROM product_addons`);
         for (const productAddon of cloudProductAddons.rows) {
-            const keys = Object.keys(productAddon).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-            const values = Object.values(productAddon).filter((_, index) => Object.keys(productAddon)[index] !== 'id');
+            const keys = Object.keys(productAddon).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(productAddon);
             const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
             const insertQuery = `INSERT INTO product_addons (${keys.join(', ')}) VALUES (${placeholders})`;
             await promisifiedLocalQuery(insertQuery, values);
@@ -679,8 +679,8 @@ const syncCloudToLocal = async () => {
         const cloudTags = await promisifiedCloudQuery(`SELECT * FROM tags`);
         await promisifiedLocalQuery(`DELETE FROM tags`);
         for (const tag of cloudTags.rows) {
-            const keys = Object.keys(tag).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-            const values = Object.values(tag).filter((_, index) => Object.keys(tag)[index] !== 'id');
+            const keys = Object.keys(tag).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(tag);
             const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
             const insertQuery = `INSERT INTO tags (${keys.join(', ')}) VALUES (${placeholders})`;
             await promisifiedLocalQuery(insertQuery, values);
@@ -691,8 +691,8 @@ const syncCloudToLocal = async () => {
         const cloudProductTags = await promisifiedCloudQuery(`SELECT * FROM product_tags`);
         await promisifiedLocalQuery(`DELETE FROM product_tags`);
         for (const productTag of cloudProductTags.rows) {
-            const keys = Object.keys(productTag).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-            const values = Object.values(productTag).filter((_, index) => Object.keys(productTag)[index] !== 'id');
+            const keys = Object.keys(productTag).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(productTag);
             const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
             const insertQuery = `INSERT INTO product_tags (${keys.join(', ')}) VALUES (${placeholders})`;
             await promisifiedLocalQuery(insertQuery, values);
@@ -703,8 +703,8 @@ const syncCloudToLocal = async () => {
         const cloudCustomers = await promisifiedCloudQuery(`SELECT * FROM customers`);
         await promisifiedLocalQuery(`DELETE FROM customers`);
         for (const customer of cloudCustomers.rows) {
-            const keys = Object.keys(customer).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-            const values = Object.values(customer).filter((_, index) => Object.keys(customer)[index] !== 'id');
+            const keys = Object.keys(customer).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(customer);
             const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
             const insertQuery = `INSERT INTO customers (${keys.join(', ')}) VALUES (${placeholders})`;
             await promisifiedLocalQuery(insertQuery, values);
@@ -715,8 +715,8 @@ const syncCloudToLocal = async () => {
         const cloudCoupons = await promisifiedCloudQuery(`SELECT * FROM coupons`);
         await promisifiedLocalQuery(`DELETE FROM coupons`);
         for (const coupon of cloudCoupons.rows) {
-            const keys = Object.keys(coupon).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-            const values = Object.values(coupon).filter((_, index) => Object.keys(coupon)[index] !== 'id');
+            const keys = Object.keys(coupon).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(coupon);
             const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
             const insertQuery = `INSERT INTO coupons (${keys.join(', ')}) VALUES (${placeholders})`;
             await promisifiedLocalQuery(insertQuery, values);
@@ -727,8 +727,8 @@ const syncCloudToLocal = async () => {
         const cloudCacheOnholdControls = await promisifiedCloudQuery(`SELECT * FROM cache_onhold_controls`);
         await promisifiedLocalQuery(`DELETE FROM cache_onhold_controls`);
         for (const cacheControl of cloudCacheOnholdControls.rows) {
-            const keys = Object.keys(cacheControl).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-            const values = Object.values(cacheControl).filter((_, index) => Object.keys(cacheControl)[index] !== 'id');
+            const keys = Object.keys(cacheControl).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(cacheControl);
             const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
             const insertQuery = `INSERT INTO cache_onhold_controls (${keys.join(', ')}) VALUES (${placeholders})`;
             await promisifiedLocalQuery(insertQuery, values);
@@ -739,8 +739,8 @@ const syncCloudToLocal = async () => {
         const cloudStores = await promisifiedCloudQuery(`SELECT * FROM stores`);
         await promisifiedLocalQuery(`DELETE FROM stores`);
         for (const store of cloudStores.rows) {
-            const keys = Object.keys(store).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-            const values = Object.values(store).filter((_, index) => Object.keys(store)[index] !== 'id');
+            const keys = Object.keys(store).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(store);
             const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
             const insertQuery = `INSERT INTO stores (${keys.join(', ')}) VALUES (${placeholders})`;
             await promisifiedLocalQuery(insertQuery, values);
@@ -751,8 +751,8 @@ const syncCloudToLocal = async () => {
         const cloudTables = await promisifiedCloudQuery(`SELECT * FROM tables`);
         await promisifiedLocalQuery(`DELETE FROM tables`);
         for (const table of cloudTables.rows) {
-            const keys = Object.keys(table).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-            const values = Object.values(table).filter((_, index) => Object.keys(table)[index] !== 'id');
+            const keys = Object.keys(table).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(table);
             const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
             const insertQuery = `INSERT INTO tables (${keys.join(', ')}) VALUES (${placeholders})`;
             await promisifiedLocalQuery(insertQuery, values);
@@ -763,8 +763,8 @@ const syncCloudToLocal = async () => {
         const cloudOtherSettings = await promisifiedCloudQuery(`SELECT * FROM other_settings`);
         await promisifiedLocalQuery(`DELETE FROM other_settings`);
         for (const setting of cloudOtherSettings.rows) {
-            const keys = Object.keys(setting).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-            const values = Object.values(setting).filter((_, index) => Object.keys(setting)[index] !== 'id');
+            const keys = Object.keys(setting).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(setting);
             const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
             const insertQuery = `INSERT INTO other_settings (${keys.join(', ')}) VALUES (${placeholders})`;
             await promisifiedLocalQuery(insertQuery, values);
@@ -775,18 +775,11 @@ const syncCloudToLocal = async () => {
         const cloudRoleHasPermissions = await promisifiedCloudQuery(`SELECT * FROM role_has_permissions`);
         await promisifiedLocalQuery(`DELETE FROM role_has_permissions`);
         for (const rolePermission of cloudRoleHasPermissions.rows) {
-            // Validasi apakah permission_id ada di tabel permissions
-            const permissionExists = await promisifiedLocalQuery(`SELECT 1 FROM permissions WHERE id = $1 LIMIT 1`, [rolePermission.permission_id]);
-
-            if (permissionExists.rows.length > 0) {
-                const keys = Object.keys(rolePermission).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-                const values = Object.values(rolePermission).filter((_, index) => Object.keys(rolePermission)[index] !== 'id');
-                const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
-                const insertQuery = `INSERT INTO role_has_permissions (${keys.join(', ')}) VALUES (${placeholders})`;
-                await promisifiedLocalQuery(insertQuery, values);
-            } else {
-                console.log(`Skipping role_permission with invalid permission_id ${rolePermission.permission_id}`);
-            }
+            const keys = Object.keys(rolePermission).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(rolePermission);
+            const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
+            const insertQuery = `INSERT INTO role_has_permissions (${keys.join(', ')}) VALUES (${placeholders})`;
+            await promisifiedLocalQuery(insertQuery, values);
         }
         console.log('Table role_has_permissions synchronized successfully from cloud to local.');
 
@@ -794,8 +787,8 @@ const syncCloudToLocal = async () => {
         const cloudModelHasPermissions = await promisifiedCloudQuery(`SELECT * FROM model_has_permissions`);
         await promisifiedLocalQuery(`DELETE FROM model_has_permissions`);
         for (const modelPermission of cloudModelHasPermissions.rows) {
-            const keys = Object.keys(modelPermission).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-            const values = Object.values(modelPermission).filter((_, index) => Object.keys(modelPermission)[index] !== 'id');
+            const keys = Object.keys(modelPermission).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(modelPermission);
             const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
             const insertQuery = `INSERT INTO model_has_permissions (${keys.join(', ')}) VALUES (${placeholders})`;
             await promisifiedLocalQuery(insertQuery, values);
@@ -806,8 +799,8 @@ const syncCloudToLocal = async () => {
         const cloudModelHasRoles = await promisifiedCloudQuery(`SELECT * FROM model_has_roles`);
         await promisifiedLocalQuery(`DELETE FROM model_has_roles`);
         for (const modelRole of cloudModelHasRoles.rows) {
-            const keys = Object.keys(modelRole).filter(key => key !== 'id').map(key => key === 'table' ? '"table"' : key);
-            const values = Object.values(modelRole).filter((_, index) => Object.keys(modelRole)[index] !== 'id');
+            const keys = Object.keys(modelRole).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(modelRole);
             const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
             const insertQuery = `INSERT INTO model_has_roles (${keys.join(', ')}) VALUES (${placeholders})`;
             await promisifiedLocalQuery(insertQuery, values);
@@ -878,7 +871,9 @@ app.post('/sync-cloud-to-local', async (req, res) => {
     }
 });
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3001;
