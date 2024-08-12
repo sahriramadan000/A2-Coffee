@@ -41,7 +41,7 @@ const options = {
 const localPool = new Pool({
     host: 'localhost',
     port: 5432,
-    database: 'a2',
+    database: 'a2test',
     user: 'postgres',
     password: 'root',
   });
@@ -49,7 +49,7 @@ const localPool = new Pool({
 const cloudPool = new Pool({
     host: '85.31.224.243',
     port: 5432,
-    database: 'a2coffee',
+    database: 'a2test',
     user: 'postgres',
     password: 'SuksesJooal2024!',
 });
