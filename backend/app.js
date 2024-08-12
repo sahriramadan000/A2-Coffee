@@ -57,11 +57,100 @@ const cloudPool = new Pool({
 
 setInterval(() => {
     RealtimeDashboardOrder()
+    syncAllOrdersAndRelatedTables()
 }, 1000);
-
 
 const promisifiedLocalQuery = util.promisify(localPool.query).bind(localPool);
 const promisifiedCloudQuery = util.promisify(cloudPool.query).bind(cloudPool);
+
+async function syncAllOrdersAndRelatedTables() {
+    const today = moment().format('YYYY-MM-DD');
+
+    try {
+        // Sinkronkan tabel orders tanpa menghapus data di lokal
+        const cloudOrders = await promisifiedCloudQuery(`SELECT * FROM orders WHERE created_at::date = $1`, [today]);
+
+        for (const order of cloudOrders.rows) {
+            const id = order.id; // Asumsikan 'id' adalah primary key di tabel orders
+            const localOrderQuery = `SELECT 1 FROM orders WHERE id = $1 LIMIT 1`;
+            const localOrder = await promisifiedLocalQuery(localOrderQuery, [id]);
+
+            if (localOrder.rows.length === 0) {
+                const keys = Object.keys(order).map(key => key === 'table' ? '"table"' : key);
+                const values = Object.values(order);
+                const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
+                const insertQuery = `INSERT INTO orders (${keys.join(', ')}) VALUES (${placeholders})`;
+                await promisifiedLocalQuery(insertQuery, values);
+                console.log(`Inserted order ID ${id} into local orders table.`);
+            }
+        }
+
+        console.log('Table orders synchronized successfully from cloud to local.');
+
+        // Sinkronkan tabel order_products
+        const cloudOrderProducts = await promisifiedCloudQuery(`SELECT * FROM order_products WHERE created_at::date = $1`, [today]);
+
+        for (const orderProduct of cloudOrderProducts.rows) {
+            const id = orderProduct.id; // Asumsikan 'id' adalah primary key di tabel order_products
+            const localOrderProductQuery = `SELECT 1 FROM order_products WHERE id = $1 LIMIT 1`;
+            const localOrderProduct = await promisifiedLocalQuery(localOrderProductQuery, [id]);
+
+            if (localOrderProduct.rows.length === 0) {
+                const keys = Object.keys(orderProduct).map(key => key === 'table' ? '"table"' : key);
+                const values = Object.values(orderProduct);
+                const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
+                const insertQuery = `INSERT INTO order_products (${keys.join(', ')}) VALUES (${placeholders})`;
+                await promisifiedLocalQuery(insertQuery, values);
+                console.log(`Inserted order_product ID ${id} into local order_products table.`);
+            }
+        }
+
+        console.log('Table order_products synchronized successfully from cloud to local.');
+
+        // Sinkronkan tabel order_product_addons
+        const cloudOrderProductAddons = await promisifiedCloudQuery(`SELECT * FROM order_product_addons WHERE created_at::date = $1`, [today]);
+
+        for (const orderProductAddon of cloudOrderProductAddons.rows) {
+            const id = orderProductAddon.id; // Asumsikan 'id' adalah primary key di tabel order_product_addons
+            const localOrderProductAddonQuery = `SELECT 1 FROM order_product_addons WHERE id = $1 LIMIT 1`;
+            const localOrderProductAddon = await promisifiedLocalQuery(localOrderProductAddonQuery, [id]);
+
+            if (localOrderProductAddon.rows.length === 0) {
+                const keys = Object.keys(orderProductAddon).map(key => key === 'table' ? '"table"' : key);
+                const values = Object.values(orderProductAddon);
+                const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
+                const insertQuery = `INSERT INTO order_product_addons (${keys.join(', ')}) VALUES (${placeholders})`;
+                await promisifiedLocalQuery(insertQuery, values);
+                console.log(`Inserted order_product_addon ID ${id} into local order_product_addons table.`);
+            }
+        }
+
+        console.log('Table order_product_addons synchronized successfully from cloud to local.');
+
+        // Sinkronkan tabel order_coupons
+        const cloudOrderCoupons = await promisifiedCloudQuery(`SELECT * FROM order_coupons WHERE created_at::date = $1`, [today]);
+
+        for (const orderCoupon of cloudOrderCoupons.rows) {
+            const id = orderCoupon.id; // Asumsikan 'id' adalah primary key di tabel order_coupons
+            const localOrderCouponQuery = `SELECT 1 FROM order_coupons WHERE id = $1 LIMIT 1`;
+            const localOrderCoupon = await promisifiedLocalQuery(localOrderCouponQuery, [id]);
+
+            if (localOrderCoupon.rows.length === 0) {
+                const keys = Object.keys(orderCoupon).map(key => key === 'table' ? '"table"' : key);
+                const values = Object.values(orderCoupon);
+                const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
+                const insertQuery = `INSERT INTO order_coupons (${keys.join(', ')}) VALUES (${placeholders})`;
+                await promisifiedLocalQuery(insertQuery, values);
+                console.log(`Inserted order_coupon ID ${id} into local order_coupons table.`);
+            }
+        }
+
+        console.log('Table order_coupons synchronized successfully from cloud to local.');
+
+    } catch (error) {
+        console.error('Error syncing orders and related tables:', error);
+    }
+}
 
 const syncLocalToCloud = async () => {
     try {
