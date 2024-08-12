@@ -85,8 +85,6 @@ async function syncAllOrdersAndRelatedTables() {
             }
         }
 
-        console.log('Table orders synchronized successfully from cloud to local.');
-
         // Sinkronkan tabel order_products
         const cloudOrderProducts = await promisifiedCloudQuery(`SELECT * FROM order_products WHERE created_at::date = $1`, [today]);
 
@@ -104,8 +102,6 @@ async function syncAllOrdersAndRelatedTables() {
                 console.log(`Inserted order_product ID ${id} into local order_products table.`);
             }
         }
-
-        console.log('Table order_products synchronized successfully from cloud to local.');
 
         // Sinkronkan tabel order_product_addons
         const cloudOrderProductAddons = await promisifiedCloudQuery(`SELECT * FROM order_product_addons WHERE created_at::date = $1`, [today]);
@@ -125,8 +121,6 @@ async function syncAllOrdersAndRelatedTables() {
             }
         }
 
-        console.log('Table order_product_addons synchronized successfully from cloud to local.');
-
         // Sinkronkan tabel order_coupons
         const cloudOrderCoupons = await promisifiedCloudQuery(`SELECT * FROM order_coupons WHERE created_at::date = $1`, [today]);
 
@@ -144,8 +138,6 @@ async function syncAllOrdersAndRelatedTables() {
                 console.log(`Inserted order_coupon ID ${id} into local order_coupons table.`);
             }
         }
-
-        console.log('Table order_coupons synchronized successfully from cloud to local.');
 
     } catch (error) {
         console.error('Error syncing orders and related tables:', error);
