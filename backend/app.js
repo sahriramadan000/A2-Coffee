@@ -219,79 +219,299 @@ async function syncAllOrdersAndRelatedTables() {
 }
 
 const syncLocalToCloud = async () => {
+    const today = moment().format('YYYY-MM-DD');
+
     try {
-      const today = moment().format('YYYY-MM-DD');
+        // 1. Sinkronkan tabel permissions (dependency for role_has_permissions and model_has_permissions)
+        const localPermissions = await promisifiedLocalQuery(`SELECT * FROM permissions`);
+        await promisifiedCloudQuery(`DELETE FROM permissions`);
+        for (const permission of localPermissions.rows) {
+            const keys = Object.keys(permission).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(permission);
+            const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
+            const insertQuery = `INSERT INTO permissions (${keys.join(', ')}) VALUES (${placeholders})`;
+            await promisifiedCloudQuery(insertQuery, values);
+        }
+        console.log('Table permissions synchronized successfully from local to cloud.');
 
-      // Sinkronkan tabel orders terlebih dahulu
-      const localOrders = await promisifiedLocalQuery(`SELECT * FROM orders WHERE created_at::date = $1`, [today]);
+        // 2. Sinkronkan tabel roles (dependency for role_has_permissions and model_has_roles)
+        const localRoles = await promisifiedLocalQuery(`SELECT * FROM roles`);
+        await promisifiedCloudQuery(`DELETE FROM roles`);
+        for (const role of localRoles.rows) {
+            const keys = Object.keys(role).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(role);
+            const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
+            const insertQuery = `INSERT INTO roles (${keys.join(', ')}) VALUES (${placeholders})`;
+            await promisifiedCloudQuery(insertQuery, values);
+        }
+        console.log('Table roles synchronized successfully from local to cloud.');
 
-      const cloudOrders = await promisifiedCloudQuery(`SELECT 1 FROM orders WHERE created_at::date = $1 LIMIT 1`, [today]);
-      if (cloudOrders.rows.length > 0) {
-        await promisifiedCloudQuery(`DELETE FROM orders WHERE created_at::date = $1`, [today]);
-      }
+        // 3. Sinkronkan tabel users (dependency for orders and other user-related tables)
+        const localUsers = await promisifiedLocalQuery(`SELECT * FROM users`);
+        await promisifiedCloudQuery(`DELETE FROM users`);
+        for (const user of localUsers.rows) {
+            const keys = Object.keys(user).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(user);
+            const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
+            const insertQuery = `INSERT INTO users (${keys.join(', ')}) VALUES (${placeholders})`;
+            await promisifiedCloudQuery(insertQuery, values);
+        }
+        console.log('Table users synchronized successfully from local to cloud.');
 
-      for (const order of localOrders.rows) {
-        const keys = Object.keys(order).map(key => key === 'table' ? '"table"' : key);
-        const values = Object.values(order);
-        const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
-        const insertQuery = `INSERT INTO orders (${keys.join(', ')}) VALUES (${placeholders})`;
-        await promisifiedCloudQuery(insertQuery, values);
-      }
-      console.log('Table orders synchronized successfully from local to cloud.');
+        // 4. Sinkronkan tabel suppliers (dependency for materials)
+        const localSuppliers = await promisifiedLocalQuery(`SELECT * FROM suppliers`);
+        await promisifiedCloudQuery(`DELETE FROM suppliers`);
+        for (const supplier of localSuppliers.rows) {
+            const keys = Object.keys(supplier).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(supplier);
+            const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
+            const insertQuery = `INSERT INTO suppliers (${keys.join(', ')}) VALUES (${placeholders})`;
+            await promisifiedCloudQuery(insertQuery, values);
+        }
+        console.log('Table suppliers synchronized successfully from local to cloud.');
 
-      // Sinkronkan tabel order_products
-      const localOrderProducts = await promisifiedLocalQuery(`SELECT * FROM order_products WHERE created_at::date = $1`, [today]);
+        // 5. Sinkronkan tabel products (dependency for order_products and product-related tables)
+        const localProducts = await promisifiedLocalQuery(`SELECT * FROM products`);
+        await promisifiedCloudQuery(`DELETE FROM products`);
+        for (const product of localProducts.rows) {
+            const keys = Object.keys(product).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(product);
+            const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
+            const insertQuery = `INSERT INTO products (${keys.join(', ')}) VALUES (${placeholders})`;
+            await promisifiedCloudQuery(insertQuery, values);
+        }
+        console.log('Table products synchronized successfully from local to cloud.');
 
-      const cloudOrderProducts = await promisifiedCloudQuery(`SELECT 1 FROM order_products WHERE created_at::date = $1 LIMIT 1`, [today]);
-      if (cloudOrderProducts.rows.length > 0) {
-        await promisifiedCloudQuery(`DELETE FROM order_products WHERE created_at::date = $1`, [today]);
-      }
+        // 6. Sinkronkan tabel materials (dependency for orders or related processes)
+        const localMaterials = await promisifiedLocalQuery(`SELECT * FROM materials`);
+        await promisifiedCloudQuery(`DELETE FROM materials`);
+        for (const material of localMaterials.rows) {
+            const keys = Object.keys(material).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(material);
+            const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
+            const insertQuery = `INSERT INTO materials (${keys.join(', ')}) VALUES (${placeholders})`;
+            await promisifiedCloudQuery(insertQuery, values);
+        }
+        console.log('Table materials synchronized successfully from local to cloud.');
 
-      for (const orderProduct of localOrderProducts.rows) {
-        const keys = Object.keys(orderProduct).map(key => key === 'table' ? '"table"' : key);
-        const values = Object.values(orderProduct);
-        const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
-        const insertQuery = `INSERT INTO order_products (${keys.join(', ')}) VALUES (${placeholders})`;
-        await promisifiedCloudQuery(insertQuery, values);
-      }
-      console.log('Table order_products synchronized successfully from local to cloud.');
+        // 7. Sinkronkan tabel orders (dependency for order_products, order_coupons, etc.)
+        const localOrders = await promisifiedLocalQuery(`SELECT * FROM orders WHERE created_at::date = $1`, [today]);
+        const cloudOrders = await promisifiedCloudQuery(`SELECT 1 FROM orders WHERE created_at::date = $1 LIMIT 1`, [today]);
+        if (cloudOrders.rows.length > 0) {
+            await promisifiedCloudQuery(`DELETE FROM orders WHERE created_at::date = $1`, [today]);
+        }
+        for (const order of localOrders.rows) {
+            const keys = Object.keys(order).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(order);
+            const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
+            const insertQuery = `INSERT INTO orders (${keys.join(', ')}) VALUES (${placeholders})`;
+            await promisifiedCloudQuery(insertQuery, values);
+        }
+        console.log('Table orders synchronized successfully from local to cloud.');
 
-      // Sinkronkan tabel order_product_addons
-      const localOrderProductAddons = await promisifiedLocalQuery(`SELECT * FROM order_product_addons WHERE created_at::date = $1`, [today]);
+        // 8. Sinkronkan tabel order_products
+        const localOrderProducts = await promisifiedLocalQuery(`SELECT * FROM order_products WHERE created_at::date = $1`, [today]);
+        const cloudOrderProducts = await promisifiedCloudQuery(`SELECT 1 FROM order_products WHERE created_at::date = $1 LIMIT 1`, [today]);
+        if (cloudOrderProducts.rows.length > 0) {
+            await promisifiedCloudQuery(`DELETE FROM order_products WHERE created_at::date = $1`, [today]);
+        }
+        for (const orderProduct of localOrderProducts.rows) {
+            const keys = Object.keys(orderProduct).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(orderProduct);
+            const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
+            const insertQuery = `INSERT INTO order_products (${keys.join(', ')}) VALUES (${placeholders})`;
+            await promisifiedCloudQuery(insertQuery, values);
+        }
+        console.log('Table order_products synchronized successfully from local to cloud.');
 
-      const cloudOrderProductAddons = await promisifiedCloudQuery(`SELECT 1 FROM order_product_addons WHERE created_at::date = $1 LIMIT 1`, [today]);
-      if (cloudOrderProductAddons.rows.length > 0) {
-        await promisifiedCloudQuery(`DELETE FROM order_product_addons WHERE created_at::date = $1`, [today]);
-      }
+        // 9. Sinkronkan tabel order_product_addons
+        const localOrderProductAddons = await promisifiedLocalQuery(`SELECT * FROM order_product_addons WHERE created_at::date = $1`, [today]);
+        const cloudOrderProductAddons = await promisifiedCloudQuery(`SELECT 1 FROM order_product_addons WHERE created_at::date = $1 LIMIT 1`, [today]);
+        if (cloudOrderProductAddons.rows.length > 0) {
+            await promisifiedCloudQuery(`DELETE FROM order_product_addons WHERE created_at::date = $1`, [today]);
+        }
+        for (const orderProductAddon of localOrderProductAddons.rows) {
+            const keys = Object.keys(orderProductAddon).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(orderProductAddon);
+            const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
+            const insertQuery = `INSERT INTO order_product_addons (${keys.join(', ')}) VALUES (${placeholders})`;
+            await promisifiedCloudQuery(insertQuery, values);
+        }
+        console.log('Table order_product_addons synchronized successfully from local to cloud.');
 
-      for (const orderProductAddon of localOrderProductAddons.rows) {
-        const keys = Object.keys(orderProductAddon).map(key => key === 'table' ? '"table"' : key);
-        const values = Object.values(orderProductAddon);
-        const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
-        const insertQuery = `INSERT INTO order_product_addons (${keys.join(', ')}) VALUES (${placeholders})`;
-        await promisifiedCloudQuery(insertQuery, values);
-      }
-      console.log('Table order_product_addons synchronized successfully from local to cloud.');
+        // 10. Sinkronkan tabel order_coupons
+        const localOrderCoupons = await promisifiedLocalQuery(`SELECT * FROM order_coupons WHERE created_at::date = $1`, [today]);
+        const cloudOrderCoupons = await promisifiedCloudQuery(`SELECT 1 FROM order_coupons WHERE created_at::date = $1 LIMIT 1`, [today]);
+        if (cloudOrderCoupons.rows.length > 0) {
+            await promisifiedCloudQuery(`DELETE FROM order_coupons WHERE created_at::date = $1`, [today]);
+        }
+        for (const orderCoupon of localOrderCoupons.rows) {
+            const keys = Object.keys(orderCoupon).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(orderCoupon);
+            const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
+            const insertQuery = `INSERT INTO order_coupons (${keys.join(', ')}) VALUES (${placeholders})`;
+            await promisifiedCloudQuery(insertQuery, values);
+        }
+        console.log('Table order_coupons synchronized successfully from local to cloud.');
 
-      // Sinkronkan tabel order_coupons
-      const localOrderCoupons = await promisifiedLocalQuery(`SELECT * FROM order_coupons WHERE created_at::date = $1`, [today]);
+        // 11. Sinkronkan tabel addons
+        const localAddons = await promisifiedLocalQuery(`SELECT * FROM addons`);
+        await promisifiedCloudQuery(`DELETE FROM addons`);
+        for (const addon of localAddons.rows) {
+            const keys = Object.keys(addon).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(addon);
+            const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
+            const insertQuery = `INSERT INTO addons (${keys.join(', ')}) VALUES (${placeholders})`;
+            await promisifiedCloudQuery(insertQuery, values);
+        }
+        console.log('Table addons synchronized successfully from local to cloud.');
 
-      const cloudOrderCoupons = await promisifiedCloudQuery(`SELECT 1 FROM order_coupons WHERE created_at::date = $1 LIMIT 1`, [today]);
-      if (cloudOrderCoupons.rows.length > 0) {
-        await promisifiedCloudQuery(`DELETE FROM order_coupons WHERE created_at::date = $1`, [today]);
-      }
+        // 12. Sinkronkan tabel product_addons
+        const localProductAddons = await promisifiedLocalQuery(`SELECT * FROM product_addons`);
+        await promisifiedCloudQuery(`DELETE FROM product_addons`);
+        for (const productAddon of localProductAddons.rows) {
+            const keys = Object.keys(productAddon).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(productAddon);
+            const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
+            const insertQuery = `INSERT INTO product_addons (${keys.join(', ')}) VALUES (${placeholders})`;
+            await promisifiedCloudQuery(insertQuery, values);
+        }
+        console.log('Table product_addons synchronized successfully from local to cloud.');
 
-      for (const orderCoupon of localOrderCoupons.rows) {
-        const keys = Object.keys(orderCoupon).map(key => key === 'table' ? '"table"' : key);
-        const values = Object.values(orderCoupon);
-        const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
-        const insertQuery = `INSERT INTO order_coupons (${keys.join(', ')}) VALUES (${placeholders})`;
-        await promisifiedCloudQuery(insertQuery, values);
-      }
-      console.log('Table order_coupons synchronized successfully from local to cloud.');
+        // 13. Sinkronkan tabel tags
+        const localTags = await promisifiedLocalQuery(`SELECT * FROM tags`);
+        await promisifiedCloudQuery(`DELETE FROM tags`);
+        for (const tag of localTags.rows) {
+            const keys = Object.keys(tag).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(tag);
+            const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
+            const insertQuery = `INSERT INTO tags (${keys.join(', ')}) VALUES (${placeholders})`;
+            await promisifiedCloudQuery(insertQuery, values);
+        }
+        console.log('Table tags synchronized successfully from local to cloud.');
+
+        // 14. Sinkronkan tabel product_tags
+        const localProductTags = await promisifiedLocalQuery(`SELECT * FROM product_tags`);
+        await promisifiedCloudQuery(`DELETE FROM product_tags`);
+        for (const productTag of localProductTags.rows) {
+            const keys = Object.keys(productTag).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(productTag);
+            const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
+            const insertQuery = `INSERT INTO product_tags (${keys.join(', ')}) VALUES (${placeholders})`;
+            await promisifiedCloudQuery(insertQuery, values);
+        }
+        console.log('Table product_tags synchronized successfully from local to cloud.');
+
+        // 15. Sinkronkan tabel customers
+        const localCustomers = await promisifiedLocalQuery(`SELECT * FROM customers`);
+        await promisifiedCloudQuery(`DELETE FROM customers`);
+        for (const customer of localCustomers.rows) {
+            const keys = Object.keys(customer).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(customer);
+            const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
+            const insertQuery = `INSERT INTO customers (${keys.join(', ')}) VALUES (${placeholders})`;
+            await promisifiedCloudQuery(insertQuery, values);
+        }
+        console.log('Table customers synchronized successfully from local to cloud.');
+
+        // 16. Sinkronkan tabel coupons
+        const localCoupons = await promisifiedLocalQuery(`SELECT * FROM coupons`);
+        await promisifiedCloudQuery(`DELETE FROM coupons`);
+        for (const coupon of localCoupons.rows) {
+            const keys = Object.keys(coupon).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(coupon);
+            const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
+            const insertQuery = `INSERT INTO coupons (${keys.join(', ')}) VALUES (${placeholders})`;
+            await promisifiedCloudQuery(insertQuery, values);
+        }
+        console.log('Table coupons synchronized successfully from local to cloud.');
+
+        // 17. Sinkronkan tabel cache_onhold_controls
+        const localCacheOnholdControls = await promisifiedLocalQuery(`SELECT * FROM cache_onhold_controls`);
+        await promisifiedCloudQuery(`DELETE FROM cache_onhold_controls`);
+        for (const cacheControl of localCacheOnholdControls.rows) {
+            const keys = Object.keys(cacheControl).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(cacheControl);
+            const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
+            const insertQuery = `INSERT INTO cache_onhold_controls (${keys.join(', ')}) VALUES (${placeholders})`;
+            await promisifiedCloudQuery(insertQuery, values);
+        }
+        console.log('Table cache_onhold_controls synchronized successfully from local to cloud.');
+
+        // 18. Sinkronkan tabel stores
+        const localStores = await promisifiedLocalQuery(`SELECT * FROM stores`);
+        await promisifiedCloudQuery(`DELETE FROM stores`);
+        for (const store of localStores.rows) {
+            const keys = Object.keys(store).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(store);
+            const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
+            const insertQuery = `INSERT INTO stores (${keys.join(', ')}) VALUES (${placeholders})`;
+            await promisifiedCloudQuery(insertQuery, values);
+        }
+        console.log('Table stores synchronized successfully from local to cloud.');
+
+        // 19. Sinkronkan tabel tables
+        const localTables = await promisifiedLocalQuery(`SELECT * FROM tables`);
+        await promisifiedCloudQuery(`DELETE FROM tables`);
+        for (const table of localTables.rows) {
+            const keys = Object.keys(table).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(table);
+            const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
+            const insertQuery = `INSERT INTO tables (${keys.join(', ')}) VALUES (${placeholders})`;
+            await promisifiedCloudQuery(insertQuery, values);
+        }
+        console.log('Table tables synchronized successfully from local to cloud.');
+
+        // 20. Sinkronkan tabel other_settings
+        const localOtherSettings = await promisifiedLocalQuery(`SELECT * FROM other_settings`);
+        await promisifiedCloudQuery(`DELETE FROM other_settings`);
+        for (const setting of localOtherSettings.rows) {
+            const keys = Object.keys(setting).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(setting);
+            const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
+            const insertQuery = `INSERT INTO other_settings (${keys.join(', ')}) VALUES (${placeholders})`;
+            await promisifiedCloudQuery(insertQuery, values);
+        }
+        console.log('Table other_settings synchronized successfully from local to cloud.');
+
+        // 21. Sinkronkan tabel role_has_permissions
+        const localRoleHasPermissions = await promisifiedLocalQuery(`SELECT * FROM role_has_permissions`);
+        await promisifiedCloudQuery(`DELETE FROM role_has_permissions`);
+        for (const rolePermission of localRoleHasPermissions.rows) {
+            const keys = Object.keys(rolePermission).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(rolePermission);
+            const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
+            const insertQuery = `INSERT INTO role_has_permissions (${keys.join(', ')}) VALUES (${placeholders})`;
+            await promisifiedCloudQuery(insertQuery, values);
+        }
+        console.log('Table role_has_permissions synchronized successfully from local to cloud.');
+
+        // 22. Sinkronkan tabel model_has_permissions
+        const localModelHasPermissions = await promisifiedLocalQuery(`SELECT * FROM model_has_permissions`);
+        await promisifiedCloudQuery(`DELETE FROM model_has_permissions`);
+        for (const modelPermission of localModelHasPermissions.rows) {
+            const keys = Object.keys(modelPermission).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(modelPermission);
+            const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
+            const insertQuery = `INSERT INTO model_has_permissions (${keys.join(', ')}) VALUES (${placeholders})`;
+            await promisifiedCloudQuery(insertQuery, values);
+        }
+        console.log('Table model_has_permissions synchronized successfully from local to cloud.');
+
+        // 23. Sinkronkan tabel model_has_roles
+        const localModelHasRoles = await promisifiedLocalQuery(`SELECT * FROM model_has_roles`);
+        await promisifiedCloudQuery(`DELETE FROM model_has_roles`);
+        for (const modelRole of localModelHasRoles.rows) {
+            const keys = Object.keys(modelRole).map(key => key === 'table' ? '"table"' : key);
+            const values = Object.values(modelRole);
+            const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
+            const insertQuery = `INSERT INTO model_has_roles (${keys.join(', ')}) VALUES (${placeholders})`;
+            await promisifiedCloudQuery(insertQuery, values);
+        }
+        console.log('Table model_has_roles synchronized successfully from local to cloud.');
 
     } catch (err) {
-      console.error('Error synchronizing tables from local to cloud:', err);
+        console.error('Error synchronizing tables from local to cloud:', err);
     }
 };
 
