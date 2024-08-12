@@ -41,7 +41,7 @@ const options = {
 const localPool = new Pool({
     host: 'localhost',
     port: 5432,
-    database: 'a2',
+    database: 'a2test',
     user: 'postgres',
     password: 'root',
   });
@@ -49,7 +49,7 @@ const localPool = new Pool({
 const cloudPool = new Pool({
     host: '85.31.224.243',
     port: 5432,
-    database: 'a2coffee',
+    database: 'a2',
     user: 'postgres',
     password: 'SuksesJooal2024!',
 });
@@ -103,7 +103,7 @@ async function syncAllOrdersAndRelatedTables() {
                     const updateSet = keys.map((key, index) => `${key} = $${index + 1}`).join(', ');
                     const updateQuery = `UPDATE orders SET ${updateSet} WHERE id = $${keys.length + 1}`;
                     await promisifiedLocalQuery(updateQuery, [...values, id]);
-                    console.log(`Updated order ID ${id} in local orders table.`);
+                    console.log(`Updated order ID ${id} in local orders table. ${updateSet}`);
                 }
             }
         }
@@ -878,7 +878,7 @@ app.post('/sync-cloud-to-local', async (req, res) => {
     }
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

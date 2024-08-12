@@ -53,7 +53,7 @@
                                                                     {{-- <small>Unit: {{ $item->conditions }}</small> --}}
                                                                 </div>
 
-                                                                @can('delete-product-in-carts')
+                                                                @can('delete-product-in-cart')
                                                                 <div class="">
                                                                     <a href="{{ route('delete-item', $key)}}" class="" style="border-bottom: 1px dashed red;">
                                                                         <i class='bx bx-trash font-14 text-danger'></i>
