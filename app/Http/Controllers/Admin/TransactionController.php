@@ -313,7 +313,7 @@ class TransactionController extends Controller
                 $tax           = (($subtotal + $service) * $other_setting->pb01 / 100);
                 $totalPayment  = ($subtotal + $service) + $tax;
 
-                $canDelete = Auth::user()->can('delete-product-in-carts');
+                $canDelete = Auth::user()->can('delete-product-in-cart');
 
                 return response()->json([
                     'success'   => 'Cart item updated successfully!',
@@ -583,8 +583,8 @@ class TransactionController extends Controller
             }
 
             // Delete Cache after add to cart
-            // $orders = Order::findOrFail($request->id);
-            // $orders->delete();
+            $orders = Order::findOrFail($request->id);
+            $orders->delete();
 
             // Set return data
             $dataCart = Cart::session(Auth::user()->id)->getContent();

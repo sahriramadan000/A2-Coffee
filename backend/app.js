@@ -49,7 +49,7 @@ const localPool = new Pool({
 const cloudPool = new Pool({
     host: '85.31.224.243',
     port: 5432,
-    database: 'a2test',
+    database: 'a2',
     user: 'postgres',
     password: 'SuksesJooal2024!',
 });

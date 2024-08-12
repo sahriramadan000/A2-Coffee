@@ -302,7 +302,6 @@ class OrderController extends Controller
 
         // Ambil order terakhir yang dibuat hari ini dan sudah dibayar
         $lastOrder = Order::whereDate('created_at', $today)
-                        //   ->where(' payment_status', 'Paid')
                           ->orderBy('id', 'desc')
                           ->first();
 
