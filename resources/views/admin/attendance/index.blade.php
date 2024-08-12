@@ -72,6 +72,7 @@
                         <thead>
                             <tr>
                                 <th width="7%">No</th>
+                                <th>Name</th>
                                 <th>Date</th>
                                 <th>Check in</th>
                                 <th>Check Out</th>
@@ -169,9 +170,9 @@
             ajax: {
                 url: "{{ route('attendances.get-data') }}",
                 error: function(xhr, textStatus, errorThrown) {
-                    $('#attendances-table').DataTable().clear().draw(); // Bersihkan tabel
-                    console.log(xhr.responseText); // Tampilkan pesan kesalahan di konsol browser
-                    alert('There was an error fetching data. Please try again later.'); // Tampilkan pesan kesalahan kepada pengguna
+                    $('#attendances-table').DataTable().clear().draw(); // Clear the table
+                    console.log(xhr.responseText); // Log the error to the browser console
+                    alert('There was an error fetching data. Please try again later.'); // Alert the user
                 }
             },
             columns: [
@@ -180,6 +181,7 @@
                     orderable: false,
                     searchable: false
                 },
+                { data: 'name', name: 'name' }, // Add this line to include the user's name
                 { data: 'date', name: 'date' },
                 { data: 'check_in', name: 'check_in' },
                 { data: 'check_out', name: 'check_out' },
@@ -208,6 +210,7 @@
             "lengthMenu": [10, 20, 50],
             "pageLength": 10
         });
+
 
         // Event create by Modal
         $(document).on('click', '.attendances-add', function() {

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Attendance;
 use App\Models\Order;
 use App\Models\OrderProduct;
 use App\Models\User;
@@ -309,6 +310,67 @@ class ReportController extends Controller
                     return '<a href="#" class="btn btn-sm btn-primary">View</a>';
                 })
                 ->rawColumns(['order_products', 'action'])
+                ->make(true);
+        }
+    }
+
+    public function reportAbsensi(){
+        $data ['page_title'] = 'Report Absensi';
+        $data['account_users'] = User::get();
+        $data['attendances'] = Attendance::get();
+
+        return view('admin.report.sales.absensi',$data);
+    }
+
+    public function getReportAbsensi(Request $request)
+    {
+        $page_title = 'Report Refund';
+        $account_users = User::get();
+
+        $type = $request->input('type', 'day');
+        $user = $request->user_id;
+        $date = $request->input('start_date', date('Y-m-d'));
+
+        // Initialize $orders as an empty collection
+        $orders = collect();
+
+        if ($type == 'day') {
+            if ($user == 'All') {
+                $orders = Attendance::whereDate('created_at', $date)
+                            ->orderBy('id', 'desc')
+                            ->get();
+            } else {
+                $orders = Attendance::where('user_id', $user)
+                            ->whereDate('created_at', $date)
+                            ->orderBy('id', 'desc')
+                            ->get();
+            }
+        } elseif ($type == 'monthly') {
+            $month = $request->input('month', date('m'));
+            $monthPart = date('m', strtotime($month)); // Ensures the input is in 'm' format
+            $orders = Attendance::whereMonth('created_at', $monthPart)
+                        ->when($user != 'All', function ($query) use ($user) {
+                            return $query->where('user_id', $user);
+                        })
+                        ->orderBy('id', 'desc')
+                        ->get();
+        } elseif ($type == 'yearly') {
+            $year = $request->input('year', date('Y'));
+            $orders = Attendance::whereYear('created_at', $year)
+                        ->when($user != 'All', function ($query) use ($user) {
+                            return $query->where('user_id', $user);
+                        })
+                        ->orderBy('id', 'desc')
+                        ->get();
+        }
+
+        if ($request->ajax()) {
+            // $query = Order::with(['orderProducts.orderProductAddons'])->select('orders.*');
+            return DataTables::of($orders)
+                ->addIndexColumn()
+                ->addColumn('name', function ($row) {
+                    return $row->user->username; // Access the related user's name
+                })
                 ->make(true);
         }
     }

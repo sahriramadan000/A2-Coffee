@@ -53,7 +53,7 @@
                                                                     {{-- <small>Unit: {{ $item->conditions }}</small> --}}
                                                                 </div>
 
-                                                                @can('delete-product-in-cart')
+                                                                @can('delete-product-in-carts')
                                                                 <div class="">
                                                                     <a href="{{ route('delete-item', $key)}}" class="" style="border-bottom: 1px dashed red;">
                                                                         <i class='bx bx-trash font-14 text-danger'></i>
@@ -155,14 +155,14 @@
                                                         ON HOLD
                                                     </h6>
                                                 </button> --}}
-                                                @can('discount')
+                                                @can('discounts')
                                                 <button type="button" class="btn btn-lg btn-white fw-bold w-25 p-3" onclick="ModalAddDiscount('{{ route('modal-add-discount') }}', '{{ route('update-cart-by-discount') }}', '{{ csrf_token() }}')" data-bs-target="#modal-add-discount">
                                                     <h6 class="mb-0 text-dark">
                                                         DISCOUNT
                                                     </h6>
                                                 </button>
                                                 @endcan
-                                                @can('void')
+                                                @can('voids')
                                                 <button type="button" class="btn btn-lg btn-danger fw-bold w-25 p-3" onclick="voidCart('{{ route('void-cart') }}', '{{ csrf_token() }}')">
                                                     <h6 class="mb-0 text-white">
                                                         VOID
