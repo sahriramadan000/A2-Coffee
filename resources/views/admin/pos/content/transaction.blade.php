@@ -184,11 +184,14 @@
                                                         <h6 class="mb-3">Metode Payment</h6>
                                                         <select name="payment_method" id="payment_method" class="form-control form-control-sm">
                                                             <option selected disabled value="">Pilih Metode Pembayaran</option>
-                                                            <option value="Transfer Bank">Transfer Bank</option>
                                                             <option value="EDC BCA">EDC BCA</option>
                                                             <option value="EDC BRI">EDC BRI</option>
                                                             <option value="EDC BNI">EDC BNI</option>
-                                                            <option value="Qris">Qris</option>
+                                                            <option value="EDC PANIN">EDC PANIN</option>
+                                                            <option value="Qris BCA">Qris BCA</option>
+                                                            <option value="Qris BRI">Qris BRI</option>
+                                                            <option value="Qris BNI">Qris BNI</option>
+                                                            <option value="Qris MANDIRI">Qris MANDIRI</option>
                                                             <option value="Cash">Cash</option>
                                                         </select>
                                                     </div>

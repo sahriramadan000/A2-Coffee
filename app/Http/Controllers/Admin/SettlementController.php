@@ -184,7 +184,7 @@ class SettlementController extends Controller
             foreach ($groupedData as $paymentMethod => $data){
                 $printer->text($paymentMethod ." : ". number_format($data['total'],0)."\n");
             }
-            $printer->text("Total Keseluruhan   : ". $orders->count()."\n");
+            $printer->text("Total Keseluruhan   : ". $totalAll."\n");
             $printer->text("--------------------------------\n");
 
             $printer->text("Pajak           : Rp.".number_format($pb01,0)."\n");
