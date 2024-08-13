@@ -352,6 +352,7 @@ class TransactionController extends Controller
                     'is_discount' => $cart->attributes['product']['is_discount'],
                     'percent_discount' => $cart->attributes['product']['percent_discount'],
                     'price_discount' => $cart->attributes['product']['price_discount'],
+                    'category' => $cart->attributes['product']['category'],
                     'qty' => (int) $cart->quantity,
                     'addons' => $cart->attributes['addons'],
                     'status_input' => 'cloud',
@@ -396,6 +397,7 @@ class TransactionController extends Controller
                 'is_discount' => $product['is_discount'],
                 'percent_discount' => $product['percent_discount'],
                 'price_discount' => $product['price_discount'],
+                'category' => $product['category'],
                 'qty' => $product['qty'],
                 'status_input' => 'cloud',
             ]);
