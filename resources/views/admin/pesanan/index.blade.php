@@ -109,7 +109,7 @@
                             $newInvoiceNumber = $parts[0] . '-' .'CUST'.$lastPart ;
 
                             ?>
-                            <h3 class="mb-0">{{ $item->customer_name ?? $newInvoiceNumber }}</h3>
+                            <h3 class="mb-0">{{ $item->table ?? $newInvoiceNumber }}</h3>
                             <div class="mt-1">
                                 <span class="badge badge-light-primary mb-2 me-4">{{ $item->payment_method }}</span>
                             </div>
