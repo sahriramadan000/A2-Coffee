@@ -139,11 +139,15 @@
                                         <div class="col-12">
                                             <div class="btn-group w-100 p-3 pt-0" role="group" aria-label="Grouping Button">
                                                 <input type="hidden" name="button" id="buttonValue" value="">
+
+                                                @can('simpan-order')
+                                                    
                                                 <button type="button" class="btn btn-lg btn-success fw-bold w-25 p-3" data-bs-toggle="modal" data-bs-target="#modalPayment" onclick="setButtonValue('simpan-order')">
                                                     <h6 class="mb-0 text-white">
                                                         SIMPAN ORDER
                                                     </h6>
                                                 </button>
+                                                @endcan
 
                                                 <button type="button" class="btn btn-lg btn-warning fw-bold w-25 p-3" data-bs-toggle="modal" data-bs-target="#modalOpenBill" onclick="setButtonValue('simpan-bill')">
                                                     <h6 class="mb-0 text-white">

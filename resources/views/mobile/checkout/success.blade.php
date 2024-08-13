@@ -9,8 +9,8 @@
             </div>
             <div class="payment-success-content mt-32">
                 <div class="payment-success-content-full">
-                    <h1>Payment Successful!</h1>
-                    <p>Your payment has been processed successfully.</p>
+                    <h1>Order Successful!</h1>
+                    <p>Your order has been processed successfully.</p>
                     <div class="success-track-btn">
                         <a href="{{ route('mobile.homepage', ['kode_meja' => Request::get('kode_meja')]) }}">Go Home</a>
                     </div>
