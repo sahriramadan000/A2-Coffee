@@ -97,6 +97,7 @@ class OrderController extends Controller
                     'table'             => $request->table ?? null,
                     'inputer'           => $request->inputer ?? '',
                     'payment_status'    => 'Paid',
+                    'status_input'      => 'cloud',
                     'payment_method'    => $request->payment_method,
     
                     'total_qty'         => array_sum($request->qty),
@@ -125,6 +126,7 @@ class OrderController extends Controller
                     'inputer'           => $request->inputer ?? '-',
                     'payment_status'    => 'Unpaid',
                     'payment_method'    => 'Open Bill',
+                    'status_input'      => 'cloud',
     
                     'total_qty'         => array_sum($request->qty),
                     'subtotal'          => $subtotal,
@@ -158,6 +160,7 @@ class OrderController extends Controller
                     'discount_value'     => $coupon->discount_value,
                     'discount_threshold' => (($coupon->type == 'Percentage Discount') ? $coupon->discount_threshold : null),
                     'max_discount_value' => (($coupon->type == 'Percentage Discount') ? $coupon->max_discount_value : null),
+                    'status_input'      => 'cloud',
                 ]);
 
                 $coupon->current_usage += 1;
@@ -261,6 +264,7 @@ class OrderController extends Controller
                     'price_discount'    => $product['price_discount'],
                     'category'          => $product['category'],
                     'qty'               => $product['qty'],
+                    'status_input'      => 'cloud',
                 ]);
 
                 // Simpan addons terkait ke tabel order_product_addons
@@ -271,6 +275,7 @@ class OrderController extends Controller
                             'order_product_id' => $orderProduct->id,
                             'name'             => $getAddon->name,
                             'price'            => $getAddon->price,
+                            'status_input'      => 'cloud',
                         ]);
                     }
                 }

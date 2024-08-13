@@ -286,6 +286,7 @@ class TransactionController extends Controller
             'no_invoice' => $this->generateInvoice(),
             'payment_status' => 'Unpaid',
             'payment_method' => 'Open Bill',
+            'status_input' => 'cloud',
             'table' => $table->name,
             'total_qty' => array_sum($request->quantity),
             'subtotal' => $subTotal,
@@ -311,6 +312,7 @@ class TransactionController extends Controller
             ->firstOrFail();
 
             $order->total_qty += array_sum($request->quantity);
+            $order->status_input = 'cloud';
             $subtotal = $order->subtotal + $subTotal;
             $service = $subtotal * $other_setting->layanan / 100;
             $pb01 = ($subtotal + $service) * $other_setting->pb01 / 100;
@@ -352,6 +354,7 @@ class TransactionController extends Controller
                     'price_discount' => $cart->attributes['product']['price_discount'],
                     'qty' => (int) $cart->quantity,
                     'addons' => $cart->attributes['addons'],
+                    'status_input' => 'cloud',
                 ];
             } else {
                 $orderProducts[$uniqueKey]['qty'] += (int) $cart->quantity;
@@ -363,15 +366,15 @@ class TransactionController extends Controller
             $stockCheck[$productId] += (int) $cart->quantity;
         }
 
-        foreach ($stockCheck as $productId => $totalQty) {
-            $product = Product::findOrFail($productId);
-            if ((int) $product->current_stock < $totalQty) {
-                throw new \Exception('Stock product ' . $product->name . ' kurang - Stock tersisa ' . $product->current_stock);
-            }
+        // foreach ($stockCheck as $productId => $totalQty) {
+        //     $product = Product::findOrFail($productId);
+        //     if ((int) $product->current_stock < $totalQty) {
+        //         throw new \Exception('Stock product ' . $product->name . ' kurang - Stock tersisa ' . $product->current_stock);
+        //     }
 
-            $product->current_stock = (int) $product->current_stock - (int) $totalQty;
-            $product->save();
-        }
+        //     $product->current_stock = (int) $product->current_stock - (int) $totalQty;
+        //     $product->save();
+        // }
 
         foreach ($orderProducts as $product) {
             $sellingPrice = $product['selling_price'];
@@ -394,6 +397,7 @@ class TransactionController extends Controller
                 'percent_discount' => $product['percent_discount'],
                 'price_discount' => $product['price_discount'],
                 'qty' => $product['qty'],
+                'status_input' => 'cloud',
             ]);
 
             foreach ($product['addons'] as $addon) {
