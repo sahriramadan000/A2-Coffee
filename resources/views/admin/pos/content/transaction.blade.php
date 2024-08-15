@@ -141,7 +141,6 @@
                                                 <input type="hidden" name="button" id="buttonValue" value="">
 
                                                 @can('simpan-order')
-                                                    
                                                 <button type="button" class="btn btn-lg btn-success fw-bold w-25 p-3" data-bs-toggle="modal" data-bs-target="#modalPayment" onclick="setButtonValue('simpan-order')">
                                                     <h6 class="mb-0 text-white">
                                                         SIMPAN ORDER

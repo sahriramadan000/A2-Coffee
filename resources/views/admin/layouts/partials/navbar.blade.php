@@ -171,8 +171,8 @@
                                 &#x1F44B;
                             </div>
                             <div class="media-body">
-                                <h5>Shaun Park</h5>
-                                <p>Project Leader</p>
+                                <h5>{{ Auth::user()->username ?? '-' }}</h5>
+                                <p>{{ Auth::user()->getRoleNames()->first() }}</p>
                             </div>
                         </div>
                     </div>

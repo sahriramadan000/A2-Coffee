@@ -98,6 +98,7 @@ class PermissionSeeder extends Seeder
             'coupon',
             'delete-product-in-cart',
             'simpan-order',
+            'detail-penjualan',
 
         ];
 
