@@ -147,6 +147,9 @@ class RoleController extends Controller
                 $role->permissions()->detach($permission);
             }
 
+            // Clear permission cache
+            app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+
             // Kirim respons ke klien (jika diperlukan)
             return response()->json(['message' => 'Permission updated successfully']);
         } catch (\Throwable $th) {
@@ -173,6 +176,8 @@ class RoleController extends Controller
                 // Check status False delete all permission
                 $role->revokePermissionTo(Permission::all());
             }
+
+            app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
             return response()->json(['message' => 'Permissions updated successfully'], 200);
         } catch (\Exception $e) {
