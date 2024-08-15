@@ -138,7 +138,6 @@
             </li>
             @endcan
 
-            @can('order-pesanan')
             <li class="menu {{ request()->routeIs('order-pesanan') ? 'active' : '' }}">
                 <a href="{{ route('order-pesanan') }}" aria-expanded="false" class="dropdown-toggle">
                     <div class="">
@@ -147,7 +146,6 @@
                     </div>
                 </a>
             </li>
-            @endcan
 
             @can('settlement')
             <li class="menu {{ request()->routeIs('settlements.index') ? 'active' : '' }}">
