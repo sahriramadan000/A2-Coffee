@@ -51,7 +51,7 @@
                         </div>
                     </div>
 
-                    <div class="col-12 col-md-6">
+                    {{-- <div class="col-12 col-md-6">
                         <div class="form-group mb-3">
                             <label for="status">Status Position</label>
                             <select class="form-control form-control-sm" name="status_position" id="status_position">
@@ -64,7 +64,7 @@
                                 <p class="text-danger">{{ $errors->first('status_position') }}</p>
                             @endif
                         </div>
-                    </div>
+                    </div> --}}
                 </div>
             </div>
             <div class="modal-footer">
