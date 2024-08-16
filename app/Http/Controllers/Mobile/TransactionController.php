@@ -311,16 +311,24 @@ class TransactionController extends Controller
             ->where('payment_status', 'Unpaid')
             ->firstOrFail();
 
+            // Menambahkan jumlah quantity baru ke total quantity
             $order->total_qty += array_sum($request->quantity);
-            $order->status_input = 'cloud';
-            $subtotal = $order->subtotal + $subTotal;
+            
+            // Menambahkan subTotal baru ke subtotal yang sudah ada
+            $currentSubtotal = $order->subtotal;
+            $subtotal = $currentSubtotal + $subTotal;
+            
+            // Hitung biaya layanan dan pajak
             $service = $subtotal * $other_setting->layanan / 100;
             $pb01 = ($subtotal + $service) * $other_setting->pb01 / 100;
+
+            // Set nilai baru ke model order
             $order->subtotal = $subtotal;
             $order->service = $service;
             $order->pb01 = $pb01;
             $order->total = $subtotal + $service + $pb01;
             $order->updated_at = now();
+            $order->status_input = 'cloud';
             $order->status_realtime = 'new';
             $order->save();
 
