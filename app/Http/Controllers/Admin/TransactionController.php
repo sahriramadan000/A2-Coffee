@@ -8,6 +8,7 @@ use App\Models\CacheOnholdControl;
 use App\Models\Coupons;
 use App\Models\Customer;
 use App\Models\Order;
+use App\Models\OrderCoupon;
 use App\Models\OrderProduct;
 use App\Models\OrderProductAddon;
 use App\Models\OtherSetting;
@@ -862,6 +863,7 @@ class TransactionController extends Controller
     public function orderPesanan(Request $request){
         $data ['page_title'] = 'Order Pesanan';
         $data['account_users'] = User::get();
+        $data['coupons'] = Coupons::get();
 
         $data['order_products'] = OrderProduct::orderBy('updated_at', 'ASC')->get();
         $data ['other_setting'] = OtherSetting::get()->first();
@@ -903,13 +905,80 @@ class TransactionController extends Controller
             $order->status_input    = 'cloud';
             $order->payment_method  = $request->payment_method;
             $order->cash = $request->cash ?? 0;
+            $other_setting  = OtherSetting::get()->first();
+            $service        = $other_setting->layanan / 100;
+            $biaya_layanan  = 0;
+            $kembalian      = 0;
+            $subtotal       = $order->subtotal;
 
-            if ($request->payment_method == 'Cash' && $request->cash != null) {
-                $kembalian = $order->total - $request->cash ;
+            // Coupon
+            if ($request->coupon_id) {
+                $coupon         = Coupons::findOrFail($request->coupon_id);
+                $coupon_type    = $coupon->type;
+                $coupon_amount  = 0;
+                $temp_total     = 0;
+
+                // Simpan data kupon di tabel OrderCoupon
+                OrderCoupon::create([
+                    'order_id'           => $order->id,
+                    'name'               => $coupon->name,
+                    'code'               => $coupon->code,
+                    'type'               => $coupon->type,
+                    'discount_value'     => $coupon->discount_value,
+                    'discount_threshold' => ($coupon_type == 'Percentage Discount') ? $coupon->discount_threshold : null,
+                    'max_discount_value' => ($coupon_type == 'Percentage Discount') ? $coupon->max_discount_value : null,
+                    'status_input'       => 'cloud',
+                ]);
+
+                $coupon->current_usage += 1;
+                $coupon->save();
+
+                // Hitung jumlah diskon berdasarkan tipe kupon
+                if ($coupon_type == 'Percentage Discount') {
+                    $coupon_amount = $subtotal * $coupon->discount_value / 100;
+
+                    // Terapkan maksimal nilai diskon jika ada
+                    if ($subtotal >= $coupon->discount_threshold && $coupon_amount > $coupon->max_discount_value) {
+                        $coupon_amount = $coupon->max_discount_value;
+                    }
+                    $order->percent_discount = (int) $coupon->discount_value;
+                } else {
+                    $coupon_amount  = (int) $coupon->discount_value;
+                    $order->price_discount   = $coupon_amount;
+                }
+
+                // Periksa biaya layanan
+                if ($other_setting->layanan != 0) {
+                    $biaya_layanan  = ($subtotal - $coupon_amount) * $service;
+                    $temp_total     = ($subtotal - $coupon_amount) + $biaya_layanan;
+                } else {
+                    $temp_total     = $subtotal - $coupon_amount;
+                }
+
+                dd($temp_total);
+
+                // Hitung pajak & total harga
+                $taxPriceByCoupon   = $temp_total * ($other_setting->pb01 / 100);
+                $totalPriceByCoupon = $temp_total + $taxPriceByCoupon;
+
+                // Set data di Order
+                $order->is_coupon   = true;
+                $order->service     = $biaya_layanan;
+                $order->pb01        = $taxPriceByCoupon;
+                $order->total       = $totalPriceByCoupon;
             }
-            $order->kembalian = $request->kembalian ?? 0;
+
+            // Hitung kembalian jika metode pembayaran adalah Cash
+            if ($request->payment_method == 'Cash' && $request->cash != null) {
+                $kembalian = $request->cash - $order->total;
+                $order->kembalian = $kembalian;
+            } else {
+                $order->kembalian = 0;
+            }
 
             $order->save();
+
+
 
             $table = Table::where('name', $order->table)->first(); // Assuming 'table_name' is the correct field
 
@@ -921,10 +990,9 @@ class TransactionController extends Controller
             if ($request->cash) {
                 return redirect()->back()->with('success','Uang Yang Di kembalikan '. $kembalian);
             }else{
-                return redirect()->back()->with('success', 'Update Return');
+                return redirect()->back()->with('success', 'Update Payment');
             }
         } catch (\Throwable $th) {
-            // dd($th);
             return response()->json(['failed' => true, 'message' => $th->getMessage()]);
         }
     }

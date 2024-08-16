@@ -158,7 +158,22 @@
                                                 <span>Rp.{{ number_format($item->subtotal,0) }}</span>
                                             </div>
                                         </li>
-
+                                        
+                                        {{-- @if ($item->is_coupon == true && $item->price_discount != 0)
+                                        <li class="list-group-item">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <h4 class="mb-1 dark-grey"><strong>Coupon</strong></h4>
+                                                <span>Rp.{{ number_format($item->price_discount,0) }}</span>
+                                            </div>
+                                        </li>
+                                        @else
+                                        <li class="list-group-item">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <h4 class="mb-1 dark-grey"><strong>Coupon</strong></h4>
+                                                <span>Rp.{{ number_format($item->percent_discount,0) }}</span>
+                                            </div>
+                                        </li>
+                                        @endif --}}
                                         <li class="list-group-item">
                                             <div class="d-flex w-100 justify-content-between">
                                                 <h4 class="mb-1 dark-grey"><strong>PB01 :</strong></h4>
@@ -174,7 +189,7 @@
                                         <li class="list-group-item">
                                             <div class="d-flex w-100 justify-content-between">
                                                 <h4 class="mb-1 dark-grey"><strong>Total Payment :</strong></h4>
-                                                <span>Rp.{{ number_format($item->subtotal,0) }}</span>
+                                                <span>Rp.{{ number_format($item->total,0) }}</span>
                                             </div>
                                         </li>
                                             <li class="list-group-item">
@@ -222,7 +237,7 @@
                                                     </div>
                                                 </div>
                                         
-                                                @if ($item->payment_status != 'Paid')
+                                                @if ($item->payment_status != 'Paid' || $item->payment_method == 'Return')
                                                 <div class="col-lg-6 mx-auto mt-4">
                                                     <button type="button" class="btn btn-sm w-100 btn-secondary" data-bs-toggle="modal" data-bs-target="#exampleModal-{{ $item->id }}">Update Payment</button>
                                                 </div>
@@ -244,8 +259,42 @@
                                                                     </button>
                                                                 </div>
                                                                 <div class="modal-body">
+                                                                    {{-- <div class="form-group">
+                                                                        <h6 class="mb-3">Type</h6>
+                                                                        <select name="type" class="form-control form-control-sm payment-method" data-modal-id="{{ $item->id }}">
+                                                                            <option selected value="Percentage Discount">Coupon</option>
+                                                                            <option value="Discount">Discount</option>
+                                                                        </select>
+                                                                    </div>
+
                                                                     <div class="form-group">
-                                                                        <h6 class="mb-3">Metode Payment</h6>
+                                                                        <h6 class="mb-3">Discount</h6>
+                                                                        <select name="discount" class="form-control form-control-sm payment-method" data-modal-id="{{ $item->id }}">
+                                                                            <option selected value="Price">Price</option>
+                                                                            <option value="Percent">Percent</option>
+                                                                        </select>
+                                                                    </div>
+
+                                                                    <div class="form-group mt-3">
+                                                                        <div class="input-group">
+                                                                            <span class="input-group-text">Rp.</span>
+                                                                            <input type="text" class="form-control" aria-label="Price" name="input-price" id="input-price">
+                                                                        </div>
+                                                                    </div>
+                                                                    
+                                                                    <div class="form-group mt-2 cash-input" id="-{{ $item->id }}">
+                                                                        <label for="cash" class="form-label">Coupon</label>
+                                                                        <select class="form-select mb-3" name="coupon_id" id="select-coupon" aria-label="Default select example">
+                                                                            <option selected disabled>Select Coupon</option>
+                                                                            @foreach ($coupons as $coupon)
+                                                                            <option value="{{ $coupon->id }}">{{ $coupon->name }} <small>({{ $coupon->type == 'Percentage Discount' ? 'Percent: '. $coupon->discount_value.'%' : 'Price: Rp.'. number_format($coupon->discount_value, 0, ',', '.') }})</small></option>
+                                                                            @endforeach
+                                                                        </select>
+                                                                    </div> --}}
+                                                                    
+
+                                                                    <div class="form-group">
+                                                                        <h6 class="mt-2 mb-3">Metode Payment</h6>
                                                                         <select name="payment_method" class="form-control form-control-sm payment-method" data-modal-id="{{ $item->id }}">
                                                                             <option selected value="Transfer Bank">Transfer Bank</option>
                                                                             <option value="EDC BCA">EDC BCA</option>
