@@ -120,6 +120,7 @@ class OrderController extends Controller
 
             }else{
                 if ($table->status_position == 'Open') {
+                    dd('lama');
                     $order = Order::where('table', $table->name)->where('payment_status', 'Unpaid')->firstOrFail();
 
                     // Menambahkan jumlah quantity baru ke total quantity
@@ -135,7 +136,7 @@ class OrderController extends Controller
         
                     $order->inputer = ($request->inputer ? $request->inputer : $order->inputer);
 
-                    // Set nilai baru ke model order
+                    // Set nilai baru ke model order 
                     $order->update([
                         'subtotal' => $subtotals,
                         'service' => $service,
@@ -148,6 +149,7 @@ class OrderController extends Controller
                     ]);
 
                 }else{
+                    dd('baru');
                     $order = Order::create([
                         'no_invoice'        => $this->generateInvoice(),
                         'cashier_name'      => Auth::user()->fullname,
