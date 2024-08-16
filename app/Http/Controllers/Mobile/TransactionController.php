@@ -318,7 +318,7 @@ class TransactionController extends Controller
             // Menambahkan subTotal baru ke subtotal yang sudah ada
             $currentSubtotal = $order->subtotal;
             $subtotal = $currentSubtotal + $subTotal;
-            dd($currentSubtotal,$subtotal);
+            dd($currentSubtotal,$subTotal,$subtotal);
             
             // Hitung biaya layanan dan pajak
             $service = $subtotal * $other_setting->layanan / 100;
