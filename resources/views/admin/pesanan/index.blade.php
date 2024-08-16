@@ -240,11 +240,14 @@
                                                     </div>
                                                 </div>
 
-                                                @if ($item->payment_status != 'Paid' || $item->payment_method == 'Return')
-                                                <div class="col-lg-6 mx-auto mt-4">
-                                                    <button type="button" class="btn btn-sm w-100 btn-secondary" data-bs-toggle="modal" data-bs-target="#exampleModal-{{ $item->id }}">Update Payment</button>
-                                                </div>
+                                                @if ($item->payment_status != 'Paid' && !($item->payment_status == 'Unpaid' && $item->payment_method == 'Return'))
+                                                    <div class="col-lg-6 mx-auto mt-4">
+                                                        <button type="button" class="btn btn-sm w-100 btn-secondary" data-bs-toggle="modal" data-bs-target="#exampleModal-{{ $item->id }}">
+                                                            Update Payment
+                                                        </button>
+                                                    </div>
                                                 @endif
+
 
                                                 <div class="modal fade" id="exampleModal-{{ $item->id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                                     <div class="modal-dialog" role="document">
