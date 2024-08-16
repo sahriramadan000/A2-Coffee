@@ -955,8 +955,6 @@ class TransactionController extends Controller
                     $temp_total     = $subtotal - $coupon_amount;
                 }
 
-                dd($temp_total);
-
                 // Hitung pajak & total harga
                 $taxPriceByCoupon   = $temp_total * ($other_setting->pb01 / 100);
                 $totalPriceByCoupon = $temp_total + $taxPriceByCoupon;

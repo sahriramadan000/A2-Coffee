@@ -136,14 +136,16 @@ class OrderController extends Controller
                     $order->inputer = ($request->inputer ? $request->inputer : $order->inputer);
 
                     // Set nilai baru ke model order
-                    $order->subtotal = $subtotals;
-                    $order->service = $service;
-                    $order->pb01 = $pb01;
-                    $order->total = $subtotals + $service + $pb01;
-                    $order->updated_at = now();
-                    $order->status_input = 'cloud';
-                    $order->status_realtime = 'new';
-                    $order->save();
+                    $order->update([
+                        'subtotal' => $subtotals,
+                        'service' => $service,
+                        'pb01' => $pb01,
+                        'total' => $subtotals + $service + $pb01,
+                        'inputer' => $request->inputer ?? $order->inputer,
+                        'status_input' => 'cloud',
+                        'status_realtime' => 'new',
+                        'updated_at' => now(),
+                    ]);
 
                 }else{
                     $order = Order::create([
