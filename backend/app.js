@@ -87,11 +87,11 @@ async function syncAllOrdersAndRelatedTables() {
                 // Jika data sudah ada, cek apakah ada perubahan dan update jika perlu
                 const localOrder = localOrderResult.rows[0];
                 let isDifferent = false;
-                
+
                 // Periksa perubahan pada setiap kolom, kecuali `status_input`
                 for (const key in order) {
                   if (localOrder['status_input'] == 'cloud' && order[key] !== localOrder[key] && key !== 'created_at' && key !== 'updated_at') {
-                      // console.log(key, order[key], localOrder[key], order['status_input']);  
+                      // console.log(key, order[key], localOrder[key], order['status_input']);
                       isDifferent = true;
                         break;
                     }

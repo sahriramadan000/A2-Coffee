@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\TableController;
 use App\Http\Controllers\Admin\TagController;
 use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\KeyVoidController;
 use App\Http\Controllers\Mobile\CartController;
 use App\Http\Controllers\Mobile\HomepageController;
 use App\Http\Controllers\Mobile\TransactionController as MobileTransactionController;
@@ -170,18 +171,18 @@ Route::middleware(['auth'])->group(function () {
         Route::prefix('sales')->name('sales.')->group(function () {
             Route::get('gross', [ReportController::class, 'reportGross'])->name('report-gross');
             Route::get('gross-data', [ReportController::class, 'getReportGross'])->name('get-report-gross');
-            
+
             Route::get('payment-method', [ReportController::class, 'paymentMethod'])->name('payment-method');
             Route::get('payment-method-data', [ReportController::class, 'getReportPayment'])->name('get-payment-method');
-            
+
             Route::get('refund', [ReportController::class, 'refund'])->name('refund');
             Route::get('refund-data', [ReportController::class, 'getReportRefund'])->name('get-return');
-    
+
             Route::get('absensi', [ReportController::class, 'reportAbsensi'])->name('report-absensi');
             Route::get('absensi-data', [ReportController::class, 'getReportAbsensi'])->name('get-report-absensi'); // Changed URI to 'absensi-data'
         });
     });
-    
+
 
     // settlement
     Route::prefix('settlements')->name('settlements.')->group(function () {
@@ -232,6 +233,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', [OtherSettingController::class, 'getModal'])->name('modal');
         Route::put('/{otherSettingId}', [OtherSettingController::class, 'update'])->name('update');
     });
+
+    // Generate Key
+    Route::post('/generate-key', [KeyVoidController::class, 'generateKey'])->name('generate.key');
 
     // Transaction
     Route::get('/transaction', [TransactionController::class, 'index'])->name('pos');

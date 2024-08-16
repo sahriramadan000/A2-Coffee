@@ -158,7 +158,7 @@
                                                 <span>Rp.{{ number_format($item->subtotal,0) }}</span>
                                             </div>
                                         </li>
-                                        
+
                                         {{-- @if ($item->is_coupon == true && $item->price_discount != 0)
                                         <li class="list-group-item">
                                             <div class="d-flex w-100 justify-content-between">
@@ -218,7 +218,7 @@
                                                             @csrf
                                                             <div class="modal-content">
                                                                 <div class="modal-header">
-                                                                    <h5 class="modal-title" id="returnLabel">Apakah Anda Yakin Ingin Menyelesaikan Pembayaran</h5>
+                                                                    <h5 class="modal-title" id="returnLabel">Apakah Anda Yakin Ingin Mereturn Order</h5>
                                                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
                                                                         <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x">
                                                                             <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -227,7 +227,10 @@
                                                                     </button>
                                                                 </div>
                                                                 <div class="modal-body">
-                                                                    <p>Apakah Anda Yakin Ingin Retun Order Ini?!</p>
+                                                                    <div class="mb-3">
+                                                                        <label for="key" class="form-label">Enter Key</label>
+                                                                        <input type="text" class="form-control" id="key" name="key" required>
+                                                                    </div>
                                                                 </div>
                                                                 <div class="modal-footer">
                                                                     <button type="submit" class="btn btn-primary">Save</button>
@@ -236,13 +239,13 @@
                                                         </form>
                                                     </div>
                                                 </div>
-                                        
+
                                                 @if ($item->payment_status != 'Paid' || $item->payment_method == 'Return')
                                                 <div class="col-lg-6 mx-auto mt-4">
                                                     <button type="button" class="btn btn-sm w-100 btn-secondary" data-bs-toggle="modal" data-bs-target="#exampleModal-{{ $item->id }}">Update Payment</button>
                                                 </div>
                                                 @endif
-                                        
+
                                                 <div class="modal fade" id="exampleModal-{{ $item->id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                                     <div class="modal-dialog" role="document">
                                                         <form action="{{ route('update-payment', $item->id) }}" method="POST">
@@ -281,7 +284,7 @@
                                                                             <input type="text" class="form-control" aria-label="Price" name="input-price" id="input-price">
                                                                         </div>
                                                                     </div>
-                                                                    
+
                                                                     <div class="form-group mt-2 cash-input" id="-{{ $item->id }}">
                                                                         <label for="cash" class="form-label">Coupon</label>
                                                                         <select class="form-select mb-3" name="coupon_id" id="select-coupon" aria-label="Default select example">
@@ -291,7 +294,7 @@
                                                                             @endforeach
                                                                         </select>
                                                                     </div> --}}
-                                                                    
+
 
                                                                     <div class="form-group">
                                                                         <h6 class="mt-2 mb-3">Metode Payment</h6>
@@ -322,7 +325,7 @@
                                                 </div>
                                             </div>
                                         </li>
-                                            
+
                                     </ul>
                                 </div>
                             </div>

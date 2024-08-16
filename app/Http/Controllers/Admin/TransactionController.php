@@ -7,6 +7,7 @@ use App\Models\Addon;
 use App\Models\CacheOnholdControl;
 use App\Models\Coupons;
 use App\Models\Customer;
+use App\Models\KeyVoid;
 use App\Models\Order;
 use App\Models\OrderCoupon;
 use App\Models\OrderProduct;
@@ -631,11 +632,11 @@ class TransactionController extends Controller
     public function printStruk(Request $request){
         $orders = Order::where('id', $request->id)->first();
         $orderProducts = OrderProduct::where('order_id', $orders->id)->get();
-        
+
         if (count($orderProducts) != 0) {
             $connector = new NetworkPrintConnector("192.168.123.120", 9100);
             $printer = new Printer($connector);
-                
+
             /* Initialize */
             $printer -> initialize();
 
@@ -645,38 +646,38 @@ class TransactionController extends Controller
                 $lebar_kolom_1 = 10;
                 $lebar_kolom_2 = 9;
                 $lebar_kolom_3 = 19;
-            
-                // Melakukan wordwrap(), jadi jika karakter teks melebihi lebar kolom, ditambahkan \n 
+
+                // Melakukan wordwrap(), jadi jika karakter teks melebihi lebar kolom, ditambahkan \n
                 $kolom1 = wordwrap($kolom1, $lebar_kolom_1, "\n", true);
                 $kolom2 = wordwrap($kolom2, $lebar_kolom_2, "\n", true);
                 $kolom3 = wordwrap($kolom3, $lebar_kolom_3, "\n", true);
-            
+
                 // Merubah hasil wordwrap menjadi array, kolom yang memiliki 2 index array berarti memiliki 2 baris (kena wordwrap)
                 $kolom1Array = explode("\n", $kolom1);
                 $kolom2Array = explode("\n", $kolom2);
                 $kolom3Array = explode("\n", $kolom3);
-            
+
                 // Mengambil jumlah baris terbanyak dari kolom-kolom untuk dijadikan titik akhir perulangan
                 $jmlBarisTerbanyak = max(count($kolom1Array), count($kolom2Array), count($kolom3Array));
-            
+
                 // Mendeklarasikan variabel untuk menampung kolom yang sudah di edit
                 $hasilBaris = array();
-            
-                // Melakukan perulangan setiap baris (yang dibentuk wordwrap), untuk menggabungkan setiap kolom menjadi 1 baris 
+
+                // Melakukan perulangan setiap baris (yang dibentuk wordwrap), untuk menggabungkan setiap kolom menjadi 1 baris
                 for ($i = 0; $i < $jmlBarisTerbanyak; $i++) {
-                    // memberikan spasi di setiap cell berdasarkan lebar kolom yang ditentukan, 
+                    // memberikan spasi di setiap cell berdasarkan lebar kolom yang ditentukan,
                     $hasilKolom1 = str_pad((isset($kolom1Array[$i]) ? $kolom1Array[$i] : ""), $lebar_kolom_1, " ");
                     $hasilKolom2 = str_pad((isset($kolom2Array[$i]) ? $kolom2Array[$i] : ""), $lebar_kolom_2, " ");
                     $hasilKolom3 = str_pad((isset($kolom3Array[$i]) ? $kolom3Array[$i] : ""), $lebar_kolom_3, " ");
-            
+
                     // Menggabungkan kolom tersebut menjadi 1 baris dan ditampung ke variabel hasil (ada 1 spasi disetiap kolom)
                     $hasilBaris[] = $hasilKolom1 . " " . $hasilKolom2 . " " . $hasilKolom3 ;
                 }
-            
+
                 // Hasil yang berupa array, disatukan kembali menjadi string dan tambahkan \n disetiap barisnya.
                 return implode("\n", $hasilBaris) . "\n";
             }
-            
+
 
             // Membuat judul
             $printer->initialize();
@@ -691,7 +692,7 @@ class TransactionController extends Controller
             $printer->text("No Inv : ".$orders->no_invoice."\n");
             $printer->text("Waktu  : ".$orders->created_at."\n");
             $printer->text("--------------------------------\n");
-            
+
             $printer->text("Customer             : ".$orders->customer_name ?? '-'."\n");
             $printer->text("Order                : ".$orders->inputer."\n");
             $printer->text("Table                : ".$orders->table."\n");
@@ -725,7 +726,7 @@ class TransactionController extends Controller
             $printer->text("Bill Terbayar\n");
             $printer->text("Terima kasih telah berbelanja\n");
             $printer->text("Silahkan Datang Kembali\n");
-            
+
             $printer->feed(3); // mencetak 5 baris kosong agar terangkat (pemotong kertas saya memiliki jarak 5 baris dari toner)
             $printer->cut();
             $printer->close();
@@ -738,11 +739,11 @@ class TransactionController extends Controller
     public function printBill(Request $request){
         $orders = Order::where('id', $request->id)->first();
         $orderProducts = OrderProduct::where('order_id', $orders->id)->get();
-        
+
         if (count($orderProducts) != 0) {
             $connector = new NetworkPrintConnector("192.168.123.120", 9100);
             $printer = new Printer($connector);
-                
+
             /* Initialize */
             $printer -> initialize();
 
@@ -752,38 +753,38 @@ class TransactionController extends Controller
                 $lebar_kolom_1 = 10;
                 $lebar_kolom_2 = 9;
                 $lebar_kolom_3 = 19;
-            
-                // Melakukan wordwrap(), jadi jika karakter teks melebihi lebar kolom, ditambahkan \n 
+
+                // Melakukan wordwrap(), jadi jika karakter teks melebihi lebar kolom, ditambahkan \n
                 $kolom1 = wordwrap($kolom1, $lebar_kolom_1, "\n", true);
                 $kolom2 = wordwrap($kolom2, $lebar_kolom_2, "\n", true);
                 $kolom3 = wordwrap($kolom3, $lebar_kolom_3, "\n", true);
-            
+
                 // Merubah hasil wordwrap menjadi array, kolom yang memiliki 2 index array berarti memiliki 2 baris (kena wordwrap)
                 $kolom1Array = explode("\n", $kolom1);
                 $kolom2Array = explode("\n", $kolom2);
                 $kolom3Array = explode("\n", $kolom3);
-            
+
                 // Mengambil jumlah baris terbanyak dari kolom-kolom untuk dijadikan titik akhir perulangan
                 $jmlBarisTerbanyak = max(count($kolom1Array), count($kolom2Array), count($kolom3Array));
-            
+
                 // Mendeklarasikan variabel untuk menampung kolom yang sudah di edit
                 $hasilBaris = array();
-            
-                // Melakukan perulangan setiap baris (yang dibentuk wordwrap), untuk menggabungkan setiap kolom menjadi 1 baris 
+
+                // Melakukan perulangan setiap baris (yang dibentuk wordwrap), untuk menggabungkan setiap kolom menjadi 1 baris
                 for ($i = 0; $i < $jmlBarisTerbanyak; $i++) {
-                    // memberikan spasi di setiap cell berdasarkan lebar kolom yang ditentukan, 
+                    // memberikan spasi di setiap cell berdasarkan lebar kolom yang ditentukan,
                     $hasilKolom1 = str_pad((isset($kolom1Array[$i]) ? $kolom1Array[$i] : ""), $lebar_kolom_1, " ");
                     $hasilKolom2 = str_pad((isset($kolom2Array[$i]) ? $kolom2Array[$i] : ""), $lebar_kolom_2, " ");
                     $hasilKolom3 = str_pad((isset($kolom3Array[$i]) ? $kolom3Array[$i] : ""), $lebar_kolom_3, " ");
-            
+
                     // Menggabungkan kolom tersebut menjadi 1 baris dan ditampung ke variabel hasil (ada 1 spasi disetiap kolom)
                     $hasilBaris[] = $hasilKolom1 . " " . $hasilKolom2 . " " . $hasilKolom3 ;
                 }
-            
+
                 // Hasil yang berupa array, disatukan kembali menjadi string dan tambahkan \n disetiap barisnya.
                 return implode("\n", $hasilBaris) . "\n";
             }
-            
+
 
             // Membuat judul
             $printer->initialize();
@@ -798,7 +799,7 @@ class TransactionController extends Controller
             $printer->text("No Inv : ".$orders->no_invoice."\n");
             $printer->text("Waktu  : ".$orders->created_at."\n");
             $printer->text("--------------------------------\n");
-            
+
             $printer->text("Customer : ".$orders->customer_name."\n");
             $printer->text("Order    : ".$orders->inputer."\n");
             $printer->text("Table    : ".$orders->table."\n");
@@ -831,7 +832,7 @@ class TransactionController extends Controller
             $printer->text("Bill Belum Terbayar\n");
             $printer->text("Terima kasih telah berbelanja\n");
             $printer->text("Silahkan Datang Kembali\n");
-            
+
             $printer->feed(3); // mencetak 5 baris kosong agar terangkat (pemotong kertas saya memiliki jarak 5 baris dari toner)
             $printer->cut();
             $printer->close();
@@ -999,26 +1000,43 @@ class TransactionController extends Controller
 
     public function returnOrder(Request $request, $id) {
         try {
+            // Validate the incoming request
+            $request->validate([
+                'key' => 'required|string'
+            ]);
+
+            // Retrieve the key from the request
+            $key = $request->input('key');
+
+            // Check if the key exists in the database
+            $validKey = KeyVoid::where('key', $key)->first();
+
+            if (!$validKey) {
+                return redirect()->back()->with('failed', 'Kunci tidak valid atau tidak tersedia.');
+            }
+
+            // Proceed with the return process
             $order = Order::findOrFail($id);
             $order->payment_status = 'Unpaid';
             $order->payment_method = 'Return';
             $order->save();
 
-            // Find the associated OrderProduct records
-            $order_products = OrderProduct::where('order_id', $id)->get();
-
+            // Optionally update order products
+            // $order_products = OrderProduct::where('order_id', $id)->get();
             // foreach ($order_products as $order_product) {
             //     $products = Product::where('name', $order_product->name)->get();
-
             //     foreach ($products as $product) {
             //         $product->current_stock += $order_product->qty;
             //         $product->save();
             //     }
             // }
 
-            return redirect()->back()->with('success', 'Update Return');
+            // Delete the used key from the database
+            $validKey->delete();
+
+            // Redirect back with a success message
+            return redirect()->back()->with('success', 'Orderan Berhasil di Return.');
         } catch (\Throwable $th) {
-            // dd($th);
             return response()->json(['failed' => true, 'message' => $th->getMessage()]);
         }
     }

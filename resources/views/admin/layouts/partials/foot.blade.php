@@ -59,4 +59,65 @@
         var formattedInput = formatRupiah(input);
         inputField.val(formattedInput);
     }
+
+    function generateKey(url) {
+        Swal.fire({
+            title: 'Generating Key',
+            text: 'Please wait...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+            },
+            success: function(data) {
+                Swal.close();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Key Generated Successfully',
+                    html: `
+                        <p>Your generated key is: <strong id="generated-key">${data.key}</strong></p>
+                        <button id="copy-key" class="btn btn-primary">Copy Key</button>
+                    `,
+                    didOpen: () => {
+                        const copyButton = Swal.getHtmlContainer().querySelector('#copy-key');
+                        copyButton.addEventListener('click', () => {
+                            const keyElement = Swal.getHtmlContainer().querySelector('#generated-key');
+                            const key = keyElement.textContent;
+                            navigator.clipboard.writeText(key).then(() => {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Key Copied',
+                                    text: 'The key has been copied to your clipboard.',
+                                });
+                            }).catch((err) => {
+                                console.error('Failed to copy key: ', err);
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Copy Failed',
+                                    text: 'There was an error copying the key to your clipboard.',
+                                });
+                            });
+                        });
+                    }
+                });
+            },
+            error: function(xhr, status, error) {
+                Swal.close();
+                console.error('Failed to generate key: ', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Failed to Generate Key',
+                    text: error,
+                });
+            }
+        });
+    }
+
 </script>
