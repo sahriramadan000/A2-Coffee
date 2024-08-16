@@ -66,7 +66,8 @@
                 </ul>
             </li> --}}
 
-            <li class="menu {{ (request()->routeIs('suppliers.index') || request()->routeIs('materials.index')) ? 'active' : '' }}">
+            @canany(['supplier-list', 'material-list', 'tag-list', 'table-list', 'addon-list', 'product-list', 'customer-list'])
+            <li class="menu {{ (request()->routeIs('suppliers.index') || request()->routeIs('materials.index') || request()->routeIs('stores.index') || request()->routeIs('tags.index') || request()->routeIs('tables.index') || request()->routeIs('addons.index') || request()->routeIs('products.index') || request()->routeIs('customers.index')) ? 'active' : '' }}">
                 <a href="#inventory" data-bs-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
                     <div class="">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clipboard"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
@@ -76,35 +77,58 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right"><polyline points="9 18 15 12 9 6"></polyline></svg>
                     </div>
                 </a>
-                <ul class="collapse submenu list-unstyled {{ (request()->routeIs('suppliers.index') || request()->routeIs('materials.index')) ? 'show' : '' }}" id="inventory" data-bs-parent="#accordionExample">
+                <ul class="collapse submenu list-unstyled {{ (request()->routeIs('suppliers.index') || request()->routeIs('materials.index') || request()->routeIs('stores.index') || request()->routeIs('tags.index') || request()->routeIs('tables.index') || request()->routeIs('addons.index') || request()->routeIs('products.index') || request()->routeIs('customers.index')) ? 'show' : '' }}" id="inventory" data-bs-parent="#accordionExample">
+                    @can('supplier-list')
                     <li class="{{ request()->routeIs('suppliers.index') ? 'active' : '' }}">
                         <a href="{{ route('suppliers.index') }}"> Suppliers </a>
                     </li>
+                    @endcan
+
                     <li class="{{ request()->routeIs('stores.index') ? 'active' : '' }}">
                         <a href="{{ route('stores.index') }}"> Store </a>
                     </li>
+
+                    @can('material-list')
                     <li class="{{ request()->routeIs('materials.index') ? 'active' : '' }}">
                         <a href="{{ route('materials.index') }}"> Materials </a>
                     </li>
+                    @endcan
+
+                    @can('tag-list')
                     <li class="{{ request()->routeIs('tags.index') ? 'active' : '' }}">
                         <a href="{{ route('tags.index') }}"> Tags </a>
                     </li>
+                    @endcan
+
+                    @can('table-list')
                     <li class="{{ request()->routeIs('tables.index') ? 'active' : '' }}">
                         <a href="{{ route('tables.index') }}"> Table </a>
                     </li>
+                    @endcan
+
+                    @can('addon-list')
                     <li class="{{ request()->routeIs('addons.index') ? 'active' : '' }}">
                         <a href="{{ route('addons.index') }}"> Addons </a>
                     </li>
+                    @endcan
+
+                    @can('product-list')
                     <li class="{{ request()->routeIs('products.index') ? 'active' : '' }}">
                         <a href="{{ route('products.index') }}"> Products </a>
                     </li>
+                    @endcan
+
+                    @can('customer-list')
                     <li class="{{ request()->routeIs('customers.index') ? 'active' : '' }}">
                         <a href="{{ route('customers.index') }}"> Customer </a>
                     </li>
+                    @endcan
                 </ul>
             </li>
+            @endcanany
 
-            <li class="menu {{ (request()->routeIs('suppliers.index') || request()->routeIs('materials.index')) ? 'active' : '' }}">
+            @canany(['report-gross-profit', 'report-payment-method', 'report-refund', 'report-absensi'])
+            <li class="menu {{ (request()->routeIs(['report.sales.report-gross', 'report.sales.payment-method', 'report.sales.report-absensi', 'report.sales.refund'])) ? 'active' : '' }}">
                 <a href="#report" data-bs-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
                     <div class="">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
@@ -114,21 +138,34 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right"><polyline points="9 18 15 12 9 6"></polyline></svg>
                     </div>
                 </a>
-                <ul class="collapse submenu list-unstyled {{ (request()->routeIs(['report.sales.report-gross', 'payment-method.index'])) ? 'show' : '' }}" id="report" data-bs-parent="#accordionExample">
+
+                <ul class="collapse submenu list-unstyled {{ (request()->routeIs(['report.sales.report-gross', 'report.sales.payment-method', 'report.sales.report-absensi', 'report.sales.refund'])) ? 'show' : '' }}" id="report" data-bs-parent="#accordionExample">
+                    @can('report-gross-profit')
                     <li class="{{ request()->routeIs('report.sales.report-gross') ? 'active' : '' }}">
                         <a href="{{ route('report.sales.report-gross') }}"> Gross Profit </a>
                     </li>
+                    @endcan
+
+                    @can('report-payment-method')
                     <li class="{{ request()->routeIs('report.sales.payment-method') ? 'active' : '' }}">
                         <a href="{{ route('report.sales.payment-method') }}"> Payment Method </a>
                     </li>
+                    @endcan
+
+                    @can('report-refund')
                     <li class="{{ request()->routeIs('report.sales.refund') ? 'active' : '' }}">
                         <a href="{{ route('report.sales.refund') }}"> Report Refund </a>
                     </li>
+                    @endcan
+
+                    @can('report-absensi')
                     <li class="{{ request()->routeIs('report.sales.report-absensi') ? 'active' : '' }}">
                         <a href="{{ route('report.sales.report-absensi') }}"> Absensi </a>
                     </li>
+                    @endcan
                 </ul>
             </li>
+            @endcan
 
             @can('coupon-list')
             <li class="menu {{ request()->routeIs('coupons.index') ? 'active' : '' }}">

@@ -100,6 +100,11 @@ class PermissionSeeder extends Seeder
             'simpan-order',
             'detail-penjualan',
 
+            // Report Permission
+            'report-gross-profit',
+            'report-payment-method',
+            'report-refund',
+            'report-absensi',
         ];
 
         foreach ($permissions as $permission) {
