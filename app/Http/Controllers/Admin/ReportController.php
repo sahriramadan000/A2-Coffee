@@ -81,9 +81,8 @@ class ReportController extends Controller
 
         $totalPriceSum = $orders->sum('subtotal');
         $modal = OrderProduct::whereIn('order_id', $orders->pluck('id'))
-            ->selectRaw('sum(selling_price * qty) as total_cost')
+            ->selectRaw('sum(cost_price * qty) as total_cost')
             ->value('total_cost');
-
 
         $data['total_price'] = $totalPriceSum;
         $data['nett_sales'] = (int)$totalPriceSum -(int) $modal;
