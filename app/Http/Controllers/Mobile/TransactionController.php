@@ -107,7 +107,6 @@ class TransactionController extends Controller
         $session_cart       = Cart::session($sessionId)->getContent();
         $other_setting      = OtherSetting::first();
         $subTotal           = Cart::session($sessionId)->getTotal();
-        dd($subTotal);
         // ================ Create Data Order ==============================
         try {
             if ($table->status_position == 'Open') {
@@ -311,6 +310,8 @@ class TransactionController extends Controller
             $order = Order::where('table', $table->name)
             ->where('payment_status', 'Unpaid')
             ->firstOrFail();
+            
+            dd($subTotal);
 
             // Menambahkan jumlah quantity baru ke total quantity
             $order->total_qty += array_sum($request->quantity);
