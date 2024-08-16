@@ -311,14 +311,14 @@ class TransactionController extends Controller
             ->where('payment_status', 'Unpaid')
             ->firstOrFail();
             
-            dd($subTotal);
-
+            
             // Menambahkan jumlah quantity baru ke total quantity
             $order->total_qty += array_sum($request->quantity);
             
             // Menambahkan subTotal baru ke subtotal yang sudah ada
             $currentSubtotal = $order->subtotal;
             $subtotal = $currentSubtotal + $subTotal;
+            dd($subtotal);
             
             // Hitung biaya layanan dan pajak
             $service = $subtotal * $other_setting->layanan / 100;
