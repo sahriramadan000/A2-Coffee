@@ -142,7 +142,7 @@ class OrderController extends Controller
                         'pb01' => $pb01,
                         'total' => $subtotals + $service + $pb01,
                         'inputer' => $request->inputer ?? $order->inputer,
-                        // 'status_input' => 'cloud',
+                        'status_input' => 'cloud',
                         'status_realtime' => 'new',
                         'updated_at' => now(),
                     ]);
