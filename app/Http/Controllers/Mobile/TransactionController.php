@@ -107,6 +107,7 @@ class TransactionController extends Controller
         $session_cart       = Cart::session($sessionId)->getContent();
         $other_setting      = OtherSetting::first();
         $subTotal           = Cart::session($sessionId)->getTotal();
+        dd($subTotal);
         // ================ Create Data Order ==============================
         try {
             if ($table->status_position == 'Open') {
