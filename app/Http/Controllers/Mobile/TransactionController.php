@@ -298,8 +298,8 @@ class TransactionController extends Controller
             'updated_at' => now(),
         ]);
 
-        $table->status_position = 'Open';
-        $table->save();
+            $table->status_position = 'Open';
+            $table->save();
 
         $this->handleOrderProducts($session_cart, $order);
     }

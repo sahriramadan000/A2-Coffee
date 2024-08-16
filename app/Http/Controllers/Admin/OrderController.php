@@ -12,6 +12,7 @@ use App\Models\OrderProduct;
 use App\Models\OrderProductAddon;
 use App\Models\OtherSetting;
 use App\Models\Product;
+use App\Models\Table;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Darryldecode\Cart\Facades\CartFacade as Cart;
@@ -27,6 +28,7 @@ class OrderController extends Controller
             $session_cart   = Cart::session(Auth::user()->id)->getContent();
             $other_setting  = OtherSetting::get()->first();
             $checkToken     = Order::where('token',$token)->get();
+            $table          = Table::where('name', $request->table)->first();
             // $checkToken     = Order::where('token',$token)->where('payment_status', 'Paid')->get();
             $service        = $other_setting->layanan / 100;
             $pb01           = $other_setting->pb01/100;
@@ -86,6 +88,7 @@ class OrderController extends Controller
                 $kembalian = $cash - ($request->type_discount ? $total_price_by_discount : $total_price);
             } 
             
+            // dd($table);
             // =================Create Data Order================
             if ($request->button == 'simpan-order') {
                 $order = Order::create([
@@ -116,32 +119,64 @@ class OrderController extends Controller
                 ]);
 
             }else{
-                $order = Order::create([
-                    'no_invoice'        => $this->generateInvoice(),
-                    'cashier_name'      => Auth::user()->fullname,
-                    'customer_name'     => $customer->name ?? null,
-                    'customer_email'    => $customer->email ?? null,
-                    'customer_phone'    => $customer->phone ?? null,
-                    'table'             => $request->table ?? null,
-                    'inputer'           => $request->inputer ?? '-',
-                    'payment_status'    => 'Unpaid',
-                    'payment_method'    => 'Open Bill',
-                    'status_input'      => 'cloud',
-    
-                    'total_qty'         => array_sum($request->qty),
-                    'subtotal'          => $subtotal,
-                    'type_discount'     => ($request->type_discount ? $request->type_discount : null) ,
-                    'price_discount'    => $getDiscountPrice,
-                    'percent_discount'  => $getDiscountPercent,
-                    'service'           => ($request->type_discount ? $service_by_discount : $biaya_layanan),
-                    'pb01'              => ($request->type_discount ? $tax_by_discount : $pb01),
-                    'total'             => ($request->type_discount ? $total_price_by_discount : $total_price),
-                    'cash'              => $cash,
-                    'kembalian'         => $kembalian,
-                    'token'             => $token,
-                    'created_at'        => date('Y-m-d H:i:s'),
-                    'updated_at'        => date('Y-m-d H:i:s'),
-                ]);
+                if ($table->status_position == 'Open') {
+                    $order = Order::where('table', $table->name)->where('payment_status', 'Unpaid')->firstOrFail();
+
+                    // Menambahkan jumlah quantity baru ke total quantity
+                    $currentQty = $order->total_qty;
+                    $order->total_qty = $currentQty + array_sum($request->qty);
+
+                    $currentSubtotal = $order->subtotal;
+                    $subtotals = $currentSubtotal + $subtotal;
+                    
+                    // Hitung biaya layanan dan pajak
+                    $service = $subtotals * $other_setting->layanan / 100;
+                    $pb01 = ($subtotals + $service) * $other_setting->pb01 / 100;
+        
+                    $order->inputer = ($request->inputer ? $request->inputer : $order->inputer);
+
+                    // Set nilai baru ke model order
+                    $order->subtotal = $subtotals;
+                    $order->service = $service;
+                    $order->pb01 = $pb01;
+                    $order->total = $subtotals + $service + $pb01;
+                    $order->updated_at = now();
+                    $order->status_input = 'cloud';
+                    $order->status_realtime = 'new';
+                    $order->save();
+
+                }else{
+                    $order = Order::create([
+                        'no_invoice'        => $this->generateInvoice(),
+                        'cashier_name'      => Auth::user()->fullname,
+                        'customer_name'     => $customer->name ?? null,
+                        'customer_email'    => $customer->email ?? null,
+                        'customer_phone'    => $customer->phone ?? null,
+                        'table'             => $request->table ?? null,
+                        'inputer'           => $request->inputer ?? '-',
+                        'payment_status'    => 'Unpaid',
+                        'payment_method'    => 'Open Bill',
+                        'status_input'      => 'cloud',
+        
+                        'total_qty'         => array_sum($request->qty),
+                        'subtotal'          => $subtotal,
+                        'type_discount'     => ($request->type_discount ? $request->type_discount : null) ,
+                        'price_discount'    => $getDiscountPrice,
+                        'percent_discount'  => $getDiscountPercent,
+                        'service'           => ($request->type_discount ? $service_by_discount : $biaya_layanan),
+                        'pb01'              => ($request->type_discount ? $tax_by_discount : $pb01),
+                        'total'             => ($request->type_discount ? $total_price_by_discount : $total_price),
+                        'cash'              => $cash,
+                        'kembalian'         => $kembalian,
+                        'token'             => $token,
+                        'created_at'        => date('Y-m-d H:i:s'),
+                        'updated_at'        => date('Y-m-d H:i:s'),
+                    ]);
+
+                    $table->status_position = 'Open';
+                    $table->save();
+                }
+                
             }
             // =================Create Data Order================
 
