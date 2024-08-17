@@ -165,7 +165,9 @@
                                             <div class="d-flex w-100 justify-content-between align-items-center">
                                                 <div class="d-flex flex-row align-items-center">
                                                     <h4 class="mb-1 dark-grey"><strong>Coupon</strong></h4>
-                                                    <span class="fs-6"> ({{ $coupon_names ?? '-' }})</span>
+                                                    @foreach ($item->orderCoupons as $orderCoupon)
+                                                    <span class="fs-6"> ({{ $orderCoupon->name ?? '-' }})</span>
+                                                    @endforeach
                                                 </div>
                                                 <span>Rp.{{ number_format($item->orderCoupons->discount_value,0) }}</span>
                                             </div>
