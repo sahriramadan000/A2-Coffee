@@ -163,11 +163,13 @@
                                         {{-- @if ($item->is_coupon == false ) --}}
                                         <li class="list-group-item">
                                             <div class="d-flex w-100 justify-content-between align-items-center">
+                                                @foreach ($item->orderCoupons as $orderCoupon)
                                                 <div class="d-flex flex-row align-items-center">
                                                     <h4 class="mb-1 dark-grey"><strong>Coupon</strong></h4>
-                                                    <span class="fs-6"> ({{ $item->orderCoupons->name ?? '-' }})</span>
+                                                    <span class="fs-6"> ({{ $orderCoupon->name ?? '-' }})</span>
                                                 </div>
-                                                <span>Rp.{{ number_format($item->orderCoupons->discount_value,0) }}</span>
+                                                <span>Rp.{{ number_format($orderCoupon->discount_value,0) }}</span>
+                                                @endforeach
                                             </div>
                                         </li>
                                         @elseif($item->type_discount)
