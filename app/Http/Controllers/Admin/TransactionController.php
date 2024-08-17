@@ -961,11 +961,11 @@ class TransactionController extends Controller
 
                     // Hitung jumlah diskon berdasarkan tipe kupon
                     if ($coupon_type == 'Percentage Discount') {
-                        $coupon_amount = $subtotal * $coupon->discount_value / 100;
+                        $coupon_amount = (int) ($subtotal * $coupon->discount_value / 100);
 
                         // Terapkan maksimal nilai diskon jika ada
                         if ($subtotal >= $coupon->discount_threshold && $coupon_amount > $coupon->max_discount_value) {
-                            $coupon_amount = $coupon->max_discount_value;
+                            $coupon_amount = (int) ($coupon->max_discount_value);
                         }
                         $order->percent_discount = (int) $coupon->discount_value;
                     } else {
@@ -975,8 +975,8 @@ class TransactionController extends Controller
 
                     // Periksa biaya layanan
                     if ($other_setting->layanan != 0) {
-                        $biaya_layanan  = ($subtotal - $coupon_amount) * $service;
-                        $temp_total     = ($subtotal - $coupon_amount) + $biaya_layanan;
+                        $biaya_layanan  = (int) (($subtotal - $coupon_amount) * $service);
+                        $temp_total     = (int) (($subtotal - $coupon_amount) + $biaya_layanan);
                     } else {
                         $temp_total     = $subtotal - $coupon_amount;
                     }
@@ -987,9 +987,9 @@ class TransactionController extends Controller
 
                     // Set data di Order
                     $order->is_coupon   = true;
-                    $order->service     = $biaya_layanan;
-                    $order->pb01        = $taxPriceByCoupon;
-                    $order->total       = $totalPriceByCoupon;
+                    $order->service     = (int) ($biaya_layanan);
+                    $order->pb01        = (int) ($taxPriceByCoupon);
+                    $order->total       = (int) ($totalPriceByCoupon);
                 }
             }
 
