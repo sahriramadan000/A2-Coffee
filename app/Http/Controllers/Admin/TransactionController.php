@@ -919,16 +919,16 @@ class TransactionController extends Controller
                 // ===================By Discount====================
                 $getDiscountPrice   = ($request->discount_price ? (int) str_replace('.', '', $request->discount_price) : 0);
                 $getDiscountPercent = ($request->discount_percent ? (int) $request->discount_percent : 0);
-    
+            
                 if ($request->type_discount == 'Percent') {
                     $discount_amount = $subtotal * ($getDiscountPercent / 100);
                 } else {
                     $discount_amount = $getDiscountPrice;
                 }
-    
-                $service_by_discount     = (int) (($subtotal - $discount_amount) * ($service));
-                $tax_by_discount         = (int) ((($subtotal - $discount_amount) + $service_by_discount) * $pb01);
-                $total_price_by_discount = (int) (($subtotal - $discount_amount) + $service_by_discount + $tax_by_discount);
+            
+                $service_by_discount     = (int) ceil(($subtotal - $discount_amount) * $service);
+                $tax_by_discount         = (int) ceil((($subtotal - $discount_amount) + $service_by_discount) * $pb01);
+                $total_price_by_discount = (int) ceil(($subtotal - $discount_amount) + $service_by_discount + $tax_by_discount);
                 // ===================By Discount====================
                 $order->type_discount     = strtolower($request->type_discount);
                 $order->price_discount    = $discount_amount;
@@ -936,14 +936,14 @@ class TransactionController extends Controller
                 $order->service           = $service_by_discount;
                 $order->pb01              = $tax_by_discount;
                 $order->total             = $total_price_by_discount;
-            }else if($request->type && $request->type == 'Coupon') {
+            } else if ($request->type && $request->type == 'Coupon') {
                 // Coupon
                 if ($request->coupon_id) {
                     $coupon         = Coupons::findOrFail($request->coupon_id);
                     $coupon_type    = $coupon->type;
                     $coupon_amount  = 0;
                     $temp_total     = 0;
-
+            
                     // Simpan data kupon di tabel OrderCoupon
                     OrderCoupon::create([
                         'order_id'           => $order->id,
@@ -955,14 +955,14 @@ class TransactionController extends Controller
                         'max_discount_value' => ($coupon_type == 'Percentage Discount') ? $coupon->max_discount_value : null,
                         'status_input'       => 'cloud',
                     ]);
-
+            
                     $coupon->current_usage += 1;
                     $coupon->save();
-
+            
                     // Hitung jumlah diskon berdasarkan tipe kupon
                     if ($coupon_type == 'Percentage Discount') {
                         $coupon_amount = (int) ($subtotal * $coupon->discount_value / 100);
-
+            
                         // Terapkan maksimal nilai diskon jika ada
                         if ($subtotal >= $coupon->discount_threshold && $coupon_amount > $coupon->max_discount_value) {
                             $coupon_amount = (int) ($coupon->max_discount_value);
@@ -972,24 +972,24 @@ class TransactionController extends Controller
                         $coupon_amount  = (int) $coupon->discount_value;
                         $order->price_discount   = $coupon_amount;
                     }
-
+            
                     // Periksa biaya layanan
                     if ($other_setting->layanan != 0) {
-                        $biaya_layanan  = (int) (($subtotal - $coupon_amount) * $service);
+                        $biaya_layanan  = (int) ceil(($subtotal - $coupon_amount) * $service);
                         $temp_total     = (int) (($subtotal - $coupon_amount) + $biaya_layanan);
                     } else {
                         $temp_total     = $subtotal - $coupon_amount;
                     }
-
+            
                     // Hitung pajak & total harga
-                    $taxPriceByCoupon   = $temp_total * ($other_setting->pb01 / 100);
-                    $totalPriceByCoupon = $temp_total + $taxPriceByCoupon;
-
+                    $taxPriceByCoupon   = ceil($temp_total * ($other_setting->pb01 / 100));
+                    $totalPriceByCoupon = ceil($temp_total + $taxPriceByCoupon);
+            
                     // Set data di Order
                     $order->is_coupon   = true;
-                    $order->service     = (int) ($biaya_layanan);
-                    $order->pb01        = (int) ($taxPriceByCoupon);
-                    $order->total       = (int) ($totalPriceByCoupon);
+                    $order->service     = (int) $biaya_layanan;
+                    $order->pb01        = (int) $taxPriceByCoupon;
+                    $order->total       = (int) $totalPriceByCoupon;
                 }
             }
 
@@ -1002,8 +1002,6 @@ class TransactionController extends Controller
             }
 
             $order->save();
-
-
 
             $table = Table::where('name', $order->table)->first(); // Assuming 'table_name' is the correct field
 
