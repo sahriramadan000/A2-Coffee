@@ -234,6 +234,14 @@
                                                             @endforeach
                                                         </select>
                                                     </div>
+
+                                                    <div class="form-group">
+                                                        <h6 class="mt-3">Status Order</h6>
+                                                        <select name="status_order" id="status_order" class="form-control form-control-sm">
+                                                            <option selected value="Order Baru">Order Baru</option>
+                                                            <option value="Order Tambahan">Order Tambahan</option>
+                                                        </select>
+                                                    </div>
                                                 </div>
                                                 <div class="modal-footer">
                                                     <button type="button" class="btn btn-danger" data-bs-dismiss="modal">CLOSE</button>

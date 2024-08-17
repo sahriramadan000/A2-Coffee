@@ -119,8 +119,8 @@ class OrderController extends Controller
                 ]);
 
             }else{
-                if ($table->status_position == 'Open') {
-                    $order = Order::where('table', $table->name)->where('payment_status', 'Unpaid')->firstOrFail();
+                if ($request->status_order == 'Order Tambahan') {
+                    $order = Order::where('table', $table->name)->where('payment_status', 'Unpaid')->where('payment_method', 'Open Bill')->whereDate('created_at', Carbon::today())->latest()->firstOrFail();
 
                     // Menambahkan jumlah quantity baru ke total quantity
                     $currentQty = $order->total_qty;
@@ -175,8 +175,6 @@ class OrderController extends Controller
                         'updated_at'        => date('Y-m-d H:i:s'),
                     ]);
 
-                    $table->status_position = 'Open';
-                    $table->save();
                 }
                 
             }
