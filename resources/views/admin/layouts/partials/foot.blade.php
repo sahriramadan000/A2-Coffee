@@ -86,9 +86,9 @@
                         <button id="copy-key" class="btn btn-primary">Copy Key</button>
                     `,
                     didOpen: () => {
-                        const copyButton = Swal.getHtmlContainer().querySelector('#copy-key');
+                        const copyButton = document.getElementById('copy-key');
                         copyButton.addEventListener('click', () => {
-                            const keyElement = Swal.getHtmlContainer().querySelector('#generated-key');
+                            const keyElement = document.getElementById('generated-key');
                             const key = keyElement.textContent;
                             navigator.clipboard.writeText(key).then(() => {
                                 Swal.fire({

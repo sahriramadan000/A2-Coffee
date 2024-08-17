@@ -220,9 +220,11 @@
                                                     <a href="{{ route('print-struk', $item->id) }}" type="submit" class="btn btn-sm w-100 btn-warning">Print Struk</a>
                                                 </div>
                                                 @can('void')
+                                                @if($item->payment_method != 'Return')
                                                 <div class="col-lg-4">
                                                     <button type="button" class="btn btn-sm w-100 btn-danger" data-bs-toggle="modal" data-bs-target="#return-{{ $item->id }}">Refund</button>
                                                 </div>
+                                                @endif
                                                 @endcan
                                                 <div class="modal fade" id="return-{{ $item->id }}" tabindex="-1" role="dialog" aria-labelledby="returnLabel" aria-hidden="true">
                                                     <div class="modal-dialog" role="document">
