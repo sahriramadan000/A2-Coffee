@@ -282,52 +282,52 @@
                                                                 <div class="modal-body">
                                                                     <div class="form-group">
                                                                         <h6 class="mb-3">Discount Or Coupon</h6>
-                                                                        <select name="type" id="type-select" class="form-control form-control-sm payment-method" data-modal-id="{{ $item->id }}">
-                                                                            <option selected value="">Select Discount Or Coupon </option>
+                                                                        <select name="type" class="type-select form-control form-control-sm payment-method" data-modal-id="{{ $item->id }}">
+                                                                            <option selected value="">Select Discount Or Coupon</option>
                                                                             <option value="Coupon">Coupon</option>
                                                                             <option value="Discount">Discount</option>
                                                                         </select>
                                                                     </div>
-
-                                                                    <div class="form-group" id="discount-group">
+                                                
+                                                                    <div class="form-group discount-group" style="display: none;">
                                                                         <h6 class="mt-3">Discount</h6>
-                                                                        <select name="type_discount" class="form-control" id="select-type-discount" data-modal-id="{{ $item->id }}">
+                                                                        <select name="type_discount" class="form-control select-type-discount" data-modal-id="{{ $item->id }}">
                                                                             <option selected value="Price">Price</option>
                                                                             <option value="Percent">Percent</option>
                                                                         </select>
                                                                     </div>
-
-                                                                    <div class="row" id="type-discount-group">
+                                                
+                                                                    <div class="row type-discount-group" style="display: none;">
                                                                         <div class="col-12 col-md-6">
                                                                             <div class="form-group mt-3">
                                                                                 <div class="input-group">
                                                                                     <span class="input-group-text">Rp.</span>
-                                                                                    <input type="text" class="form-control" aria-label="Price" name="discount_price" id="input-price">
+                                                                                    <input type="text" class="form-control input-price" aria-label="Price" name="discount_price">
                                                                                 </div>
                                                                             </div>
                                                                         </div>
-
+                                                
                                                                         <div class="col-12 col-md-6">
                                                                             <div class="input-group mt-3">
-                                                                                <input type="number" class="form-control" min="0" max="100" aria-label="percent" name="discount_percent" id="input-percent" disabled>
+                                                                                <input type="number" class="form-control input-percent" min="0" max="100" aria-label="percent" name="discount_percent" disabled>
                                                                                 <span class="input-group-text">%</span>
                                                                             </div>
                                                                         </div>
                                                                     </div>
-
-                                                                    <div class="form-group mt-2 cash-input" id="coupon-group">
+                                                
+                                                                    <div class="form-group mt-2 cash-input coupon-group" style="display: none;">
                                                                         <label for="cash" class="form-label">Coupon</label>
-                                                                        <select class="form-select mb-3" name="coupon_id" id="select-coupon" aria-label="Default select example">
+                                                                        <select class="form-select mb-3 select-coupon" name="coupon_id" aria-label="Default select example">
                                                                             <option selected disabled>Select Coupon</option>
                                                                             @foreach ($coupons as $coupon)
                                                                             <option value="{{ $coupon->id }}">{{ $coupon->name }} <small>({{ $coupon->type == 'Percentage Discount' ? 'Percent: '. $coupon->discount_value.'%' : 'Price: Rp.'. number_format($coupon->discount_value, 0, ',', '.') }})</small></option>
                                                                             @endforeach
                                                                         </select>
                                                                     </div>
-
+                                                
                                                                     <div class="form-group">
                                                                         <h6 class="mt-3">Metode Payment</h6>
-                                                                        <select name="payment_method" class="form-control form-control-sm payment-method" data-modal-id="{{ $item->id }}">
+                                                                        <select name="payment_method" class="form-control form-control-sm payment-method">
                                                                             <option selected value="Transfer Bank">Transfer Bank</option>
                                                                             <option value="EDC BCA">EDC BCA</option>
                                                                             <option value="EDC BRI">EDC BRI</option>
@@ -340,9 +340,9 @@
                                                                             <option value="Cash">Cash</option>
                                                                         </select>
                                                                     </div>
-                                                                    <div class="form-group mt-2 cash-input" id="cashInput-{{ $item->id }}" style="display: none;">
+                                                                    <div class="form-group mt-2 cash-input" style="display: none;">
                                                                         <label for="cash" class="form-label">Cash</label>
-                                                                        <input type="text" name="cash" value="{{ old('cash') }}" class="form-control form-control-sm" placeholder="Ex:50.000" id="cash" aria-describedby="cash">
+                                                                        <input type="text" name="cash" value="{{ old('cash') }}" class="form-control form-control-sm" placeholder="Ex:50.000" aria-describedby="cash">
                                                                     </div>
                                                                 </div>
                                                                 <div class="modal-footer">
@@ -370,63 +370,72 @@
 @push('js')
 <script>
     $(document).ready(function() {
-        // Initial check on page load
-        toggleFields();
-
-        // Event listener for change on the "Type" select
-        $('#type-select').on('change', function() {
-            toggleFields();
+        // Toggle fields on page load based on the selected type
+        $('.type-select').each(function() {
+            toggleFields($(this));
         });
 
-        function toggleFields() {
-            var selectedType = $('#type-select').val();
+        // Event listener for change on the "Type" select
+        $('.type-select').on('change', function() {
+            toggleFields($(this));
+        });
+
+        function toggleFields(typeSelect) {
+            var selectedType = typeSelect.val();
+            var modalId = typeSelect.data('modal-id');
+            var discountGroup = typeSelect.closest('.modal-body').find('.discount-group');
+            var typeDiscountGroup = typeSelect.closest('.modal-body').find('.type-discount-group');
+            var couponGroup = typeSelect.closest('.modal-body').find('.coupon-group');
 
             if (selectedType === 'Coupon') {
-                $('#coupon-group').show();
-                $('#discount-group').hide();
-                $('#type-discount-group').hide();
+                couponGroup.show();
+                discountGroup.hide();
+                typeDiscountGroup.hide();
             } else if (selectedType === 'Discount') {
-                $('#coupon-group').hide();
-                $('#discount-group').show();
-                $('#type-discount-group').show();
-            }else {
-                $('#coupon-group').hide();
-                $('#discount-group').hide();
-                $('#type-discount-group').hide();
+                couponGroup.hide();
+                discountGroup.show();
+                typeDiscountGroup.show();
+            } else {
+                couponGroup.hide();
+                discountGroup.hide();
+                typeDiscountGroup.hide();
             }
         }
 
-        $('#select-type-discount').on('change', function() {
+        // Handle Discount Type change
+        $('.select-type-discount').on('change', function() {
             var selectedValue = $(this).val();
+            var modalBody = $(this).closest('.modal-body');
+            var inputPrice = modalBody.find('.input-price');
+            var inputPercent = modalBody.find('.input-percent');
 
             if (selectedValue == 'Price') {
-                $('#input-price').prop('disabled', false);
-                $('#input-percent').prop('disabled', true).val('');  // Disable and clear the Percent input
+                inputPrice.prop('disabled', false);
+                inputPercent.prop('disabled', true).val(''); // Disable and clear the Percent input
             } else if (selectedValue == 'Percent') {
-                $('#input-percent').prop('disabled', false);
-                $('#input-price').prop('disabled', true).val('');  // Disable and clear the Price input
+                inputPercent.prop('disabled', false);
+                inputPrice.prop('disabled', true).val(''); // Disable and clear the Price input
             }
         });
 
+        // Handle Rupiah formatting on price input
+        $('.input-price').on('keyup', function() {
+            handleInput($(this));
+        });
+
+        function formatRupiah(angka) {
+            var numberString = angka.toString().replace(/\D/g, '');
+            var ribuan = numberString.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+            return ribuan;
+        }
+
+        function handleInput(inputField) {
+            var input = inputField.val().replace(/\D/g, '');
+            var formattedInput = formatRupiah(input);
+            inputField.val(formattedInput);
+        }
     });
 
-    $('#input-price').on('keyup', function() {
-        handleInput('input-price');
-    });
-
-    // Input Rupiah
-    function formatRupiah(angka) {
-        var numberString = angka.toString().replace(/\D/g, '');
-        var ribuan = numberString.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-        return ribuan;
-    }
-
-    function handleInput(inputId) {
-        var inputField = $('#' + inputId);
-        var input = inputField.val().replace(/\D/g, '');
-        var formattedInput = formatRupiah(input);
-        inputField.val(formattedInput);
-    }
 
     document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.payment-method').forEach(selectInput => {
