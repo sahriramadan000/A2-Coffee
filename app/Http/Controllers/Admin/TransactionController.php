@@ -881,7 +881,13 @@ class TransactionController extends Controller
                 ->get();
         }
 
-        $data['coupon_names'] = OrderCoupon::where('order_id',$orders->id)->get();
+        $data['coupon_names'] = [];
+
+        // Loop through each order and retrieve the associated coupons
+        foreach ($orders as $order) {
+            $data['coupon_names'][$order->id] = OrderCoupon::where('order_id', $order->id)->get();
+        }
+        
         $data['orders'] = $orders;
 
         foreach ($orders as $order) {
