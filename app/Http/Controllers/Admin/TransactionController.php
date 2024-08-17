@@ -926,9 +926,9 @@ class TransactionController extends Controller
                     $discount_amount = $getDiscountPrice;
                 }
     
-                $service_by_discount     = ($subtotal - $discount_amount) * ($service);
-                $tax_by_discount         = (($subtotal - $discount_amount) + $service_by_discount) * $pb01;
-                $total_price_by_discount = ($subtotal - $discount_amount) + $service_by_discount + $tax_by_discount;
+                $service_by_discount     = (int) (($subtotal - $discount_amount) * ($service));
+                $tax_by_discount         = (int) ((($subtotal - $discount_amount) + $service_by_discount) * $pb01);
+                $total_price_by_discount = (int) (($subtotal - $discount_amount) + $service_by_discount + $tax_by_discount);
                 // ===================By Discount====================
                 $order->type_discount     = strtolower($request->type_discount);
                 $order->price_discount    = $discount_amount;
