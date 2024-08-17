@@ -159,31 +159,44 @@
                                             </div>
                                         </li>
 
-                                        {{-- @if ($item->is_coupon == true && $item->price_discount != 0)
+                                        @if ($item->is_coupon == true && $item->price_discount != 0)
+                                        {{-- @if ($item->is_coupon == false ) --}}
                                         <li class="list-group-item">
-                                            <div class="d-flex w-100 justify-content-between">
-                                                <h4 class="mb-1 dark-grey"><strong>Coupon</strong></h4>
-                                                <span>Rp.{{ number_format($item->price_discount,0) }}</span>
+                                            <div class="d-flex w-100 justify-content-between align-items-center">
+                                                <div class="d-flex flex-row align-items-center">
+                                                    <h4 class="mb-1 dark-grey"><strong>Coupon</strong></h4>
+                                                    <span class="fs-6"> ({{ $item->orderCoupons->name ?? '-' }})</span>
+                                                </div>
+                                                <span>Rp.{{ number_format($item->orderCoupons->discount_value,0) }}</span>
                                             </div>
                                         </li>
-                                        @else
+                                        @elseif($item->type_discount)
                                         <li class="list-group-item">
-                                            <div class="d-flex w-100 justify-content-between">
-                                                <h4 class="mb-1 dark-grey"><strong>Coupon</strong></h4>
-                                                <span>Rp.{{ number_format($item->percent_discount,0) }}</span>
+                                            <div class="d-flex w-100 justify-content-between align-items-center">
+                                                <div class="d-flex flex-row align-items-center">
+                                                    <h4 class="mb-1 dark-grey"><strong>Discount</strong></h4>
+                                                    <span class="fs-6"> ({{ $item->type_discount ?? '-' }})</span>
+                                                </div>
+                                                <span>
+                                                    @if($item->type_discount == 'percent')
+                                                        {{ $item->percent_discount }}%
+                                                    @else
+                                                        Rp.{{ number_format($item->price_discount,0) }}
+                                                    @endif
+                                                </span>
                                             </div>
                                         </li>
-                                        @endif --}}
-                                        <li class="list-group-item">
-                                            <div class="d-flex w-100 justify-content-between">
-                                                <h4 class="mb-1 dark-grey"><strong>PB01 :</strong></h4>
-                                                <span>Rp.{{ number_format($item->pb01,0) }}</span>
-                                            </div>
-                                        </li>
+                                        @endif
                                         <li class="list-group-item">
                                             <div class="d-flex w-100 justify-content-between">
                                                 <h4 class="mb-1 dark-grey"><strong>Service :</strong></h4>
                                                 <span>Rp.{{ number_format($item->service,0) }}</span>
+                                            </div>
+                                        </li>
+                                        <li class="list-group-item">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <h4 class="mb-1 dark-grey"><strong>PB01 :</strong></h4>
+                                                <span>Rp.{{ number_format($item->pb01,0) }}</span>
                                             </div>
                                         </li>
                                         <li class="list-group-item">
@@ -265,30 +278,42 @@
                                                                     </button>
                                                                 </div>
                                                                 <div class="modal-body">
-                                                                    {{-- <div class="form-group">
-                                                                        <h6 class="mb-3">Type</h6>
-                                                                        <select name="type" class="form-control form-control-sm payment-method" data-modal-id="{{ $item->id }}">
-                                                                            <option selected value="Percentage Discount">Coupon</option>
+                                                                    <div class="form-group">
+                                                                        <h6 class="mb-3">Discount Or Coupon</h6>
+                                                                        <select name="type" id="type-select" class="form-control form-control-sm payment-method" data-modal-id="{{ $item->id }}">
+                                                                            <option selected value="">Select Discount Or Coupon </option>
+                                                                            <option value="Coupon">Coupon</option>
                                                                             <option value="Discount">Discount</option>
                                                                         </select>
                                                                     </div>
 
-                                                                    <div class="form-group">
-                                                                        <h6 class="mb-3">Discount</h6>
-                                                                        <select name="discount" class="form-control form-control-sm payment-method" data-modal-id="{{ $item->id }}">
+                                                                    <div class="form-group" id="discount-group">
+                                                                        <h6 class="mt-3">Discount</h6>
+                                                                        <select name="type_discount" class="form-control" id="select-type-discount" data-modal-id="{{ $item->id }}">
                                                                             <option selected value="Price">Price</option>
                                                                             <option value="Percent">Percent</option>
                                                                         </select>
                                                                     </div>
 
-                                                                    <div class="form-group mt-3">
-                                                                        <div class="input-group">
-                                                                            <span class="input-group-text">Rp.</span>
-                                                                            <input type="text" class="form-control" aria-label="Price" name="input-price" id="input-price">
+                                                                    <div class="row" id="type-discount-group">
+                                                                        <div class="col-12 col-md-6">
+                                                                            <div class="form-group mt-3">
+                                                                                <div class="input-group">
+                                                                                    <span class="input-group-text">Rp.</span>
+                                                                                    <input type="text" class="form-control" aria-label="Price" name="discount_price" id="input-price">
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="col-12 col-md-6">
+                                                                            <div class="input-group mt-3">
+                                                                                <input type="number" class="form-control" min="0" max="100" aria-label="percent" name="discount_percent" id="input-percent" disabled>
+                                                                                <span class="input-group-text">%</span>
+                                                                            </div>
                                                                         </div>
                                                                     </div>
 
-                                                                    <div class="form-group mt-2 cash-input" id="-{{ $item->id }}">
+                                                                    <div class="form-group mt-2 cash-input" id="coupon-group">
                                                                         <label for="cash" class="form-label">Coupon</label>
                                                                         <select class="form-select mb-3" name="coupon_id" id="select-coupon" aria-label="Default select example">
                                                                             <option selected disabled>Select Coupon</option>
@@ -296,11 +321,10 @@
                                                                             <option value="{{ $coupon->id }}">{{ $coupon->name }} <small>({{ $coupon->type == 'Percentage Discount' ? 'Percent: '. $coupon->discount_value.'%' : 'Price: Rp.'. number_format($coupon->discount_value, 0, ',', '.') }})</small></option>
                                                                             @endforeach
                                                                         </select>
-                                                                    </div> --}}
-
+                                                                    </div>
 
                                                                     <div class="form-group">
-                                                                        <h6 class="mt-2 mb-3">Metode Payment</h6>
+                                                                        <h6 class="mt-3">Metode Payment</h6>
                                                                         <select name="payment_method" class="form-control form-control-sm payment-method" data-modal-id="{{ $item->id }}">
                                                                             <option selected value="Transfer Bank">Transfer Bank</option>
                                                                             <option value="EDC BCA">EDC BCA</option>
@@ -343,6 +367,65 @@
 
 @push('js')
 <script>
+    $(document).ready(function() {
+        // Initial check on page load
+        toggleFields();
+
+        // Event listener for change on the "Type" select
+        $('#type-select').on('change', function() {
+            toggleFields();
+        });
+
+        function toggleFields() {
+            var selectedType = $('#type-select').val();
+
+            if (selectedType === 'Coupon') {
+                $('#coupon-group').show();
+                $('#discount-group').hide();
+                $('#type-discount-group').hide();
+            } else if (selectedType === 'Discount') {
+                $('#coupon-group').hide();
+                $('#discount-group').show();
+                $('#type-discount-group').show();
+            }else {
+                $('#coupon-group').hide();
+                $('#discount-group').hide();
+                $('#type-discount-group').hide();
+            }
+        }
+
+        $('#select-type-discount').on('change', function() {
+            var selectedValue = $(this).val();
+
+            if (selectedValue == 'Price') {
+                $('#input-price').prop('disabled', false);
+                $('#input-percent').prop('disabled', true).val('');  // Disable and clear the Percent input
+            } else if (selectedValue == 'Percent') {
+                $('#input-percent').prop('disabled', false);
+                $('#input-price').prop('disabled', true).val('');  // Disable and clear the Price input
+            }
+        });
+
+    });
+
+    $('#input-price').on('keyup', function() {
+        handleInput('input-price');
+    });
+
+    // Input Rupiah
+    function formatRupiah(angka) {
+        var numberString = angka.toString().replace(/\D/g, '');
+        var ribuan = numberString.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        return ribuan;
+    }
+
+    function handleInput(inputId) {
+        var inputField = $('#' + inputId);
+        var input = inputField.val().replace(/\D/g, '');
+        var formattedInput = formatRupiah(input);
+        inputField.val(formattedInput);
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.payment-method').forEach(selectInput => {
             const modalId = selectInput.getAttribute('data-modal-id');
