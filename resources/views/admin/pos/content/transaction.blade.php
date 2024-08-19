@@ -41,6 +41,13 @@
                                                 @php
                                                     $inputer    = $item->attributes['inputer'] ?? '';
                                                     $table      = $item->attributes['table'] ?? '';
+
+                                                    $note = $item->attributes['note'] ?? '';
+
+                                                    // If 'note' is an array, convert it to a string
+                                                    if (is_array($note)) {
+                                                        $note = implode(', ', $note); // You can choose the separator, here it’s a comma followed by a space
+                                                    }
                                                 @endphp
 
                                                     <tr class="table-cart text-white">
@@ -50,7 +57,7 @@
                                                                     <p class="p-0 m-0 text-white">
                                                                         {{ $item->name }}
                                                                     </p>
-                                                                    <small>Note: {{ $item->attributes['note'] ?? '' }}</small>
+                                                                    <small>Note: {{ $note ?? '' }}</small>
                                                                 </div>
 
                                                                 @can('delete-product-in-cart')
