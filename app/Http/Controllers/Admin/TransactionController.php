@@ -202,6 +202,9 @@ class TransactionController extends Controller
 
             $product = Product::findOrFail($request->product_id);
 
+            // Ambil Note dari request
+            $note = $request->note ?? [];
+            
             // Ambil addons dari request
             $addons = $request->addons ?? [];
 
@@ -230,6 +233,7 @@ class TransactionController extends Controller
             $productDetailAttributes = array(
                 'product' => $product,
                 'addons'  => $addons,
+                'note'  => $note,
             );
 
             $itemIdentifier = md5(json_encode($productDetailAttributes));

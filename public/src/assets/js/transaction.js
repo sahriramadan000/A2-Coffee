@@ -483,10 +483,11 @@ function ModalAddToCart(productId, url = '/modal-add-cart') {
                     }).get();
 
                     const quantity = $('#qty-add').val();
+                    const note = $('#note').val();
                     const route = $(this).data('route');
                     const token = $(this).data('token');
 
-                    addToCart(productId, selectedAddons, quantity, route, token);
+                    addToCart(productId, selectedAddons, quantity, route, token,note);
                 });
             });
         },
@@ -773,7 +774,7 @@ function numberFormat(number) {
 }
 
 // Add Product To Cart
-function addToCart(productId, addons, quantity, url, token) {
+function addToCart(productId, addons, quantity, url, token,note) {
     $.ajax({
         url: url,
         type: 'POST',
@@ -785,18 +786,22 @@ function addToCart(productId, addons, quantity, url, token) {
             "product_id":productId,
             "addons":addons,
             "quantity":quantity,
+            "note":note,
         },
         success: function(response) {
-            console.log(response);
             $('#cart-product').empty();
-            console.log(response);
             $.each(response.data, function(index, cart) {
+                var note = cart.attributes['note'];
+                console.log(note);
                 var addList = `<tr class="table-cart text-white">`+
                                     `<td class="td-cart">`+
                                         `<div class="d-flex justify-content-between">`+
                                             `<div class="">`+
                                                 `<p class="p-0 m-0 text-white">`+
                                                     `${cart.name}`+
+                                                `</p>`+
+                                                `<p class="p-0 m-0 text-white">`+
+                                                    `${note}`+
                                                 `</p>`+
                                             `</div>`+
 

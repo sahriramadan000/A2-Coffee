@@ -261,6 +261,7 @@ class OrderController extends Controller
                         'category'          => $cart->attributes['product']['category'],
                         'qty'               => (int) $cart->quantity,
                         'addons'            => $cart->attributes['addons'],
+                        'note'              => $cart->attributes['note'],
                     ];
                 } else {
                     $orderProducts[$uniqueKey]['qty'] += (int) $cart->quantity;
@@ -298,6 +299,7 @@ class OrderController extends Controller
                     'price_discount'    => $product['price_discount'],
                     'category'          => $product['category'],
                     'qty'               => $product['qty'],
+                    'note'              => $product['note'],
                     'status_input'      => 'cloud',
                 ]);
 

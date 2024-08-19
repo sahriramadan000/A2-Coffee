@@ -127,6 +127,7 @@
                                                 <h4 style="color: #515365">{{ $orderProduct->name }}</h4>
                                                 <small style="color: #515365">x{{ $orderProduct->qty }} </small>
                                             </div>
+                                            <small style="color: #515365">Note : {{ $orderProduct->note }} </small>
                                             <p class="mb-1">Rp. {{ number_format($orderProduct->selling_price * $orderProduct->qty,0)  }}</p>
                                         </li>
                                     @endforeach

@@ -108,7 +108,7 @@
                                 <div class="col-12">
                                     <div class="form-group mb-3">
                                         <label for="description">Description</label>
-                                        <textarea name="description" id="description" cols="30" rows="5" class="form-control" placeholder="Ex:Susu describe">{{ old('description') }}</textarea>
+                                        <textarea name="description" id="description" cols="30" rows="5" class="form-control" placeholder="Ex:describe">{{ old('description') }}</textarea>
 
                                         @if($errors->has('description'))
                                             <p class="text-danger">{{ $errors->first('description') }}</p>

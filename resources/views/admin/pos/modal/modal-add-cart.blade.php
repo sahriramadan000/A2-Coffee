@@ -64,6 +64,16 @@
                                         <button class="btn btn-default text-white" id="btn-add" style="background: #0c0f1d !important; padding:5px 10px !important;border-color:#000;opacity:0.5;" {{ (($product->current_stock ?? 0) <= 0) ? 'disabled' : '' }}>+</button>
                                     </div>
                                 </div>
+                                <div class="col-12 col-md-12">
+                                    <div class="form-group mb-3">
+                                        <label for="note">Note</label>
+                                        <textarea name="note" id="note" cols="30" rows="5" class="form-control" placeholder="Ex:Note..">{{ old('note') }}</textarea>
+
+                                        @if($errors->has('note'))
+                                            <p class="text-danger">{{ $errors->first('note') }}</p>
+                                        @endif
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
