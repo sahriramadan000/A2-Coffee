@@ -109,11 +109,12 @@
                                         </div>
                                         <div class="">
                                             <p class="mb-1" style="font-size:14px;"><span class="fw-medium">Customer:</span> {{ $order_open_bill->customer_name ?? '-' }}</p>
+                                            <p class="mb-1" style="font-size:14px;"><span class="fw-medium">Table:</span> {{ $order_open_bill->table ?? '-' }}</p>
                                             <p class="mb-1" style="font-size:14px;"><span class="fw-medium">Date:</span> {{ date('d-m-Y H:i', strtotime($order_open_bill->created_at)) }}</p>
                                             <div class="btn-group mt-2" role="group" aria-label="Basic example">
-                                                <button type="button" class="btn py-1 px-2 m-0 btn-warning" onclick="openBillOrder('{{ route('open-bill-order') }}','{{ $order_open_bill->id }}', '{{ csrf_token() }}','{{ $order_open_bill->inputer }}','{{ $order_open_bill->table }}')">
+                                                {{-- <button type="button" class="btn py-1 px-2 m-0 btn-warning" onclick="openBillOrder('{{ route('open-bill-order') }}','{{ $order_open_bill->id }}', '{{ csrf_token() }}','{{ $order_open_bill->inputer }}','{{ $order_open_bill->table }}')">
                                                     <small class="text-white">Open</small>
-                                                </button>
+                                                </button> --}}
                                                 {{-- <a href="{{ route('print-customer',$order_open_bill->id) }}" class="btn py-1 px-2 m-0 btn-warning" type="button">
                                                     <small class="text-white">Print</small>
                                                 </a> --}}

@@ -159,7 +159,7 @@
                                             </div>
                                         </li>
 
-                                        @if ($item->is_coupon == true && $item->price_discount != 0)
+                                        @if ($item->is_coupon == true)
                                         {{-- @if ($item->is_coupon == false ) --}}
                                         <li class="list-group-item">
                                             <div class="d-flex w-100 justify-content-between align-items-center">
