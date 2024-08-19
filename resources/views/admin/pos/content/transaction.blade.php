@@ -50,7 +50,7 @@
                                                                     <p class="p-0 m-0 text-white">
                                                                         {{ $item->name }}
                                                                     </p>
-                                                                    <small>Note: {{ $item->attributes['note'] }}</small>
+                                                                    <small>Note: {{ $item->attributes['note'] ?? '' }}</small>
                                                                 </div>
 
                                                                 @can('delete-product-in-cart')
