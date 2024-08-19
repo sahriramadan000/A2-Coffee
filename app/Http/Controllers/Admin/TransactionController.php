@@ -270,7 +270,7 @@ class TransactionController extends Controller
             $other_setting = OtherSetting::select(['pb01', 'layanan'])->first();
             $subtotal      = (Cart::getTotal() ?? '0');
             $service       = $subtotal * ($other_setting->layanan / 100);
-            $tax           = (($subtotal + $service) * $other_setting->pb01 / 100);
+            $tax           = ($subtotal * $other_setting->pb01 / 100);
             $totalPayment  = ($subtotal + $service) + $tax;
 
             return response()->json([
@@ -312,7 +312,7 @@ class TransactionController extends Controller
                 $other_setting = OtherSetting::select(['pb01', 'layanan'])->first();
                 $subtotal      = (Cart::getTotal() ?? '0');
                 $service       = $subtotal * ($other_setting->layanan / 100);
-                $tax           = (($subtotal + $service) * $other_setting->pb01 / 100);
+                $tax           = ($subtotal * $other_setting->pb01 / 100);
                 $totalPayment  = ($subtotal + $service) + $tax;
 
                 $canDelete = Auth::user()->can('delete-product-in-cart');
@@ -374,7 +374,7 @@ class TransactionController extends Controller
         // Check Layanan
         if ($other_setting->layanan != 0) {
             $biaya_layanan  = ($subtotal - $coupon_amount) * $service;
-            $temp_total     = $subtotal + $biaya_layanan;
+            $temp_total     = $subtotal;
         }else{
             $temp_total     = (($subtotal - $coupon_amount) ?? 0);
         }
@@ -428,7 +428,7 @@ class TransactionController extends Controller
         }
 
         // Hitung subtotal setelah biaya layanan
-        $subtotal_with_service = $subtotal_after_discount + $biaya_layanan;
+        $subtotal_with_service = $subtotal_after_discount;
 
         // Hitung pajak (pb01)
         $tax_percentage = $other_setting->pb01 / 100;
@@ -524,7 +524,7 @@ class TransactionController extends Controller
                  $dataCart    = Cart::session(Auth::user()->id)->getContent();
                  $subtotal    = Cart::getTotal();
                  $service     = $subtotal * ($other_setting->layanan / 100);
-                 $tax         = ($subtotal + $service) * ($other_setting->pb01 / 100);
+                 $tax         = $subtotal * ($other_setting->pb01 / 100);
                  $total_price = ($subtotal + $service) + $tax;
 
 
@@ -592,7 +592,7 @@ class TransactionController extends Controller
             $dataCart = Cart::session(Auth::user()->id)->getContent();
             $subtotal = Cart::getTotal();
             $service = $subtotal * ($other_setting->layanan / 100);
-            $tax = ($subtotal + $service) * ($other_setting->pb01 / 100);
+            $tax = $subtotal * ($other_setting->pb01 / 100);
             $total_price = ($subtotal + $service) + $tax;
 
             return response()->json([
@@ -927,7 +927,7 @@ class TransactionController extends Controller
                 }
             
                 $service_by_discount     = (int) ceil(($subtotal - $discount_amount) * $service);
-                $tax_by_discount         = (int) ceil((($subtotal - $discount_amount) + $service_by_discount) * $pb01);
+                $tax_by_discount         = (int) ceil((($subtotal - $discount_amount)) * $pb01);
                 $total_price_by_discount = (int) ceil(($subtotal - $discount_amount) + $service_by_discount + $tax_by_discount);
                 // ===================By Discount====================
                 $order->type_discount     = strtolower($request->type_discount);
@@ -976,7 +976,7 @@ class TransactionController extends Controller
                     // Periksa biaya layanan
                     if ($other_setting->layanan != 0) {
                         $biaya_layanan  = (int) ceil(($subtotal - $coupon_amount) * $service);
-                        $temp_total     = (int) (($subtotal - $coupon_amount) + $biaya_layanan);
+                        $temp_total     = (int) (($subtotal - $coupon_amount));
                     } else {
                         $temp_total     = $subtotal - $coupon_amount;
                     }

@@ -176,6 +176,12 @@
         </div>
         <div class="invoiceNumber">
             <div style="margin-left: 2px;">
+                Discount :
+                <span style="float: right; margin-right: 15px;">Rp.{{ number_format($discountPrice, 0) }}</span>
+            </div>
+        </div>
+        <div class="invoiceNumber">
+            <div style="margin-left: 2px;">
                 Transaksi:
                 <span style="float: right; margin-right: 15px;">{{ number_format($totalTransaction, 0) }}</span>
             </div>

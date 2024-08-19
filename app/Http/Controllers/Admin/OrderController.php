@@ -54,7 +54,7 @@ class OrderController extends Controller
 
             if ($other_setting->layanan != 0) {
                 $biaya_layanan  = Cart::getTotal() * $service;
-                $total_price    = Cart::getTotal() + $biaya_layanan;
+                $total_price    = Cart::getTotal();
             }else{
                 $total_price    = (Cart::getTotal() ?? '0');
             }
@@ -62,7 +62,7 @@ class OrderController extends Controller
             if ($other_setting->pb01 != 0) {
                 $biaya_pb01  = $total_price * ($other_setting->pb01/100);
                 $pb01        = $biaya_pb01;
-                $total_price = $total_price + $biaya_pb01;
+                $total_price = $total_price + $biaya_layanan + $biaya_pb01;
             }else{
                 $total_price = ($total_price ?? '0');
             }
@@ -79,7 +79,7 @@ class OrderController extends Controller
 
             $subtotal = Cart::getTotal();
             $service_by_discount     = ($subtotal - $discount_amount) * ($other_setting->layanan / 100);
-            $tax_by_discount         = ($subtotal - $discount_amount) + $service_by_discount * $other_setting->pb01 / 100;
+            $tax_by_discount         = ($subtotal - $discount_amount) * $other_setting->pb01 / 100;
             $total_price_by_discount = ($subtotal - $discount_amount) + $service_by_discount + $tax_by_discount;
             // ===================By Discount====================
 
@@ -88,8 +88,7 @@ class OrderController extends Controller
                 $kembalian = $cash - ($request->type_discount ? $total_price_by_discount : $total_price);
             } 
             
-            // dd($table);
-            // =================Create Data Order================
+            // =================Create Data Order================   
             if ($request->button == 'simpan-order') {
                 $order = Order::create([
                     'no_invoice'        => $this->generateInvoice(),
@@ -131,7 +130,7 @@ class OrderController extends Controller
                     
                     // Hitung biaya layanan dan pajak
                     $service = $subtotals * $other_setting->layanan / 100;
-                    $pb01 = ($subtotals + $service) * $other_setting->pb01 / 100;
+                    $pb01 = ($subtotals) * $other_setting->pb01 / 100;
         
                     $order->inputer = ($request->inputer ? $request->inputer : $order->inputer);
 
@@ -224,7 +223,7 @@ class OrderController extends Controller
                 }
 
                 // Update tax & total price
-                $taxPriceByCoupon   = $temp_total + $biaya_layanan * ($other_setting->pb01 / 100);
+                $taxPriceByCoupon   = $temp_total * ($other_setting->pb01 / 100);
                 $totalPriceByCoupon = $temp_total + $biaya_layanan + $taxPriceByCoupon;
 
                 // Set Data

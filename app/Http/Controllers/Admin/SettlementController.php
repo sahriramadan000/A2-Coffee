@@ -132,6 +132,7 @@ class SettlementController extends Controller
         $totalAll = 0;
         $pb01 = 0;
         $service = 0;
+        $discount = 0;
     
         // Aggregate product quantities
         $productQuantities = [];
@@ -152,6 +153,7 @@ class SettlementController extends Controller
             $totalAll += $order->total ?? 0;
             $pb01 += $order->pb01 ?? 0;
             $service += $order->service ?? 0;
+            $discount += $order->price_discount ?? 0;
     
             // Aggregate product quantities
             foreach ($order->orderProducts as $orderProduct) {
@@ -189,9 +191,12 @@ class SettlementController extends Controller
 
             $printer->text("Pajak           : Rp.".number_format($pb01,0)."\n");
             $printer->text("Biaya Layanan   : Rp.".number_format($service,0)."\n");
+            $printer->text("discount        : Rp.".number_format($discount,0)."\n");
             $printer->text("Transaksi       : Rp.".number_format($orders->count(),0)."\n");
             
             
+            $printer->text("--------------------------------\n");
+            $printer->text("-----------MENU TERJUAL---------\n");
             $printer->text("--------------------------------\n");
             foreach ($productQuantities as $productName => $qty) {
                 $printer->text($productName."                       ".$qty."\n");
@@ -253,6 +258,8 @@ class SettlementController extends Controller
     //     $totalAll = 0;
     //     $pb01 = 0;
     //     $service = 0;
+    //     $discountPrice = 0;
+    //     $discountPercent = 0;
     
     //     // Aggregate product quantities
     //     $productQuantities = [];
@@ -273,7 +280,8 @@ class SettlementController extends Controller
     //         $totalAll += $order->total ?? 0;
     //         $pb01 += $order->pb01 ?? 0;
     //         $service += $order->service ?? 0;
-    
+    //         $discountPrice += $order->price_discount ?? 0;
+
     //         // Aggregate product quantities
     //         foreach ($order->orderProducts as $orderProduct) {
     //             if (!isset($productQuantities[$orderProduct->name])) {
@@ -290,6 +298,7 @@ class SettlementController extends Controller
     //     $data['totalAll'] = $totalAll;
     //     $data['pb01'] = $pb01;
     //     $data['service'] = $service;
+    //     $data['discountPrice'] = $discountPrice;
     //     $data['productQuantities'] = $productQuantities; // Pass the aggregated product quantities
     
     //     return PDF::loadview('admin.settlement.print-settlement', $data)->stream('settlement-' . '.pdf');
