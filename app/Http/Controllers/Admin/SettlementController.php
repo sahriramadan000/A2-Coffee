@@ -196,7 +196,7 @@ class SettlementController extends Controller
             
             
             $printer->text("--------------------------------\n");
-            $printer->text("-----------MENU TERJUAL---------\n");
+            $printer->text("         MENU TERJUAL           \n");
             $printer->text("--------------------------------\n");
             foreach ($productQuantities as $productName => $qty) {
                 $printer->text($productName."                       ".$qty."\n");
