@@ -41,7 +41,7 @@ class TransactionController extends Controller
         // dd($data['data_items']);
         $data['subtotal'] = $subtotal;
         $data['service']  = $subtotal * $service;
-        $data['tax']      = (($data['subtotal'] + ($data['data_items']->isEmpty() ? 0 : $data['service'])) * $data['other_setting']->pb01/100);
+        $data['tax']      = (($data['subtotal']) * $data['other_setting']->pb01/100);
         $data['total']    = ($data['subtotal'] + ($data['data_items']->isEmpty() ? 0 : $data['service'])) + $data['tax'];
 
         return view('admin.pos.index', $data);

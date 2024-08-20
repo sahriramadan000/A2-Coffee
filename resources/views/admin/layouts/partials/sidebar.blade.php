@@ -4,11 +4,11 @@
             <div class="nav-logo">
                 <div class="nav-item theme-logo">
                     <a href="{{ route('dashboard') }}">
-                        <img src="{{ asset('images/logo/logo-vmond.png') }}" class="navbar-logo" alt="logo">
+                        {{-- <img src="{{ asset('images/logo/logo-vmond.png') }}" class="navbar-logo" alt="logo"> --}}
                     </a>
                 </div>
                 <div class="nav-item theme-text">
-                    <a href="{{ route('dashboard') }}" class="nav-link"> Vmond Truck POS </a>
+                    <a href="{{ route('dashboard') }}" class="nav-link"> A2 COFEE & EATRY POS </a>
                 </div>
             </div>
             <div class="nav-item sidebar-toggle">
