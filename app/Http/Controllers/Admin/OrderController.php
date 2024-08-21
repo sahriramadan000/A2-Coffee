@@ -267,6 +267,7 @@ class OrderController extends Controller
                     $orderProducts[$uniqueKey]['qty'] += (int) $cart->quantity;
                 }
 
+
                 // Perbarui total kuantitas produk untuk pengecekan stok
                 if (!isset($stockCheck[$productId])) {
                     $stockCheck[$productId] = 0;
@@ -289,6 +290,12 @@ class OrderController extends Controller
             // Simpan produk dan addons ke tabel order_products
             foreach ($orderProducts as $product) {
                 // Buat entri order_product
+
+                $note = $product['note'];
+                if (is_array($note)) {
+                    $note = implode(', ', $note); // Convert array to a string, customize the separator as needed
+                }
+
                 $orderProduct = OrderProduct::create([
                     'order_id'          => $order->id,
                     'name'              => $product['name'],
@@ -299,7 +306,7 @@ class OrderController extends Controller
                     'price_discount'    => $product['price_discount'],
                     'category'          => $product['category'],
                     'qty'               => $product['qty'],
-                    'note'              => $product['note'],
+                    'note'              => $note,
                     'status_input'      => 'cloud',
                 ]);
 
