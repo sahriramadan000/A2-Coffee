@@ -7,11 +7,17 @@
     <title>A2 COFFEE & EATRY</title>
     <link rel="icon" type="image/x-icon" href="#!"/>
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="google" content="notranslate">
 
     @include('admin.layouts.partials.head')
 
+    <style>
+        .notranslate {
+            translate: no;
+        }
+    </style>
 </head>
-<body class="alt-menu layout-boxed" page="starter-pack">
+<body class="alt-menu layout-boxed notranslate" page="starter-pack">
 
     <!-- BEGIN LOADER -->
     <div id="load_screen"> <div class="loader"> <div class="loader-content">
