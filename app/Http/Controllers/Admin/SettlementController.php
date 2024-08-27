@@ -27,7 +27,6 @@ class SettlementController extends Controller
     {
         $page_title = 'Report Settlement';
         // $store = Store::first(); // Assuming there's only one store
-        dd($request->all());
         $type = $request->type;
         $shift = $request->shift;
         $date = $request->start_date;
@@ -44,6 +43,7 @@ class SettlementController extends Controller
                 ->get();
             } else {
                 $store = Store::where('shift',$request->shift)->first(); // Assuming there's only one store
+                dd($store);
                 // Ensure open and close times are in the correct format
                 $openTime = \Carbon\Carbon::parse($store->open_store)->format('H:i:s');
                 $closeTime = \Carbon\Carbon::parse($store->close_store)->format('H:i:s');
