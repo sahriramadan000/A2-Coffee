@@ -51,20 +51,6 @@
                             @endif
                         </div>
                     </div>
-                    <div class="col-12 col-md-6">
-                        <div class="form-group mb-3">
-                            <label for="status_position">Status Position</label>
-                            <select class="form-control form-control-sm" name="status_position" id="status_position">
-                                <option value="Open" {{ ($table->status_position == 'Open') ? 'selected' : '' }}>Open</option>
-                                <option value="Close" {{ ($table->status_position == 'Close') ? 'selected' : '' }}>Close</option>
-                                <option value="None" {{ ($table->status_position == 'None') ? 'selected' : '' }}>None</option>
-                            </select>
-
-                            @if($errors->has('status_position'))
-                                <p class="text-danger">{{ $errors->first('status_position') }}</p>
-                            @endif
-                        </div>
-                    </div>
                 </div>
             </div>
             <div class="modal-footer">

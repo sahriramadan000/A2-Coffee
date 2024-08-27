@@ -48,7 +48,7 @@ class TransactionController extends Controller
             $other_setting  = OtherSetting::get()->first();
             $subTotal       = \Cart::session($sessionId)->getTotal();
             $service        = $subTotal* $other_setting->layanan /100;
-            $pb01           = ($subTotal + $service) * $other_setting->pb01 /100 ;
+            $pb01           = ($subTotal) * $other_setting->pb01 /100 ;
             $total_price    = $subTotal + $service + $pb01;
 
             // Stock

@@ -74,7 +74,6 @@ class HomepageController extends Controller
 
     public function addToCart(Request $request){
         try {
-            dd($request->all());
             if ($request->product_id == null) {
                 return redirect()->back()->with('failed', 'Please Select The Product!');
             }

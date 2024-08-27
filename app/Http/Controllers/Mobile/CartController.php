@@ -16,7 +16,7 @@ class CartController extends Controller
 
         $data['subTotal'] = \Cart::session($sessionId)->getTotal();
         $data['layanan'] = $data['subTotal'] * $otherSetting->layanan /100;
-        $data['ppn'] = ($data['subTotal'] + $data['layanan']) * $otherSetting->pb01 /100 ;
+        $data['ppn'] = ($data['subTotal']) * $otherSetting->pb01 /100 ;
         $data['total'] = $data['subTotal'] + $data['layanan'] + $data['ppn'];
 
         // dd($data['total']);

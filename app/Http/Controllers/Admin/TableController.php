@@ -88,7 +88,6 @@ class TableController extends Controller
             $table->code                = $dataTable['code'];
             $table->name                = $dataTable['name'];
             $table->status              = $dataTable['status'];
-            $table->status_position     = $dataTable['status_position'];
             $table->barcode             = $barcode;
             $table->save();
 
@@ -132,7 +131,6 @@ class TableController extends Controller
             $table->code               = $dataTable['code'];
             $table->name               = $dataTable['name'];
             $table->status             = $dataTable['status'];
-            $table->status_position    = $dataTable['status_position'];
             $table->barcode            = $barcode;
             $table->save();
 
