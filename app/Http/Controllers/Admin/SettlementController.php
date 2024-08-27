@@ -27,7 +27,7 @@ class SettlementController extends Controller
     {
         $page_title = 'Report Settlement';
         // $store = Store::first(); // Assuming there's only one store
-        
+        dd($request->all());
         $type = $request->type;
         $shift = $request->shift;
         $date = $request->start_date;
