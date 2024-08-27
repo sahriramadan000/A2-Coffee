@@ -42,8 +42,7 @@ class SettlementController extends Controller
                 ->orderBy('id', 'desc')
                 ->get();
             } else {
-                $store = Store::where('shift',$request->shift)->first(); // Assuming there's only one store
-                dd($store);
+                $store = Store::where('shift',$request->shift)->latest()->first(); // Assuming there's only one store
                 // Ensure open and close times are in the correct format
                 $openTime = \Carbon\Carbon::parse($store->open_store)->format('H:i:s');
                 $closeTime = \Carbon\Carbon::parse($store->close_store)->format('H:i:s');
@@ -95,7 +94,7 @@ class SettlementController extends Controller
         $type = $request->type;
         $shift = $request->shift;
         $date = $request->start_date;
-        $store = Store::where('shift', $request->shift)->whereDate('open_store', $date)->first();
+        $store = Store::where('shift', $request->shift)->whereDate('open_store', $date)->latest()->first();
     
         $orders = collect();
         if ($type == 'day') {
