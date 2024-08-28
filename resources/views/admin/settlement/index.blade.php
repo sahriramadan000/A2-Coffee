@@ -78,8 +78,8 @@
                     <label class="form-label">Shift :</label>
                     <div class="input-group">
                         <select name="shift" id="shift" class="form-control form-control-lg">
-                            <option value="all">All</option>
-                            <option value="shift1" {{ Request::get('shift') == 'shift1' ? 'selected' : '' }}>Shift 1</option>
+                            {{-- <option value="all">All</option> --}}
+                            <option selected value="shift1" {{ Request::get('shift') == 'shift1' ? 'selected' : '' }}>Shift 1</option>
                             <option value="shift2" {{ Request::get('shift') == 'shift2' ? 'selected' : '' }}>Shift 2</option>
                         </select>
                     </div>
