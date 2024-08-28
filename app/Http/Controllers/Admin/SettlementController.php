@@ -191,14 +191,14 @@ class SettlementController extends Controller
             $printer->text("Pajak           : Rp.".number_format($pb01,0)."\n");
             $printer->text("Biaya Layanan   : Rp.".number_format($service,0)."\n");
             $printer->text("discount        : Rp.".number_format($discount,0)."\n");
-            $printer->text("Transaksi       : Rp.".number_format($orders->count(),0)."\n");
+            $printer->text("Transaksi       : ".number_format($orders->count(),0)."\n");
             
             
             $printer->text("--------------------------------\n");
             $printer->text("         MENU TERJUAL           \n");
             $printer->text("--------------------------------\n");
             foreach ($productQuantities as $productName => $qty) {
-                $printer->text($productName."                       ".$qty."\n");
+                $printer->text($qty."  ". $productName."\n");
             } 
 
             
