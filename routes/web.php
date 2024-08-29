@@ -282,6 +282,9 @@ Route::middleware(['auth'])->group(function () {
     // Retrun Order
     Route::patch('/return/{id}', [TransactionController::class, 'returnOrder'])->name('return-order');
 
+    // Cancel Order Product
+    Route::post('/cancel-order-product', [TransactionController::class, 'cancelOrderProduct'])->name('cancel-order-product');
+
     // Checkout
     Route::post('/checkout/{token}',[OrderController::class,'checkout'])->name('checkout-order');
     Route::post('/checkout/checkout-waiters/{token}',[OrderController::class,'checkoutWaiters'])->name('checkout-waiters');

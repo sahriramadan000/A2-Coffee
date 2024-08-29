@@ -121,16 +121,48 @@
                         <div class="row">
                             <div class="col-12 col-md-6">
                                 <ul class="list-group list-group-flush">
-                                    @foreach ($item->orderProducts as $orderProduct)
+                                    @php
+                                        $groupedOrderProducts = $item->orderProducts
+                                            ->filter(function ($product) {
+                                                return !$product->cancel_menu; // Only include products that are not canceled
+                                            })
+                                            ->groupBy('name')
+                                            ->map(function ($products) {
+                                                $totalQty = $products->sum('qty');
+                                                $totalPrice = $products->sum(function ($product) {
+                                                    return $product->selling_price * $product->qty;
+                                                });
+                                                $note = $products->pluck('note')->filter()->first(); // Get the first non-null note
+
+                                                return [
+                                                    'name' => $products->first()->name,
+                                                    'qty' => $totalQty,
+                                                    'total_price' => $totalPrice,
+                                                    'ids' => $products->pluck('id')->toArray(),
+                                                    'note' => $note,
+                                                ];
+                                            });
+                                    @endphp
+
+                                    @foreach ($groupedOrderProducts as $orderProduct)
                                         <li class="list-group-item">
                                             <div class="d-flex w-100 justify-content-between">
-                                                <h4 style="color: #515365">{{ $orderProduct->name }}</h4>
-                                                <small style="color: #515365">x{{ $orderProduct->qty }} </small>
+                                                <h4 style="color: #515365">{{ $orderProduct['name'] }}</h4>
+                                                <small style="color: #515365">x{{ $orderProduct['qty'] }} </small>
                                             </div>
-                                            <small style="color: #515365">Note : {{ $orderProduct->note ?? '' }} </small>
-                                            <p class="mb-1">Rp. {{ number_format($orderProduct->selling_price * $orderProduct->qty,0)  }}</p>
+                                            <small style="color: #515365">Note: {{ $orderProduct['note'] ?? '' }} </small>
+                                            <p class="mb-1">Rp. {{ number_format($orderProduct['total_price'], 0) }}</p>
+                                            <form action="{{ route('cancel-order-product') }}" method="POST">
+                                                @csrf
+                                                @foreach ($orderProduct['ids'] as $id)
+                                                    <input type="hidden" name="product_ids[]" value="{{ $id }}">
+                                                @endforeach
+                                                <input type="hidden" name="order_id" value="{{ $item->id }}">
+                                                <button class="btn btn-sm btn-danger">Cancel</button>
+                                            </form>     
                                         </li>
                                     @endforeach
+
                                 </ul>
                             </div>
                             <div class="col-12 col-md-6">

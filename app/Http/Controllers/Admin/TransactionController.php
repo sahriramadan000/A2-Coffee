@@ -1066,4 +1066,25 @@ class TransactionController extends Controller
             return response()->json(['failed' => true, 'message' => $th->getMessage()]);
         }
     }
+
+    public function cancelOrderProduct(Request $request)
+    {
+        try {
+            $item_ids = $request->input('product_ids');
+
+            foreach ($item_ids as $item_id) {
+                $orderDetail = OrderProduct::find($item_id);
+                if ($orderDetail) {
+                    $orderDetail->cancel_menu = true;
+                    $orderDetail->save();
+                }
+            }
+
+            return redirect()->back()->with('success', 'Cancel Product Berhasil.');
+
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('failed', 'Gagal Cancel Product.');
+        }
+    }
+
 }
