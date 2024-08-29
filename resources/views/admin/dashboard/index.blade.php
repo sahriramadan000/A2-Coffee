@@ -89,14 +89,16 @@
     document.addEventListener('DOMContentLoaded', (event) => {
         var hourlyOrders = @json($hourlyOrders);
         var labels = [];
-        var data = [];
+        var orderData = [];
+        var revenueData = [];
 
         for (var hour = 0; hour < 24; hour++) {
             var label = hour < 10 ? '0' + hour : hour;
             labels.push(label);
-            data.push(hourlyOrders[label] || 0);
+            orderData.push(hourlyOrders[label]?.count || 0);
+            revenueData.push(hourlyOrders[label]?.revenue || 0);
         }
-        console.log('data',hourlyOrders);
+        console.log('data', hourlyOrders);
 
         var ctx = document.getElementById('analyticDashboard').getContext('2d');
         var myLineChart = new Chart(ctx, {
@@ -105,9 +107,16 @@
                 labels: labels,
                 datasets: [{
                     label: 'Orders per Hour',
-                    data: data,
+                    data: orderData,
                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
                     borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1,
+                    fill: true,
+                }, {
+                    label: 'Revenue per Hour',
+                    data: revenueData,
+                    backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                    borderColor: 'rgba(153, 102, 255, 1)',
                     borderWidth: 1,
                     fill: true,
                 }]
@@ -121,6 +130,7 @@
             }
         });
     });
+
 </script>
 
 <script>

@@ -53,13 +53,17 @@ class DashboardController extends Controller
         $hourlyOrders = $orders->groupBy(function($order) {
             return Carbon::parse($order->created_at)->format('H');
         })->map(function($hour) {
-            return $hour->count();
+            return [
+                'count' => $hour->count(),
+                'revenue' => $hour->sum('total')
+            ];
         });
     
         $data['hourlyOrders'] = $hourlyOrders;
     
         return view('admin.dashboard.index', $data);
     }
+    
     
     
 }

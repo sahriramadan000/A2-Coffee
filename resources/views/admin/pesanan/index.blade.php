@@ -152,14 +152,14 @@
                                             </div>
                                             <small style="color: #515365">Note: {{ $orderProduct['note'] ?? '' }} </small>
                                             <p class="mb-1">Rp. {{ number_format($orderProduct['total_price'], 0) }}</p>
-                                            <form action="{{ route('cancel-order-product') }}" method="POST">
+                                            {{-- <form action="{{ route('cancel-order-product') }}" method="POST">
                                                 @csrf
                                                 @foreach ($orderProduct['ids'] as $id)
                                                     <input type="hidden" name="product_ids[]" value="{{ $id }}">
                                                 @endforeach
                                                 <input type="hidden" name="order_id" value="{{ $item->id }}">
                                                 <button class="btn btn-sm btn-danger">Cancel</button>
-                                            </form>     
+                                            </form>      --}}
                                         </li>
                                     @endforeach
 
