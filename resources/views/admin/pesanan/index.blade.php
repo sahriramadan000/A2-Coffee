@@ -156,6 +156,7 @@
                                         </div>
                                         <small style="color: #515365">Note: {{ $orderProduct['note'] ?? '' }} </small>
                                         <p class="mb-1">Rp. {{ number_format($orderProduct['total_price'], 0) }}</p>
+                                        @if ($item->payment_status != 'Paid')
                                         <form action="{{ route('cancel-order-product') }}" method="POST">
                                             @csrf
                                             @foreach ($orderProduct['ids'] as $id)
@@ -165,6 +166,8 @@
                                             <input type="hidden" name="key" value="{{ $orderProduct['key'] }}">
                                             <button class="btn btn-sm btn-danger">Cancel</button>
                                         </form>     
+                                        @endif
+
                                     </li>
                                     @endforeach
 
