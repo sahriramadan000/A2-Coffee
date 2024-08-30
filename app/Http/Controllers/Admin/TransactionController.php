@@ -1202,6 +1202,7 @@ class TransactionController extends Controller
             $orders->pb01 = $pb01;
             $orders->service = $biaya_layanan;
             $orders->total = $total_price;
+            $orders->status_input = 'cloud';
             $orders->save();
 
             return redirect()->back()->with('success', 'Cancel Product Berhasil.');
