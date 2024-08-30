@@ -127,12 +127,13 @@
                                                 return !$product->cancel_menu; // Only include products that are not canceled
                                             })
                                             ->groupBy('name')
-                                            ->map(function ($products) {
+                                            ->map(function ($products) use ($item) {
                                                 $totalQty = $products->sum('qty');
                                                 $totalPrice = $products->sum(function ($product) {
                                                     return $product->selling_price * $product->qty;
                                                 });
                                                 $note = $products->pluck('note')->filter()->first(); // Get the first non-null note
+                                                $key = Crypt::encrypt($item->id . '-' . implode(',', $products->pluck('id')->toArray()) . '-' . $totalQty);
 
                                                 return [
                                                     'name' => $products->first()->name,
@@ -140,27 +141,31 @@
                                                     'total_price' => $totalPrice,
                                                     'ids' => $products->pluck('id')->toArray(),
                                                     'note' => $note,
+                                                    'key' => $key,
                                                 ];
                                             });
                                     @endphp
 
                                     @foreach ($groupedOrderProducts as $orderProduct)
-                                        <li class="list-group-item">
-                                            <div class="d-flex w-100 justify-content-between">
-                                                <h4 style="color: #515365">{{ $orderProduct['name'] }}</h4>
+                                    <li class="list-group-item">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h4 style="color: #515365">{{ $orderProduct['name'] }}</h4>
+                                            <a href="#!" type="button" onclick="ModalEditQtyProduct('{{ route('modal-edit-qty-product', $orderProduct['key']) }}', '{{ $orderProduct['key'] }}', '{{ csrf_token() }}')" class="cursor-pointer" data-bs-target="#modal-add-qty-product-{{ $orderProduct['key'] }}" style="border-bottom: 1px dashed #bfbfbf; font-size:12px;">
                                                 <small style="color: #515365">x{{ $orderProduct['qty'] }} </small>
-                                            </div>
-                                            <small style="color: #515365">Note: {{ $orderProduct['note'] ?? '' }} </small>
-                                            <p class="mb-1">Rp. {{ number_format($orderProduct['total_price'], 0) }}</p>
-                                            <form action="{{ route('cancel-order-product') }}" method="POST">
-                                                @csrf
-                                                @foreach ($orderProduct['ids'] as $id)
-                                                    <input type="hidden" name="product_ids[]" value="{{ $id }}">
-                                                @endforeach
-                                                <input type="hidden" name="order_id" value="{{ $item->id }}">
-                                                <button class="btn btn-sm btn-danger">Cancel</button>
-                                            </form>     
-                                        </li>
+                                            </a>
+                                        </div>
+                                        <small style="color: #515365">Note: {{ $orderProduct['note'] ?? '' }} </small>
+                                        <p class="mb-1">Rp. {{ number_format($orderProduct['total_price'], 0) }}</p>
+                                        <form action="{{ route('cancel-order-product') }}" method="POST">
+                                            @csrf
+                                            @foreach ($orderProduct['ids'] as $id)
+                                                <input type="hidden" name="product_ids[]" value="{{ $id }}">
+                                            @endforeach
+                                            <input type="hidden" name="order_id" value="{{ $item->id }}">
+                                            <input type="hidden" name="key" value="{{ $orderProduct['key'] }}">
+                                            <button class="btn btn-sm btn-danger">Cancel</button>
+                                        </form>     
+                                    </li>
                                     @endforeach
 
                                 </ul>
@@ -400,9 +405,78 @@
         </div>
     @endforeach
 </div>
+<div id="modalContainer"></div>
 @endsection
 
 @push('js')
+<script>
+    function ModalEditQtyProduct(url = '/modal-edit-qty-product', key, token) {
+    var getTarget = `#modal-edit-qty-product-${key}`; // Ensure key is correctly passed
+    $.ajax({
+        url: url,
+        type: 'GET',
+        success: function(data) {
+            $('#modalContainer').html(data); // Load the modal content
+            $(getTarget).modal('show'); // Show the modal with the correct ID
+            $(getTarget).on('shown.bs.modal', function () {
+                // Now bind the event handlers here
+                $("#btn-add").on("click", function() {
+                    var input = $(this).siblings("input[type='number']");
+                    var value = parseInt(input.val());
+                    input.val(value + 1);
+                });
+
+                $("#btn-min").on("click", function() {
+                    var input = $(this).siblings("input[type='number']");
+                    var value = parseInt(input.val());
+                    if (value > 1) {
+                        input.val(value - 1);
+                    }
+                });
+
+                $(".qty-add").on("change", function() {
+                    if ($(this).val() < 0) {
+                        $(this).val(0);
+                    }
+                });
+
+                $('#updateQtyCartButton').on('click', function() {
+                    const quantity = $('#qty-add').val();
+                    const route = $(this).data('route');
+                    const token = $(this).data('token');
+
+                    updateCartQuantity(key, quantity, route, token, getTarget);
+                });
+            });
+        },
+        error: function(xhr, status, error) {
+            console.error('Failed to load Product: ', error);
+        }
+    });
+}
+
+
+function updateCartQuantity(key, quantity, url, token, modalSelector) {
+    $.ajax({
+        url: url,
+        type: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': token,
+        },
+        data: {
+            "key": key,
+            "quantity": quantity,
+        },
+        success: function(response) {
+            console.log(response);
+            window.location.reload();
+        },
+        error: function(xhr, status, error) {
+            console.error('Failed to update cart item: ', error);
+        }
+    });
+}
+</script>
 <script>
     $(document).ready(function() {
         // Toggle fields on page load based on the selected type

@@ -27,6 +27,7 @@ use Illuminate\Support\Facades\View;
 use Darryldecode\Cart\Facades\CartFacade as Cart;
 use Illuminate\Support\Facades\Cache;
 use PDF;
+use Illuminate\Support\Facades\Crypt;
 
 class TransactionController extends Controller
 {
@@ -94,6 +95,29 @@ class TransactionController extends Controller
             'quantity' => $cartItem->quantity, // Passing quantity ke view
         ]);
     }
+
+     // Modal edit QTY Product
+     public function modalEditQtyProduct($key)
+    {
+        $decryptedKey = Crypt::decrypt($key);
+        // Pecah string menjadi tiga bagian: orderId, productDetailIds, dan qty
+        list($orderId, $productDetailIds, $qty) = explode('-', $decryptedKey);
+
+        // Pecah string productDetailIds menjadi array
+        $productDetailIds = explode(',', $productDetailIds);
+        
+        // Mengambil data order dan produk jika diperlukan (komentar dihapus karena sudah tersedia)
+        // $order = Order::find($orderId);
+        // $productDetail = OrderProduct::find($productDetailId);
+
+        return View::make('admin.pesanan.modal-edit-quantity')->with([
+            'key'      => $key,
+            'quantity' => $qty, // Passing quantity ke view
+            // 'orderId'  => $orderId, // Passing orderId ke view
+            // 'productDetailIds' => $productDetailIds, // Passing productDetailIds ke view
+        ]);
+    }
+
 
      // Modal Search
     public function modalSearchProduct()
@@ -333,6 +357,71 @@ class TransactionController extends Controller
             } else {
                 return response()->json(['failed' => 'Cart item not found!'], 404);
             }
+        } catch (\Throwable $th) {
+            return response()->json(['failed' => 'Failed to update cart item! ' . $th->getMessage()], 500);
+        }
+    }
+    
+    public function updateCartQuantityProduct(Request $request)
+    {
+        try {
+
+            $decryptedKey = Crypt::decrypt($request->key);
+
+            dd($decryptedKey);
+            // Pisahkan hasil enkripsi menjadi tiga bagian
+            list($orderId, $productDetailIds, $qty) = explode('-', $decryptedKey);
+
+            // Pisahkan $productDetailIds menjadi array jika berisi lebih dari satu ID
+            $productDetailIds = explode(',', $productDetailIds);
+
+            $diffQty = $qty - $request->quantity;
+
+            $orders = Order::find($orderId);
+
+            $subtotal = $orders->subtotal;
+
+            // Update subtotal berdasarkan produk yang dibatalkan
+            foreach ($productDetailIds as $item_id) {
+                $orderDetail = OrderProduct::find($item_id);
+                if ($orderDetail) {
+                    $subtotal -= $orderDetail->selling_price * $orderDetail->qty;
+                    $orderDetail->save();
+                }
+            }
+
+            // Update subtotal dan simpan order
+            $orders->subtotal = $subtotal;
+            $orders->save();
+
+
+            // Menghitung biaya layanan dan pajak
+            $other_setting = OtherSetting::first();
+            $service = $other_setting->layanan / 100;
+            $biaya_layanan = 0;
+            $pb01 = 0;
+
+            if ($other_setting->layanan != 0) {
+                $biaya_layanan  = $subtotal * $service;
+            }
+
+            if ($other_setting->pb01 != 0) {
+                $pb01 = $subtotal * ($other_setting->pb01 / 100);
+            }
+
+            $total_price = $subtotal + $biaya_layanan + $pb01;
+            
+
+            return response()->json([
+                'success'   => 'Cart item updated successfully!',
+                'data'      => Cart::session(Auth::user()->id)->getContent()->toArray(),
+                'service'   => $service,
+                'tax'       => $tax,
+                'subtotal'  => $subtotal,
+                'total'     => $totalPayment,
+                'canDelete' => $canDelete,
+            ], 200);
+            return response()->json(['failed' => 'Cart item not found!'], 404);
         } catch (\Throwable $th) {
             return response()->json(['failed' => 'Failed to update cart item! ' . $th->getMessage()], 500);
         }
@@ -1071,14 +1160,49 @@ class TransactionController extends Controller
     {
         try {
             $item_ids = $request->input('product_ids');
+            $orderId = $request->input('order_id');
 
+            // Mengambil order berdasarkan ID
+            $orders = Order::find($orderId);
+
+            if (!$orders) {
+                return redirect()->back()->with('failed', 'Pesanan tidak ditemukan.');
+            }
+
+            $subtotal = $orders->subtotal;
+
+            // Update subtotal berdasarkan produk yang dibatalkan
             foreach ($item_ids as $item_id) {
                 $orderDetail = OrderProduct::find($item_id);
                 if ($orderDetail) {
+                    $subtotal -= $orderDetail->selling_price * $orderDetail->qty;
                     $orderDetail->cancel_menu = true;
                     $orderDetail->save();
                 }
             }
+
+            // Menghitung biaya layanan dan pajak
+            $other_setting = OtherSetting::first();
+            $service = $other_setting->layanan / 100;
+            $biaya_layanan = 0;
+            $pb01 = 0;
+
+            if ($other_setting->layanan != 0) {
+                $biaya_layanan  = $subtotal * $service;
+            }
+
+            if ($other_setting->pb01 != 0) {
+                $pb01 = $subtotal * ($other_setting->pb01 / 100);
+            }
+
+            $total_price = $subtotal + $biaya_layanan + $pb01;
+
+            // Update order dengan subtotal baru, pajak, dan total harga
+            $orders->subtotal = $subtotal;
+            $orders->pb01 = $pb01;
+            $orders->service = $biaya_layanan;
+            $orders->total = $total_price;
+            $orders->save();
 
             return redirect()->back()->with('success', 'Cancel Product Berhasil.');
 
@@ -1086,5 +1210,6 @@ class TransactionController extends Controller
             return redirect()->back()->with('failed', 'Gagal Cancel Product.');
         }
     }
+
 
 }

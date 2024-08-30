@@ -249,12 +249,23 @@ class OrderController extends Controller
                 // Buat kunci unik berdasarkan ID produk dan ID addons
                 $uniqueKey = $productId . '-' . implode('-', $addonIds);
 
+                
                 if (!isset($orderProducts[$uniqueKey])) {
+                    $isDiscount = $cart->attributes['product']['is_discount'];
+                    $percentDiscount = $cart->attributes['product']['percent_discount'];
+                    $priceDiscount = $cart->attributes['product']['price_discount'];
+                    $sellingPrice = $cart->attributes['product']['selling_price'];
+    
+                    if ($isDiscount == true && $percentDiscount > 0) {
+                        $sellingPrice = $sellingPrice - ($sellingPrice * ($percentDiscount / 100));
+                    }elseif ($isDiscount == true && $priceDiscount > 0) {
+                        $sellingPrice = $priceDiscount;
+                    }
                     $orderProducts[$uniqueKey] = [
                         'id'                => $productId,
                         'name'              => $cart->attributes['product']['name'],
                         'cost_price'        => $cart->attributes['product']['cost_price'],
-                        'selling_price'     => $cart->attributes['product']['selling_price'],
+                        'selling_price'     => $sellingPrice,
                         'is_discount'       => $cart->attributes['product']['is_discount'],
                         'percent_discount'  => $cart->attributes['product']['percent_discount'],
                         'price_discount'    => $cart->attributes['product']['price_discount'],
