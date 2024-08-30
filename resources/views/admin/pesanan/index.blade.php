@@ -150,14 +150,14 @@
                                     <li class="list-group-item">
                                         <div class="d-flex w-100 justify-content-between">
                                             <h4 style="color: #515365">{{ $orderProduct['name'] }}</h4>
-                                            <a href="#!" type="button" onclick="ModalEditQtyProduct('{{ route('modal-edit-qty-product', $orderProduct['key']) }}', '{{ $orderProduct['key'] }}', '{{ csrf_token() }}')" class="cursor-pointer" data-bs-target="#modal-add-qty-product-{{ $orderProduct['key'] }}" style="border-bottom: 1px dashed #bfbfbf; font-size:12px;">
+                                            {{-- <a href="#!" type="button" onclick="ModalEditQtyProduct('{{ route('modal-edit-qty-product', $orderProduct['key']) }}', '{{ $orderProduct['key'] }}', '{{ csrf_token() }}')" class="cursor-pointer" data-bs-target="#modal-add-qty-product-{{ $orderProduct['key'] }}" style="border-bottom: 1px dashed #bfbfbf; font-size:12px;"> --}}
                                                 <small style="color: #515365">x{{ $orderProduct['qty'] }} </small>
-                                            </a>
+                                            {{-- </a> --}}
                                         </div>
                                         <small style="color: #515365">Note: {{ $orderProduct['note'] ?? '' }} </small>
                                         <p class="mb-1">Rp. {{ number_format($orderProduct['total_price'], 0) }}</p>
                                         @if ($item->payment_status != 'Paid')
-                                        <form action="{{ route('cancel-order-product') }}" method="POST">
+                                        {{-- <form action="{{ route('cancel-order-product') }}" method="POST">
                                             @csrf
                                             @foreach ($orderProduct['ids'] as $id)
                                                 <input type="hidden" name="product_ids[]" value="{{ $id }}">
@@ -165,7 +165,7 @@
                                             <input type="hidden" name="order_id" value="{{ $item->id }}">
                                             <input type="hidden" name="key" value="{{ $orderProduct['key'] }}">
                                             <button class="btn btn-sm btn-danger">Cancel</button>
-                                        </form>     
+                                        </form>      --}}
                                         @endif
 
                                     </li>
