@@ -97,22 +97,23 @@ class TransactionController extends Controller
     }
 
      // Modal edit QTY Product
-     public function modalEditQtyProduct($key)
+     public function modalEditQtyProduct($id)
     {
-        $decryptedKey = Crypt::decrypt($key);
+        // $decryptedKey = Crypt::decrypt($key);
         // Pecah string menjadi tiga bagian: orderId, productDetailIds, dan qty
-        list($orderId, $productDetailIds, $qty) = explode('-', $decryptedKey);
+        // list($orderId, $productDetailIds, $qty) = explode('-', $decryptedKey);
 
         // Pecah string productDetailIds menjadi array
-        $productDetailIds = explode(',', $productDetailIds);
+        // $productDetailIds = explode(',', $productDetailIds);
         
         // Mengambil data order dan produk jika diperlukan (komentar dihapus karena sudah tersedia)
         // $order = Order::find($orderId);
-        // $productDetail = OrderProduct::find($productDetailId);
+        $productDetail = OrderProduct::find($id);
 
         return View::make('admin.pesanan.modal-edit-quantity')->with([
-            'key'      => $key,
-            'quantity' => $qty, // Passing quantity ke view
+            'id'          => $productDetail->id,
+            'order_id'    => $productDetail->order_id,
+            'quantity'    => $productDetail->qty, // Passing quantity ke view
             // 'orderId'  => $orderId, // Passing orderId ke view
             // 'productDetailIds' => $productDetailIds, // Passing productDetailIds ke view
         ]);
@@ -362,7 +363,7 @@ class TransactionController extends Controller
         }
     }
     
-    public function updateCartQuantityProduct(Request $request)
+    public function updateCartQuantityProductold(Request $request)
     {
         try {
 
@@ -1159,58 +1160,119 @@ class TransactionController extends Controller
     public function cancelOrderProduct(Request $request)
     {
         try {
-            $item_ids = $request->input('product_ids');
             $orderId = $request->input('order_id');
-
+            $orderProductId = $request->input('order_detail_id'); // Single product ID
+        
             // Mengambil order berdasarkan ID
             $orders = Order::find($orderId);
-
+        
             if (!$orders) {
                 return redirect()->back()->with('failed', 'Pesanan tidak ditemukan.');
             }
-
+        
             $subtotal = $orders->subtotal;
-
-            // Update subtotal berdasarkan produk yang dibatalkan
-            foreach ($item_ids as $item_id) {
-                $orderDetail = OrderProduct::find($item_id);
-                if ($orderDetail) {
-                    $subtotal -= $orderDetail->selling_price * $orderDetail->qty;
-                    $orderDetail->cancel_menu = true;
-                    $orderDetail->save();
-                }
+        
+            // Mengambil orderDetail berdasarkan ID produk yang akan dibatalkan
+            $orderDetail = OrderProduct::find($orderProductId);
+            if ($orderDetail) {
+                // Kurangi subtotal dengan harga produk yang dibatalkan
+                $subtotal -= $orderDetail->selling_price * $orderDetail->qty;
+                $orderDetail->delete();
             }
-
+        
             // Menghitung biaya layanan dan pajak
             $other_setting = OtherSetting::first();
             $service = $other_setting->layanan / 100;
             $biaya_layanan = 0;
             $pb01 = 0;
-
+        
             if ($other_setting->layanan != 0) {
-                $biaya_layanan  = $subtotal * $service;
+                $biaya_layanan = $subtotal * $service;
             }
-
+        
             if ($other_setting->pb01 != 0) {
                 $pb01 = $subtotal * ($other_setting->pb01 / 100);
             }
-
+        
             $total_price = $subtotal + $biaya_layanan + $pb01;
-
+        
             // Update order dengan subtotal baru, pajak, dan total harga
             $orders->subtotal = $subtotal;
             $orders->pb01 = $pb01;
             $orders->service = $biaya_layanan;
             $orders->total = $total_price;
-            $orders->status_input = 'cloud';
             $orders->save();
-
+        
             return redirect()->back()->with('success', 'Cancel Product Berhasil.');
-
+        
         } catch (\Throwable $th) {
-            return redirect()->back()->with('failed', 'Gagal Cancel Product.');
+            return redirect()->back()->with('failed', 'Gagal Cancel Product: ' . $th->getMessage());
         }
     }
 
+    public function updateCartQuantityProduct(Request $request)
+    {
+        try {
+            $orderId = $request->input('order_id');
+            $orderProductId = $request->input('order_detail_id'); // Single product ID
+            $newQty = $request->input('new_qty'); // New quantity
+            
+            // Mengambil order berdasarkan ID
+            $orders = Order::find($orderId);
+            
+            if (!$orders) {
+                return redirect()->back()->with('failed', 'Pesanan tidak ditemukan.');
+            }
+            
+            $subtotal = $orders->subtotal;
 
+            // Mengambil orderDetail berdasarkan ID produk yang akan diedit
+            $orderDetail = OrderProduct::find($orderProductId);
+            if ($orderDetail) {
+                // Kurangi subtotal dengan harga produk lama
+                $subtotal -= $orderDetail->selling_price * $orderDetail->qty;
+
+                // Update qty dengan nilai baru
+                $orderDetail->qty = $newQty;
+                $orderDetail->save();
+
+                // Tambahkan subtotal dengan harga produk baru
+                $subtotal += $orderDetail->selling_price * $newQty;
+            } else {
+                return redirect()->back()->with('failed', 'Detail produk tidak ditemukan.');
+            }
+            
+            // Menghitung biaya layanan dan pajak berdasarkan subtotal baru
+            $other_setting = OtherSetting::first();
+            $service = $other_setting->layanan / 100;
+            $biaya_layanan = 0;
+            $pb01 = 0;
+            
+            if ($other_setting->layanan != 0) {
+                $biaya_layanan = $subtotal * $service;
+            }
+            
+            if ($other_setting->pb01 != 0) {
+                $pb01 = $subtotal * ($other_setting->pb01 / 100);
+            }
+            
+            $total_price = $subtotal + $biaya_layanan + $pb01;
+            
+            // Update order dengan subtotal baru, pajak, dan total harga
+            $orders->subtotal = $subtotal;
+            $orders->pb01 = $pb01;
+            $orders->service = $biaya_layanan;
+            $orders->total = $total_price;
+            $orders->save();
+
+            return 'SUCCESS';
+            
+            // return redirect()->back()->with('success', 'Quantity produk berhasil diubah.');
+            
+        } catch (\Throwable $th) {
+            return 'Failed';
+
+            // return redirect()->back()->with('failed', 'Gagal mengubah quantity produk: ' . $th->getMessage());
+        }
+    }
 }

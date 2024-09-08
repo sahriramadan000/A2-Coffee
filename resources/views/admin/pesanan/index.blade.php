@@ -121,56 +121,30 @@
                         <div class="row">
                             <div class="col-12 col-md-6">
                                 <ul class="list-group list-group-flush">
-                                    @php
-                                        $groupedOrderProducts = $item->orderProducts
-                                            ->filter(function ($product) {
-                                                return !$product->cancel_menu; // Only include products that are not canceled
-                                            })
-                                            ->groupBy('name')
-                                            ->map(function ($products) use ($item) {
-                                                $totalQty = $products->sum('qty');
-                                                $totalPrice = $products->sum(function ($product) {
-                                                    return $product->selling_price * $product->qty;
-                                                });
-                                                $note = $products->pluck('note')->filter()->first(); // Get the first non-null note
-                                                $key = Crypt::encrypt($item->id . '-' . implode(',', $products->pluck('id')->toArray()) . '-' . $totalQty);
-
-                                                return [
-                                                    'name' => $products->first()->name,
-                                                    'qty' => $totalQty,
-                                                    'total_price' => $totalPrice,
-                                                    'ids' => $products->pluck('id')->toArray(),
-                                                    'note' => $note,
-                                                    'key' => $key,
-                                                ];
-                                            });
-                                    @endphp
-
-                                    @foreach ($groupedOrderProducts as $orderProduct)
+                                    @foreach ($item->orderProducts as $orderProduct)
                                     <li class="list-group-item">
-                                        <div class="d-flex w-100 justify-content-between">
-                                            <h4 style="color: #515365">{{ $orderProduct['name'] }}</h4>
-                                            {{-- <a href="#!" type="button" onclick="ModalEditQtyProduct('{{ route('modal-edit-qty-product', $orderProduct['key']) }}', '{{ $orderProduct['key'] }}', '{{ csrf_token() }}')" class="cursor-pointer" data-bs-target="#modal-add-qty-product-{{ $orderProduct['key'] }}" style="border-bottom: 1px dashed #bfbfbf; font-size:12px;"> --}}
-                                                <small style="color: #515365">x{{ $orderProduct['qty'] }} </small>
-                                            {{-- </a> --}}
+                                        <div class="d-flex w-100 justify-content-between align-items-start">
+                                            <h4 style="color: #515365">{{ $orderProduct->name }}</h4>
+                                            <div class="d-flex align-items-center ml-auto gap-3">
+                                                <small style="border-bottom: 1px dashed #bfbfbf; color: #515365; cursor:pointer;" onclick="ModalEditQtyProduct('{{ route('modal-edit-qty-product', $orderProduct->id) }}', '{{ $orderProduct->id }}', '{{ csrf_token() }}')">x{{ $orderProduct->qty }}</small>
+                                                <form action="{{ route('cancel-order-product') }}" method="POST" class="ml-2">
+                                                    @csrf
+                                                    <input type="hidden" name="order_id" value="{{ $item->id }}">
+                                                    <input type="hidden" name="order_detail_id" value="{{ $orderProduct->id }}">
+                                                    <button class="btn btn-sm btn-danger">Cancel</button>
+                                                </form>
+                                            </div>
                                         </div>
-                                        <small style="color: #515365">Note: {{ $orderProduct['note'] ?? '' }} </small>
-                                        <p class="mb-1">Rp. {{ number_format($orderProduct['total_price'], 0) }}</p>
-                                        @if ($item->payment_status != 'Paid')
-                                        {{-- <form action="{{ route('cancel-order-product') }}" method="POST">
-                                            @csrf
-                                            @foreach ($orderProduct['ids'] as $id)
-                                                <input type="hidden" name="product_ids[]" value="{{ $id }}">
-                                            @endforeach
-                                            <input type="hidden" name="order_id" value="{{ $item->id }}">
-                                            <input type="hidden" name="key" value="{{ $orderProduct['key'] }}">
-                                            <button class="btn btn-sm btn-danger">Cancel</button>
-                                        </form>      --}}
-                                        @endif
-
+                                        <p class="mb-1">Rp. {{ number_format($orderProduct->selling_price * $orderProduct->qty,0)  }}</p>
                                     </li>
+                                    {{-- <form action="{{ route('cancel-order-product') }}" method="POST">
+                                        @csrf
+                                        <input type="hidden" name="order_id" value="{{ $item->id }}">
+                                        <input type="hidden" name="order_detail_id" value="{{ $orderProduct->id }}">
+                                        <button class="btn btn-sm btn-danger">Cancel</button>
+                                    </form>
+                                    <button class="btn btn-sm btn-warning" >Edit</button> --}}
                                     @endforeach
-
                                 </ul>
                             </div>
                             <div class="col-12 col-md-6">
@@ -413,8 +387,8 @@
 
 @push('js')
 <script>
-    function ModalEditQtyProduct(url = '/modal-edit-qty-product', key, token) {
-    var getTarget = `#modal-edit-qty-product-${key}`; // Ensure key is correctly passed
+    function ModalEditQtyProduct(url = '/modal-edit-qty-product', id, token) {
+    var getTarget = `#modal-edit-qty-product-${id}`; 
     $.ajax({
         url: url,
         type: 'GET',
@@ -438,8 +412,8 @@
                 });
 
                 $(".qty-add").on("change", function() {
-                    if ($(this).val() < 0) {
-                        $(this).val(0);
+                    if ($(this).val() < 1) {
+                        $(this).val(1);
                     }
                 });
 
@@ -447,8 +421,10 @@
                     const quantity = $('#qty-add').val();
                     const route = $(this).data('route');
                     const token = $(this).data('token');
+                    const orderId = $(this).data('orderid');
+                    console.log(orderId);
 
-                    updateCartQuantity(key, quantity, route, token, getTarget);
+                    updateCartQuantity(id, quantity, route, token, getTarget, orderId);
                 });
             });
         },
@@ -459,7 +435,7 @@
 }
 
 
-function updateCartQuantity(key, quantity, url, token, modalSelector) {
+function updateCartQuantity(order_detail_id, quantity, url, token, modalSelector, order_id) {
     $.ajax({
         url: url,
         type: 'POST',
@@ -467,8 +443,9 @@ function updateCartQuantity(key, quantity, url, token, modalSelector) {
             'X-CSRF-TOKEN': token,
         },
         data: {
-            "key": key,
-            "quantity": quantity,
+            "order_id": order_id,
+            "order_detail_id": order_detail_id,
+            "new_qty": quantity,
         },
         success: function(response) {
             console.log(response);

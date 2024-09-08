@@ -1,4 +1,4 @@
-<div class="modal fade" id="modal-edit-qty-product-{{ $key }}" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="modal-edit-qty-product-{{ $id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
@@ -17,7 +17,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" id="updateQtyCartButton" data-route="{{ route('update-cart-qty-product') }}" data-token="{{ csrf_token() }}" class="btn btn-primary">Update Cart</button>
+                <button type="button" id="updateQtyCartButton" data-route="{{ route('update-cart-qty-product') }}" data-token="{{ csrf_token() }}" data-orderid="{{ $order_id }}" class="btn btn-primary">Update Cart</button>
             </div>
         </div>
     </div>
