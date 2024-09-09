@@ -723,238 +723,6 @@ class TransactionController extends Controller
          }
     }
 
-    public function printStruk(Request $request){
-        $orders = Order::where('id', $request->id)->first();
-        $orderProducts = OrderProduct::where('order_id', $orders->id)->get();
-
-        if (count($orderProducts) != 0) {
-            $connector = new NetworkPrintConnector("192.168.123.120", 9100);
-            $printer = new Printer($connector);
-
-            /* Initialize */
-            $printer -> initialize();
-
-            // membuat fungsi untuk membuat 1 baris tabel, agar dapat dipanggil berkali-kali dgn mudah
-            function buatBaris4Kolom($kolom1, $kolom2, $kolom3) {
-                // Mengatur lebar setiap kolom (dalam satuan karakter)
-                $lebar_kolom_1 = 10;
-                $lebar_kolom_2 = 9;
-                $lebar_kolom_3 = 19;
-
-                // Melakukan wordwrap(), jadi jika karakter teks melebihi lebar kolom, ditambahkan \n
-                $kolom1 = wordwrap($kolom1, $lebar_kolom_1, "\n", true);
-                $kolom2 = wordwrap($kolom2, $lebar_kolom_2, "\n", true);
-                $kolom3 = wordwrap($kolom3, $lebar_kolom_3, "\n", true);
-
-                // Merubah hasil wordwrap menjadi array, kolom yang memiliki 2 index array berarti memiliki 2 baris (kena wordwrap)
-                $kolom1Array = explode("\n", $kolom1);
-                $kolom2Array = explode("\n", $kolom2);
-                $kolom3Array = explode("\n", $kolom3);
-
-                // Mengambil jumlah baris terbanyak dari kolom-kolom untuk dijadikan titik akhir perulangan
-                $jmlBarisTerbanyak = max(count($kolom1Array), count($kolom2Array), count($kolom3Array));
-
-                // Mendeklarasikan variabel untuk menampung kolom yang sudah di edit
-                $hasilBaris = array();
-
-                // Melakukan perulangan setiap baris (yang dibentuk wordwrap), untuk menggabungkan setiap kolom menjadi 1 baris
-                for ($i = 0; $i < $jmlBarisTerbanyak; $i++) {
-                    // memberikan spasi di setiap cell berdasarkan lebar kolom yang ditentukan,
-                    $hasilKolom1 = str_pad((isset($kolom1Array[$i]) ? $kolom1Array[$i] : ""), $lebar_kolom_1, " ");
-                    $hasilKolom2 = str_pad((isset($kolom2Array[$i]) ? $kolom2Array[$i] : ""), $lebar_kolom_2, " ");
-                    $hasilKolom3 = str_pad((isset($kolom3Array[$i]) ? $kolom3Array[$i] : ""), $lebar_kolom_3, " ");
-
-                    // Menggabungkan kolom tersebut menjadi 1 baris dan ditampung ke variabel hasil (ada 1 spasi disetiap kolom)
-                    $hasilBaris[] = $hasilKolom1 . " " . $hasilKolom2 . " " . $hasilKolom3 ;
-                }
-
-                // Hasil yang berupa array, disatukan kembali menjadi string dan tambahkan \n disetiap barisnya.
-                return implode("\n", $hasilBaris) . "\n";
-            }
-
-
-            // Membuat judul
-            $printer->initialize();
-            $printer->selectPrintMode(Printer::MODE_DOUBLE_HEIGHT); // Setting teks menjadi lebih besar
-            $printer->setJustification(Printer::JUSTIFY_CENTER); // Setting teks menjadi rata tengah
-            $printer->text("A2 Coffee & Eatery\n");
-            $printer->text("\n");
-
-            // Data transaksi
-            $printer->initialize();
-            $printer->text("--------------------------------\n");
-            $printer->text("No Inv : ".$orders->no_invoice."\n");
-            $printer->text("Waktu  : ".$orders->created_at."\n");
-            $printer->text("--------------------------------\n");
-
-            $printer->text("Customer             : ".$orders->customer_name ?? '-'."\n");
-            $printer->text("Order                : ".$orders->inputer."\n");
-            $printer->text("Table                : ".$orders->table."\n");
-            $printer->text("Metode Pembayaran    : ".$orders->payment_method."\n");
-
-            // Membuat tabel
-            $printer->initialize(); // Reset bentuk/jenis teks
-            $printer->text("--------------------------------\n");
-            $printer->text(buatBaris4Kolom("Menu", "Qty", "Price"));
-            $printer->text("--------------------------------\n");
-
-            // Order Product
-            foreach ($orderProducts as $key => $orderProduct) {
-                $priceFormatted = 'Rp.' . number_format($orderProduct->selling_price, 0);
-                $printer->text(buatBaris4Kolom($orderProduct->name, $orderProduct->qty, $priceFormatted));
-                $printer->text("--------------------------------\n");
-            }
-
-            $printer->text("--------------------------------\n");
-
-            $printer->text("Sub Total          : Rp.".number_format($orders->subtotal,0)."\n");
-            $printer->text("Service            : Rp.".number_format($orders->service,0)."\n");
-            $printer->text("Tax                : Rp.".number_format($orders->pb01,0)."\n");
-            $printer->text("Total              : Rp.".number_format($orders->total,0)."\n");
-
-            $printer->text("\n");
-
-            // Pesan penutup
-            $printer->initialize();
-            $printer->setJustification(Printer::JUSTIFY_CENTER);
-            $printer->text("Bill Terbayar\n");
-            $printer->text("Terima kasih telah berbelanja\n");
-            $printer->text("Silahkan Datang Kembali\n");
-
-            $printer->feed(3); // mencetak 5 baris kosong agar terangkat (pemotong kertas saya memiliki jarak 5 baris dari toner)
-            $printer->cut();
-            $printer->close();
-            return redirect()->back()->with('success','Berhasil Tercetak ');
-        }else{
-            return redirect()->back()->with('failed','Print Gagal ');
-        }
-    }
-
-    public function printBill(Request $request){
-        $orders = Order::where('id', $request->id)->first();
-        $orderProducts = OrderProduct::where('order_id', $orders->id)->get();
-
-        if (count($orderProducts) != 0) {
-            $connector = new NetworkPrintConnector("192.168.123.120", 9100);
-            $printer = new Printer($connector);
-
-            /* Initialize */
-            $printer -> initialize();
-
-            // membuat fungsi untuk membuat 1 baris tabel, agar dapat dipanggil berkali-kali dgn mudah
-            function buatBaris4Kolom($kolom1, $kolom2, $kolom3) {
-                // Mengatur lebar setiap kolom (dalam satuan karakter)
-                $lebar_kolom_1 = 10;
-                $lebar_kolom_2 = 9;
-                $lebar_kolom_3 = 19;
-
-                // Melakukan wordwrap(), jadi jika karakter teks melebihi lebar kolom, ditambahkan \n
-                $kolom1 = wordwrap($kolom1, $lebar_kolom_1, "\n", true);
-                $kolom2 = wordwrap($kolom2, $lebar_kolom_2, "\n", true);
-                $kolom3 = wordwrap($kolom3, $lebar_kolom_3, "\n", true);
-
-                // Merubah hasil wordwrap menjadi array, kolom yang memiliki 2 index array berarti memiliki 2 baris (kena wordwrap)
-                $kolom1Array = explode("\n", $kolom1);
-                $kolom2Array = explode("\n", $kolom2);
-                $kolom3Array = explode("\n", $kolom3);
-
-                // Mengambil jumlah baris terbanyak dari kolom-kolom untuk dijadikan titik akhir perulangan
-                $jmlBarisTerbanyak = max(count($kolom1Array), count($kolom2Array), count($kolom3Array));
-
-                // Mendeklarasikan variabel untuk menampung kolom yang sudah di edit
-                $hasilBaris = array();
-
-                // Melakukan perulangan setiap baris (yang dibentuk wordwrap), untuk menggabungkan setiap kolom menjadi 1 baris
-                for ($i = 0; $i < $jmlBarisTerbanyak; $i++) {
-                    // memberikan spasi di setiap cell berdasarkan lebar kolom yang ditentukan,
-                    $hasilKolom1 = str_pad((isset($kolom1Array[$i]) ? $kolom1Array[$i] : ""), $lebar_kolom_1, " ");
-                    $hasilKolom2 = str_pad((isset($kolom2Array[$i]) ? $kolom2Array[$i] : ""), $lebar_kolom_2, " ");
-                    $hasilKolom3 = str_pad((isset($kolom3Array[$i]) ? $kolom3Array[$i] : ""), $lebar_kolom_3, " ");
-
-                    // Menggabungkan kolom tersebut menjadi 1 baris dan ditampung ke variabel hasil (ada 1 spasi disetiap kolom)
-                    $hasilBaris[] = $hasilKolom1 . " " . $hasilKolom2 . " " . $hasilKolom3 ;
-                }
-
-                // Hasil yang berupa array, disatukan kembali menjadi string dan tambahkan \n disetiap barisnya.
-                return implode("\n", $hasilBaris) . "\n";
-            }
-
-
-            // Membuat judul
-            $printer->initialize();
-            $printer->selectPrintMode(Printer::MODE_DOUBLE_HEIGHT); // Setting teks menjadi lebih besar
-            $printer->setJustification(Printer::JUSTIFY_CENTER); // Setting teks menjadi rata tengah
-            $printer->text("A2 Coffee & Eatery\n");
-            $printer->text("\n");
-
-            // Data transaksi
-            $printer->initialize();
-            $printer->text("--------------------------------\n");
-            $printer->text("No Inv : ".$orders->no_invoice."\n");
-            $printer->text("Waktu  : ".$orders->created_at."\n");
-            $printer->text("--------------------------------\n");
-
-            $printer->text("Customer : ".$orders->customer_name."\n");
-            $printer->text("Order    : ".$orders->inputer."\n");
-            $printer->text("Table    : ".$orders->table."\n");
-
-            // Membuat tabel
-            $printer->initialize(); // Reset bentuk/jenis teks
-            $printer->text("--------------------------------\n");
-            $printer->text(buatBaris4Kolom("Menu", "Qty", "Price"));
-            $printer->text("--------------------------------\n");
-
-            // Order Product
-            foreach ($orderProducts as $key => $orderProduct) {
-                $priceFormatted = 'Rp.' . number_format($orderProduct->selling_price, 0);
-                $printer->text(buatBaris4Kolom($orderProduct->name, $orderProduct->qty, $priceFormatted));
-                $printer->text("--------------------------------\n");
-            }
-
-            $printer->text("--------------------------------\n");
-
-            $printer->text("Sub Total          : Rp.".number_format($orders->subtotal,0)."\n");
-            $printer->text("Service            : Rp.".number_format($orders->service,0)."\n");
-            $printer->text("Tax                : Rp.".number_format($orders->pb01,0)."\n");
-            $printer->text("Total              : Rp.".number_format($orders->total,0)."\n");
-
-            $printer->text("\n");
-
-            // Pesan penutup
-            $printer->initialize();
-            $printer->setJustification(Printer::JUSTIFY_CENTER);
-            $printer->text("Bill Belum Terbayar\n");
-            $printer->text("Terima kasih telah berbelanja\n");
-            $printer->text("Silahkan Datang Kembali\n");
-
-            $printer->feed(3); // mencetak 5 baris kosong agar terangkat (pemotong kertas saya memiliki jarak 5 baris dari toner)
-            $printer->cut();
-            $printer->close();
-            return redirect()->back()->with('success','Berhasil Tercetak ');
-        }else{
-            return redirect()->back()->with('success','Print Gagal ');
-        }
-    }
-    // public function printStruk($id){
-    //     $data['current_time'] = Carbon::now()->format('Y-m-d H:i:s');
-
-    //     $orders = Order::findOrFail($id);
-    //     $data['other_setting'] = OtherSetting::get()->first();
-
-    //     $data['orders'] = $orders;
-    //     return PDF::loadview('admin.pos.print.pdf', $data)->stream('order-' . $orders->id . '.pdf');
-    // }
-
-    // public function printBill($id){
-    //     $data['current_time'] = Carbon::now()->format('Y-m-d H:i:s');
-
-    //     $orders = Order::findOrFail($id);
-    //     $data['other_setting'] = OtherSetting::get()->first();
-
-    //     $data['orders'] = $orders;
-    //     return PDF::loadview('admin.pos.print.print-bill', $data)->stream('order-' . $orders->id . '.pdf');
-    // }
-
     public function orderPesanan(Request $request){
         $data ['page_title'] = 'Order Pesanan';
         $data['account_users'] = User::get();
@@ -1275,4 +1043,444 @@ class TransactionController extends Controller
             // return redirect()->back()->with('failed', 'Gagal mengubah quantity produk: ' . $th->getMessage());
         }
     }
+
+    public function updateStatusEdit(Request $request, $id) {
+        try {
+            $order = Order::findOrFail($id);
+            $order->status_realtime = 'new';
+            $order->save();
+            return redirect()->back()->with('success', 'Berhasil Print!');
+           
+        } catch (\Throwable $th) {
+            return response()->json(['failed' => true, 'message' => $th->getMessage()]);
+        }
+    }
+
+    public function printCustomer($id)
+    {
+        $orders = Order::findOrFail($id);
+
+        try {
+            $this->printItems($orders, 'drink');
+            $this->printItems2($orders, 'food');
+
+            return redirect()->back()->with('success', 'Print berhasil dilakukan!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('failed', 'Gagal melakukan print! Error: ' . $e->getMessage());
+        }
+    }
+
+    public function printItems($orders, $category)
+    {
+        // Filter order products by category
+        $filteredOrderProducts = $orders->orderProducts->filter(function($orderProduct) use ($category) {
+            return $orderProduct->category == $category && $orderProduct->status_realtime == 'new';
+        });
+
+        // Skip printing if there are no products in this category
+        if ($filteredOrderProducts->isEmpty()) {
+            return;
+        }
+
+        // Loop to print 2 times
+        for ($i = 0; $i < 2; $i++) {
+            // $connector = new NetworkPrintConnector("192.168.123.120", 9100);
+            // $printer = new Printer($connector);
+
+            // /* Initialize */
+            // $printer->initialize();
+            // $printer->selectPrintMode(Printer::MODE_DOUBLE_HEIGHT);
+            // $printer->setJustification(Printer::JUSTIFY_CENTER);
+
+            // // Print store name
+            // $printer->text("A2 Coffee & Eatry \n");
+            // $printer->text("\n");
+
+            // // Print store address
+            // $printer->initialize();
+            // $printer->setJustification(Printer::JUSTIFY_CENTER);
+            // $printer->text("\n");
+
+            // // Print transaction details
+            // $printer->initialize();
+            // $printer->text("No Inv    : " . $orders->no_invoice . "\n");
+            // $printer->text("Customer  : " . ($orders->customer_name ?? '-') . "\n");
+            // $printer->text("Kasir     : " . ($orders->cashier_name ?? '-') . "\n");
+            // $printer->text("Table     : " . ($orders->table ?? '-') . "\n");
+            // $printer->text("Waktu     : " . $orders->created_at . "\n\n");
+
+            // // Print table header
+            // $printer->initialize();
+            // $printer->text("--------------------------------\n");
+            // $printer->text(self::buatBaris2KolomBar("Menu", "Qty"));
+
+            // Print each order item based on category
+            foreach ($filteredOrderProducts as $orderProduct) {
+                // $printer->text(self::buatBaris2KolomBar(
+                //     $orderProduct->name,
+                //     $orderProduct->qty
+                // ));
+                $dataOrderProduct = OrderProduct::find($orderProduct->id);
+                $dataOrderProduct->status_realtime = 'old';
+                $dataOrderProduct->status_input = 'local';
+                $dataOrderProduct->save();
+            }
+
+            // $printer->text("--------------------------------\n");
+
+            // // Print thank you message
+            // $printer->initialize();
+            // $printer->setJustification(Printer::JUSTIFY_CENTER);
+            // $printer->text("\nTerima kasih\n");
+
+            // // Cut the paper
+            // $printer->feed(5);
+            // $printer->cut();
+            // $printer->close();
+        }
+    }
+
+
+    public function printItems2($orders, $category)
+    {
+        // Filter order products by category
+        $filteredOrderProducts = $orders->orderProducts->filter(function($orderProduct) use ($category) {
+            return $orderProduct->category == $category && $orderProduct->status_realtime == 'new';
+        });
+
+        // Skip printing if there are no products in this category
+        if ($filteredOrderProducts->isEmpty()) {
+            return;
+        }
+
+        // Loop to print 2 times
+        for ($i = 0; $i < 2; $i++) {
+            // $connector = new WindowsPrintConnector("POS-80");
+            // $printer = new Printer($connector);
+
+            // /* Initialize */
+            // $printer->initialize();
+            // $printer->selectPrintMode(Printer::MODE_DOUBLE_HEIGHT);
+            // $printer->setJustification(Printer::JUSTIFY_CENTER);
+
+            // // Print store name
+            // $printer->text("A2 Coffee & Eatry \n");
+            // $printer->text("\n");
+
+            // // Print store address
+            // $printer->initialize();
+            // $printer->setJustification(Printer::JUSTIFY_CENTER);
+            // $printer->text("\n");
+
+            // // Print transaction details
+            // $printer->initialize();
+            // $printer->text("No Inv    : " . $orders->no_invoice . "\n");
+            // $printer->text("Customer  : " . ($orders->customer_name ?? '-') . "\n");
+            // $printer->text("Kasir     : " . ($orders->cashier_name ?? '-') . "\n");
+            // $printer->text("Table     : " . ($orders->table ?? '-') . "\n");
+            // $printer->text("Waktu     : " . $orders->created_at . "\n\n");
+
+            // // Print table header
+            // $printer->initialize();
+            // $printer->text("------------------------------------------------\n");
+            // $printer->text(self::buatBaris2Kolom("Menu", "Qty"));
+
+            // Print each order item based on category
+            foreach ($filteredOrderProducts as $orderProduct) {
+                // $printer->text(self::buatBaris2Kolom(
+                //     $orderProduct->name,
+                //     $orderProduct->qty
+                // ));
+                $dataOrderProduct = OrderProduct::find($orderProduct->id);
+                $dataOrderProduct->status_realtime = 'old';
+                $dataOrderProduct->status_input = 'local';
+                $dataOrderProduct->save();
+            }
+
+            // $printer->text("------------------------------------------------\n");
+
+            // // Print thank you message
+            // $printer->initialize();
+            // $printer->setJustification(Printer::JUSTIFY_CENTER);
+            // $printer->text("\nTerima kasih\n");
+
+            // // Cut the paper
+            // $printer->feed(5);
+            // $printer->cut();
+            // $printer->close();
+        }
+    }
+
+
+    public static function buatBaris2Kolom($kolom1, $kolom2)
+    {
+        $lebar_kolom_1 = 40;
+        $lebar_kolom_2 = 4;
+
+        $kolom1 = wordwrap($kolom1, $lebar_kolom_1, "\n", true);
+        $kolom2 = wordwrap($kolom2, $lebar_kolom_2, "\n", true);
+
+        $kolom1Array = explode("\n", $kolom1);
+        $kolom2Array = explode("\n", $kolom2);
+
+        $jmlBarisTerbanyak = max(count($kolom1Array), count($kolom2Array));
+
+        $hasilBaris = array();
+
+        for ($i = 0; $i < $jmlBarisTerbanyak; $i++) {
+            $hasilKolom1 = str_pad((isset($kolom1Array[$i]) ? $kolom1Array[$i] : ""), $lebar_kolom_1, " ");
+            $hasilKolom2 = str_pad((isset($kolom2Array[$i]) ? $kolom2Array[$i] : ""), $lebar_kolom_2, " ");
+
+            $hasilBaris[] = $hasilKolom1 . " " . $hasilKolom2;
+        }
+
+        return implode("\n", $hasilBaris) . "\n";
+    }
+
+    public static function buatBaris2KolomBar($kolom1, $kolom2)
+    {
+        $lebar_kolom_1 = 24;
+        $lebar_kolom_2 = 4;
+
+        $kolom1 = wordwrap($kolom1, $lebar_kolom_1, "\n", true);
+        $kolom2 = wordwrap($kolom2, $lebar_kolom_2, "\n", true);
+
+        $kolom1Array = explode("\n", $kolom1);
+        $kolom2Array = explode("\n", $kolom2);
+
+        $jmlBarisTerbanyak = max(count($kolom1Array), count($kolom2Array));
+
+        $hasilBaris = array();
+
+        for ($i = 0; $i < $jmlBarisTerbanyak; $i++) {
+            $hasilKolom1 = str_pad((isset($kolom1Array[$i]) ? $kolom1Array[$i] : ""), $lebar_kolom_1, " ");
+            $hasilKolom2 = str_pad((isset($kolom2Array[$i]) ? $kolom2Array[$i] : ""), $lebar_kolom_2, " ");
+
+            $hasilBaris[] = $hasilKolom1 . " " . $hasilKolom2;
+        }
+
+        return implode("\n", $hasilBaris) . "\n";
+    }
+
+    public function printStruk(Request $request){
+        $orders = Order::where('id', $request->id)->first();
+        $orderProducts = OrderProduct::where('order_id', $orders->id)->get();
+
+        if (count($orderProducts) != 0) {
+            // $connector = new WindowsPrintConnector("Printer Kasir");
+            // $printer = new Printer($connector);
+                
+            // /* Initialize */
+            // $printer -> initialize();
+
+            // membuat fungsi untuk membuat 1 baris tabel, agar dapat dipanggil berkali-kali dgn mudah
+            // function buatBaris4Kolom($kolom1, $kolom2, $kolom3) {
+            //     // Mengatur lebar setiap kolom (dalam satuan karakter)
+            //     $lebar_kolom_1 = 15;
+            //     $lebar_kolom_2 = 3;
+            //     $lebar_kolom_3 = 12;
+            
+            //     // Melakukan wordwrap(), jadi jika karakter teks melebihi lebar kolom, ditambahkan \n 
+            //     $kolom1 = wordwrap($kolom1, $lebar_kolom_1, "\n", true);
+            //     $kolom2 = wordwrap($kolom2, $lebar_kolom_2, "\n", true);
+            //     $kolom3 = wordwrap($kolom3, $lebar_kolom_3, "\n", true);
+            
+            //     // Merubah hasil wordwrap menjadi array, kolom yang memiliki 2 index array berarti memiliki 2 baris (kena wordwrap)
+            //     $kolom1Array = explode("\n", $kolom1);
+            //     $kolom2Array = explode("\n", $kolom2);
+            //     $kolom3Array = explode("\n", $kolom3);
+            
+            //     // Mengambil jumlah baris terbanyak dari kolom-kolom untuk dijadikan titik akhir perulangan
+            //     $jmlBarisTerbanyak = max(count($kolom1Array), count($kolom2Array), count($kolom3Array));
+            
+            //     // Mendeklarasikan variabel untuk menampung kolom yang sudah di edit
+            //     $hasilBaris = array();
+            
+            //     // Melakukan perulangan setiap baris (yang dibentuk wordwrap), untuk menggabungkan setiap kolom menjadi 1 baris 
+            //     for ($i = 0; $i < $jmlBarisTerbanyak; $i++) {
+            //         // memberikan spasi di setiap cell berdasarkan lebar kolom yang ditentukan, 
+            //         $hasilKolom1 = str_pad((isset($kolom1Array[$i]) ? $kolom1Array[$i] : ""), $lebar_kolom_1, " ");
+            //         $hasilKolom2 = str_pad((isset($kolom2Array[$i]) ? $kolom2Array[$i] : ""), $lebar_kolom_2, " ");
+            //         $hasilKolom3 = str_pad((isset($kolom3Array[$i]) ? $kolom3Array[$i] : ""), $lebar_kolom_3, " ");
+            
+            //         // Menggabungkan kolom tersebut menjadi 1 baris dan ditampung ke variabel hasil (ada 1 spasi disetiap kolom)
+            //         $hasilBaris[] = $hasilKolom1 . " " . $hasilKolom2 . " " . $hasilKolom3 ;
+            //     }
+            
+            //     // Hasil yang berupa array, disatukan kembali menjadi string dan tambahkan \n disetiap barisnya.
+            //     return implode("\n", $hasilBaris) . "\n";
+            // }
+            
+
+            // // Membuat judul
+            // $printer->initialize();
+            // $printer->selectPrintMode(Printer::MODE_FONT_A); // Setting teks menjadi lebih besar
+            // $printer->setJustification(Printer::JUSTIFY_CENTER); // Setting teks menjadi rata tengah
+            // $printer->text("A2 Coffee & Eatery\n");
+            // $printer->text("\n");
+
+            // // Data transaksi
+            // $printer->initialize();
+            // $printer->selectPrintMode(Printer::MODE_FONT_A); // Setting teks menjadi lebih besar
+            // $printer->text("--------------------------------\n");
+            // $printer->text("No Inv : ".$orders->no_invoice."\n");
+            // $printer->text("Waktu  : ".$orders->created_at."\n");
+            // $printer->text("--------------------------------\n");
+            
+            // $printer->text("Customer : ".$orders->customer_name."\n");
+            // $printer->text("Order    : ".$orders->inputer."\n");
+            // $printer->text("Table    : ".$orders->table."\n");
+            // $printer->text("Metode Pembayaran    : ".$orders->payment_method."\n");
+
+            // // Membuat tabel
+            // $printer->initialize(); // Reset bentuk/jenis teks
+            // $printer->selectPrintMode(Printer::MODE_FONT_A); // Setting teks menjadi lebih besar
+            // $printer->text("--------------------------------\n");
+            // $printer->text(buatBaris4Kolom("Menu", "Qty", "Price"));
+            // $printer->text("--------------------------------\n");
+
+            // // Order Product
+            // foreach ($orderProducts as $key => $orderProduct) {
+            //     $priceFormatted = 'Rp.' . number_format($orderProduct->selling_price, 0);
+            //     $printer->text(buatBaris4Kolom($orderProduct->name, $orderProduct->qty, $priceFormatted));
+            // }
+
+            // $printer->text("--------------------------------\n");
+
+            // $printer->text("Sub Total        : Rp.".number_format($orders->subtotal,0)."\n");
+            // $printer->text("Service          : Rp.".number_format($orders->service,0)."\n");
+            // $printer->text("Tax              : Rp.".number_format($orders->pb01,0)."\n");
+            // $printer->text("Total            : Rp.".number_format($orders->total,0)."\n");
+
+            // if ($orders->payment_method == 'Cash') {
+            //     $printer->text("kembalian    : Rp.".number_format($orders->total,0)."\n");
+            // }
+
+            // $printer->text("\n");
+
+            // // Pesan penutup
+            // $printer->initialize();
+            // $printer->selectPrintMode(Printer::MODE_FONT_A); // Setting teks menjadi lebih besar
+            // $printer->setJustification(Printer::JUSTIFY_CENTER);
+            // $printer->text("Bill Terbayar\n");
+            // $printer->text("Terima kasih telah berbelanja\n");
+            // $printer->text("Silahkan Datang Kembali\n");
+            
+            // $printer->feed(3); // mencetak 5 baris kosong agar terangkat (pemotong kertas saya memiliki jarak 5 baris dari toner)
+            // $printer->cut();
+            // $printer->close();
+            return redirect()->back()->with('success','Berhasil Tercetak ');
+        }else{
+            return redirect()->back()->with('failed','Print Gagal ');
+        }
+    }
+
+    public function printBill(Request $request) {
+        $orders = Order::where('id', $request->id)->first();
+        $orderProducts = OrderProduct::where('order_id', $orders->id)->get();
+
+        if (count($orderProducts) != 0) {
+            // $connector = new WindowsPrintConnector("Printer Kasir");
+            // $printer = new Printer($connector);
+            
+            // /* Initialize */
+            // $printer->initialize();
+    
+            // // membuat fungsi untuk membuat 1 baris tabel, agar dapat dipanggil berkali-kali dgn mudah
+            // function buatBaris4Kolom($kolom1, $kolom2, $kolom3) {
+            //     // Mengatur lebar setiap kolom (dalam satuan karakter)
+            //     $lebar_kolom_1 = 15;
+            //     $lebar_kolom_2 = 3;
+            //     $lebar_kolom_3 = 12;
+            
+            //     // Melakukan wordwrap(), jadi jika karakter teks melebihi lebar kolom, ditambahkan \n 
+            //     $kolom1 = wordwrap($kolom1, $lebar_kolom_1, "\n", true);
+            //     $kolom2 = wordwrap($kolom2, $lebar_kolom_2, "\n", true);
+            //     $kolom3 = wordwrap($kolom3, $lebar_kolom_3, "\n", true);
+            
+            //     // Merubah hasil wordwrap menjadi array, kolom yang memiliki 2 index array berarti memiliki 2 baris (kena wordwrap)
+            //     $kolom1Array = explode("\n", $kolom1);
+            //     $kolom2Array = explode("\n", $kolom2);
+            //     $kolom3Array = explode("\n", $kolom3);
+            
+            //     // Mengambil jumlah baris terbanyak dari kolom-kolom untuk dijadikan titik akhir perulangan
+            //     $jmlBarisTerbanyak = max(count($kolom1Array), count($kolom2Array), count($kolom3Array));
+            
+            //     // Mendeklarasikan variabel untuk menampung kolom yang sudah di edit
+            //     $hasilBaris = array();
+            
+            //     // Melakukan perulangan setiap baris (yang dibentuk wordwrap), untuk menggabungkan setiap kolom menjadi 1 baris 
+            //     for ($i = 0; $i < $jmlBarisTerbanyak; $i++) {
+            //         // memberikan spasi di setiap cell berdasarkan lebar kolom yang ditentukan, 
+            //         $hasilKolom1 = str_pad((isset($kolom1Array[$i]) ? $kolom1Array[$i] : ""), $lebar_kolom_1, " ");
+            //         $hasilKolom2 = str_pad((isset($kolom2Array[$i]) ? $kolom2Array[$i] : ""), $lebar_kolom_2, " ");
+            //         $hasilKolom3 = str_pad((isset($kolom3Array[$i]) ? $kolom3Array[$i] : ""), $lebar_kolom_3, " ");
+            
+            //         // Menggabungkan kolom tersebut menjadi 1 baris dan ditampung ke variabel hasil (ada 1 spasi disetiap kolom)
+            //         $hasilBaris[] = $hasilKolom1 . " " . $hasilKolom2 . " " . $hasilKolom3 ;
+            //     }
+            
+            //     // Hasil yang berupa array, disatukan kembali menjadi string dan tambahkan \n disetiap barisnya.
+            //     return implode("\n", $hasilBaris) . "\n";
+            // }
+    
+            // // Membuat judul
+            // $printer->initialize();
+            // $printer->selectPrintMode(Printer::MODE_FONT_A); // Setting teks menjadi lebih kecil
+            // $printer->setJustification(Printer::JUSTIFY_CENTER); // Setting teks menjadi rata tengah
+            // $printer->text("A2 Coffee & Eatery\n");
+            // $printer->text("\n");
+    
+            // // Data transaksi
+            // $printer->initialize();
+            // $printer->selectPrintMode(Printer::MODE_FONT_A); // Setting teks menjadi lebih kecil
+            // $printer->text("------------------------------------------------\n");
+            // $printer->text("No Inv : ".$orders->no_invoice."\n");
+            // $printer->text("Waktu  : ".$orders->created_at."\n");
+            // $printer->text("------------------------------------------------\n");
+            
+            // $printer->text("Customer : ".$orders->customer_name."\n");
+            // $printer->text("Order    : ".$orders->inputer."\n");
+            // $printer->text("Table    : ".$orders->table."\n");
+    
+            // // Membuat tabel
+            // $printer->initialize(); // Reset bentuk/jenis teks
+            // $printer->selectPrintMode(Printer::MODE_FONT_A); // Setting teks menjadi lebih kecil
+            // $printer->text("------------------------------------------------\n");
+            // $printer->text(buatBaris4Kolom("Menu", "Qty", "Price"));
+            // $printer->text("------------------------------------------------\n");
+    
+            // // Order Product
+            // foreach ($orderProducts as $key => $orderProduct) {
+            //     $priceFormatted = 'Rp.' . number_format($orderProduct->selling_price, 0);
+            //     $printer->text(buatBaris4Kolom($orderProduct->name, $orderProduct->qty, $priceFormatted));
+            // }
+    
+            // $printer->text("--------------------------------\n");
+    
+            // $printer->text("Sub Total        : Rp.".number_format($orders->subtotal,0)."\n");
+            // $printer->text("Service          : Rp.".number_format($orders->service,0)."\n");
+            // $printer->text("Tax              : Rp.".number_format($orders->pb01,0)."\n");
+            // $printer->text("Total            : Rp.".number_format($orders->total,0)."\n");
+    
+            // $printer->text("\n");
+    
+            // // Pesan penutup
+            // $printer->initialize();
+            // $printer->selectPrintMode(Printer::MODE_FONT_A); // Setting teks menjadi lebih kecil
+            // $printer->setJustification(Printer::JUSTIFY_CENTER);
+            // $printer->text("Bill Belum Terbayar\n");
+            // $printer->text("Terima kasih telah berbelanja\n");
+            // $printer->text("Silahkan Datang Kembali\n");
+            
+            // $printer->feed(3); // mencetak 5 baris kosong agar terangkat (pemotong kertas saya memiliki jarak 5 baris dari toner)
+            // $printer->cut();
+            // $printer->close();
+            return redirect()->back()->with('success','Berhasil Tercetak ');
+        } else {
+            return redirect()->back()->with('success','Print Gagal ');
+        }
+    }
+
+    
 }

@@ -278,7 +278,8 @@ class ReportController extends Controller
                         ->when($cashierName != 'All', function ($query) use ($cashierName) {
                             return $query->where('cashier_name', $cashierName);
                         })
-                        ->where('payment_status', 'Paid')
+                        ->where('payment_status', 'Unpaid')
+                        ->where('payment_method', 'Return')
                         ->orderBy('id', 'desc')
                         ->get();
         } elseif ($type == 'yearly') {
@@ -288,6 +289,7 @@ class ReportController extends Controller
                             return $query->where('cashier_name', $cashierName);
                         })
                         ->where('payment_status', 'Paid')
+                        ->where('payment_method', 'Return')
                         ->orderBy('id', 'desc')
                         ->get();
         }

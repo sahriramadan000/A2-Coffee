@@ -230,15 +230,21 @@
                                             </li>
                                         <li class="list-group-item">
                                             <div class="row">
-                                                <div class="col-lg-4">
+                                                <div class="col-lg-3">
+                                                    <form action="{{ route('update-status-edit', $item->id) }}" method="POST">
+                                                        @csrf
+                                                        <button type="submit" class="btn btn-sm w-100 btn-success">Print Kitchen & Bar</button>
+                                                    </form>
+                                                </div>
+                                                <div class="col-lg-3">
                                                     <a href="{{ route('print-bill', $item->id) }}" type="submit" class="btn btn-sm w-100 btn-primary">Print Bill</a>
                                                 </div>
-                                                <div class="col-lg-4">
+                                                <div class="col-lg-3">
                                                     <a href="{{ route('print-struk', $item->id) }}" type="submit" class="btn btn-sm w-100 btn-warning">Print Struk</a>
                                                 </div>
                                                 @can('void')
                                                 @if($item->payment_method != 'Return')
-                                                <div class="col-lg-4">
+                                                <div class="col-lg-3">
                                                     <button type="button" class="btn btn-sm w-100 btn-danger" data-bs-toggle="modal" data-bs-target="#return-{{ $item->id }}">Refund</button>
                                                 </div>
                                                 @endif

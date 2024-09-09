@@ -270,6 +270,9 @@ Route::middleware(['auth'])->group(function () {
     // Update Payment
     Route::patch('/update-payment/{id}', [TransactionController::class, 'updatePayment'])->name('update-payment');
 
+    // Update status EDit Product
+    Route::post('/update-status-edit/{id}', [TransactionController::class, 'updateStatusEdit'])->name('update-status-edit');
+
     // Print
     Route::get('/print-customer/{id}', [TransactionController::class, 'printCustomer'])->name('print-customer');
 
