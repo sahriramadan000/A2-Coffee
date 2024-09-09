@@ -125,15 +125,17 @@
                                     <li class="list-group-item">
                                         <div class="d-flex w-100 justify-content-between align-items-start">
                                             <h4 style="color: #515365">{{ $orderProduct->name }}</h4>
-                                            <div class="d-flex align-items-center ml-auto gap-3">
-                                                <small style="border-bottom: 1px dashed #bfbfbf; color: #515365; cursor:pointer;" onclick="ModalEditQtyProduct('{{ route('modal-edit-qty-product', $orderProduct->id) }}', '{{ $orderProduct->id }}', '{{ csrf_token() }}')">x{{ $orderProduct->qty }}</small>
-                                                <form action="{{ route('cancel-order-product') }}" method="POST" class="ml-2">
-                                                    @csrf
-                                                    <input type="hidden" name="order_id" value="{{ $item->id }}">
-                                                    <input type="hidden" name="order_detail_id" value="{{ $orderProduct->id }}">
-                                                    <button class="btn btn-sm btn-danger">Cancel</button>
-                                                </form>
-                                            </div>
+                                            @if ($item->payment_status == 'Unpaid')
+                                                <div class="d-flex align-items-center ml-auto gap-3">
+                                                    <small style="border-bottom: 1px dashed #bfbfbf; color: #515365; cursor:pointer;" onclick="ModalEditQtyProduct('{{ route('modal-edit-qty-product', $orderProduct->id) }}', '{{ $orderProduct->id }}', '{{ csrf_token() }}')">x{{ $orderProduct->qty }}</small>
+                                                    <form action="{{ route('cancel-order-product') }}" method="POST" class="ml-2">
+                                                        @csrf
+                                                        <input type="hidden" name="order_id" value="{{ $item->id }}">
+                                                        <input type="hidden" name="order_detail_id" value="{{ $orderProduct->id }}">
+                                                        <button class="btn btn-sm btn-danger">Cancel</button>
+                                                    </form>
+                                                </div>
+                                            @endif
                                         </div>
                                         <p class="mb-1">Rp. {{ number_format($orderProduct->selling_price * $orderProduct->qty,0)  }}</p>
                                     </li>
