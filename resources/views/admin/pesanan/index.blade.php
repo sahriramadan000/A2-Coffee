@@ -238,12 +238,16 @@
                                                         <button type="submit" class="btn btn-sm w-100 btn-success">Print Kitchen & Bar</button>
                                                     </form>
                                                 </div>
-                                                <div class="col-lg-3">
-                                                    <a href="{{ route('print-bill', $item->id) }}" type="submit" class="btn btn-sm w-100 btn-primary">Print Bill</a>
-                                                </div>
-                                                <div class="col-lg-3">
-                                                    <a href="{{ route('print-struk', $item->id) }}" type="submit" class="btn btn-sm w-100 btn-warning">Print Struk</a>
-                                                </div>
+                                                
+                                                @if ($item->payment_status == 'Paid')
+                                                    <div class="col-lg-3">
+                                                        <a href="{{ route('print-struk', $item->id) }}" type="submit" class="btn btn-sm w-100 btn-warning">Print Struk</a>
+                                                    </div>
+                                                @else
+                                                    <div class="col-lg-3">
+                                                        <a href="{{ route('print-bill', $item->id) }}" type="submit" class="btn btn-sm w-100 btn-primary">Print Bill</a>
+                                                    </div>
+                                                @endif
                                                 @can('void')
                                                 @if($item->payment_method != 'Return')
                                                 <div class="col-lg-3">
