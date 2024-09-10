@@ -311,7 +311,7 @@
                                                                 <div class="modal-body">
                                                                     <div class="form-group">
                                                                         <h6 class="mb-3">Discount Or Coupon</h6>
-                                                                        <select name="type" class="type-select form-control form-control-sm payment-method" data-modal-id="{{ $item->id }}">
+                                                                        <select name="type" class="type-select form-control form-control-sm payment-method">
                                                                             <option selected value="">Select Discount Or Coupon</option>
                                                                             <option value="Coupon">Coupon</option>
                                                                             <option value="Discount">Discount</option>
@@ -356,7 +356,7 @@
                                                 
                                                                     <div class="form-group">
                                                                         <h6 class="mt-3">Metode Payment</h6>
-                                                                        <select name="payment_method" class="form-control form-control-sm payment-method">
+                                                                        <select name="payment_method" class="form-control form-control-sm payment-method-control" data-modal-id="{{ $item->id }}">
                                                                             <option selected value="Transfer Bank">Transfer Bank</option>
                                                                             <option value="EDC BCA">EDC BCA</option>
                                                                             <option value="EDC BRI">EDC BRI</option>
@@ -369,10 +369,12 @@
                                                                             <option value="Cash">Cash</option>
                                                                         </select>
                                                                     </div>
-                                                                    <div class="form-group mt-2 cash-input" style="display: none;">
+                                                                    <div class="form-group mt-2 cash-input d-none" id="cashInput-{{ $item->id }}">
                                                                         <label for="cash" class="form-label">Cash</label>
                                                                         <input type="text" name="cash" value="{{ old('cash') }}" class="form-control form-control-sm" placeholder="Ex:50.000" aria-describedby="cash">
                                                                     </div>
+                                                                    
+                                                                    
                                                                 </div>
                                                                 <div class="modal-footer">
                                                                     <button type="submit" class="btn btn-primary">Save</button>
@@ -537,27 +539,32 @@ function updateCartQuantity(order_detail_id, quantity, url, token, modalSelector
         }
     });
 
-
-    document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('.payment-method').forEach(selectInput => {
-            const modalId = selectInput.getAttribute('data-modal-id');
-            const cashInput = document.getElementById(`cashInput-${modalId}`);
-
-            function handleCashInputDisplay() {
-                if (selectInput.value === 'Cash') {
-                    cashInput.style.display = 'block';
-                } else {
-                    cashInput.style.display = 'none';
-                }
-            }
-
-            // Set initial state
-            handleCashInputDisplay();
-
-            // Add change event listener
-            selectInput.addEventListener('change', handleCashInputDisplay);
-        });
+    // Event listener ketika metode pembayaran berubah
+    $('.payment-method-control').on('change', function() {
+        togglePaymentFields($(this));
     });
+
+    // Fungsi untuk menampilkan/menyembunyikan input cash
+    function togglePaymentFields(paymentSelect) {
+        var selectedMethod = paymentSelect.val();  // Ambil nilai yang dipilih
+        var modalId = paymentSelect.data('modal-id');  // Ambil ID modal terkait
+        var cashInput = $('#cashInput-' + modalId);  // Dapatkan elemen cash input berdasarkan ID modal
+
+        // Tampilkan atau sembunyikan elemen cashInput berdasarkan metode pembayaran
+        if (selectedMethod === 'Cash') {
+            cashInput.removeClass('d-none');  // Tampilkan input cash jika metode "Cash" dipilih
+        } else {
+            cashInput.addClass('d-none');  // Sembunyikan input cash untuk metode selain "Cash"
+        }
+    }
+
+    // Inisialisasi saat halaman pertama kali dimuat
+    $('.payment-method-control').each(function() {
+        togglePaymentFields($(this));
+    });
+
+
+
 </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js" integrity="sha512-T/tUfKSV1bihCnd+MxKD0Hm1uBBroVYBOYSk1knyvQ9VyZJpc/ALb4P0r6ubwVPSGB2GvjeoMAJJImBG12TiaQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
