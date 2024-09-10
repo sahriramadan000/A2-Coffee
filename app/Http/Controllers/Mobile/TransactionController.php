@@ -307,10 +307,7 @@ class TransactionController extends Controller
     public function updateOrder($session_cart, $other_setting, $subTotal, $table, $request, $token): void
     {
         try {
-            $order = Order::where('table', $table->name)
-            ->where('payment_status', 'Unpaid')
-            ->firstOrFail();
-            
+            $order = Order::where('table', $table->name)->where('payment_status', 'Unpaid')->where('payment_method', 'Open Bill')->whereDate('created_at', Carbon::today())->latest()->firstOrFail();
             
             // Menambahkan jumlah quantity baru ke total quantity
             $order->total_qty += array_sum($request->quantity);
