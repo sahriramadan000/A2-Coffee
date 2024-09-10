@@ -120,7 +120,43 @@
                     <div class="accordion-body">
                         <div class="row">
                             <div class="col-12 col-md-6">
+                                @php
+                                    // Gabungkan produk dengan nama yang sama
+                                    $mergedOrderProducts = $item->orderProducts->groupBy('name')->map(function ($products) {
+                                        return [
+                                            'ids' => $products->pluck('id')->toArray(),
+                                            'order_id' => $products->first()->order_id,
+                                            'name' => $products->first()->name,
+                                            'qty' => $products->sum('qty'),
+                                            'selling_price' => $products->first()->selling_price
+                                        ];
+                                    });
+                                @endphp
                                 <ul class="list-group list-group-flush">
+                                    @foreach ($mergedOrderProducts as $orderProduct)
+                                    <li class="list-group-item">
+                                        <div class="d-flex w-100 justify-content-between align-items-start">
+                                            <h4 style="color: #515365">{{ $orderProduct['name'] }}</h4>
+                                            @if ($item->payment_status == 'Unpaid')
+                                                <div class="d-flex align-items-center ml-auto gap-3">
+                                                    <small style="border-bottom: 1px dashed #bfbfbf; color: #515365; cursor:pointer;" onclick="ModalEditProduct('{{ route('modal-edit-product', ['id'=> $orderProduct['order_id'], 'name' => $orderProduct['name']] ) }}', '{{ $orderProduct['order_id'] }}', '{{ $orderProduct['name'] }}', '{{ csrf_token() }}')">x{{ $orderProduct['qty'] }}</small>
+                                                    <form action="{{ route('cancel-order-product') }}" method="POST" class="ml-2">
+                                                        @csrf
+                                                        <input type="hidden" name="order_id" value="{{ $item->id }}">
+                                                        @foreach ($orderProduct['ids'] as $id)
+                                                            <input type="hidden" name="order_detail_id[]" value="{{ $id }}">
+                                                        @endforeach
+                                                        <button class="btn btn-sm btn-danger">Cancel</button>
+                                                    </form>
+                                                </div>
+                                            @endif
+                                        </div>
+                                        <p class="mb-1">Rp. {{ number_format($orderProduct['selling_price'] * $orderProduct['qty'],0)  }}</p>
+                                    </li>
+                                    @endforeach
+                                </ul>
+
+                                {{-- <ul class="list-group list-group-flush">
                                     @foreach ($item->orderProducts as $orderProduct)
                                     <li class="list-group-item">
                                         <div class="d-flex w-100 justify-content-between align-items-start">
@@ -139,15 +175,8 @@
                                         </div>
                                         <p class="mb-1">Rp. {{ number_format($orderProduct->selling_price * $orderProduct->qty,0)  }}</p>
                                     </li>
-                                    {{-- <form action="{{ route('cancel-order-product') }}" method="POST">
-                                        @csrf
-                                        <input type="hidden" name="order_id" value="{{ $item->id }}">
-                                        <input type="hidden" name="order_detail_id" value="{{ $orderProduct->id }}">
-                                        <button class="btn btn-sm btn-danger">Cancel</button>
-                                    </form>
-                                    <button class="btn btn-sm btn-warning" >Edit</button> --}}
                                     @endforeach
-                                </ul>
+                                </ul> --}}
                             </div>
                             <div class="col-12 col-md-6">
                                 <div class="card">
@@ -401,52 +430,76 @@
 
 @push('js')
 <script>
-    function ModalEditQtyProduct(url = '/modal-edit-qty-product', id, token) {
-    var getTarget = `#modal-edit-qty-product-${id}`; 
-    $.ajax({
-        url: url,
-        type: 'GET',
-        success: function(data) {
-            $('#modalContainer').html(data); // Load the modal content
-            $(getTarget).modal('show'); // Show the modal with the correct ID
-            $(getTarget).on('shown.bs.modal', function () {
-                // Now bind the event handlers here
-                $("#btn-add").on("click", function() {
-                    var input = $(this).siblings("input[type='number']");
-                    var value = parseInt(input.val());
-                    input.val(value + 1);
-                });
+    function ModalEditProduct(url = '/modal-edit-product', id, name, token) {
+        // Mengganti spasi dengan tanda hubung dalam nama produk
+        var nameForId = name.replace(/ /g, '-');
 
-                $("#btn-min").on("click", function() {
-                    var input = $(this).siblings("input[type='number']");
-                    var value = parseInt(input.val());
-                    if (value > 1) {
-                        input.val(value - 1);
-                    }
+        // Menggunakan variabel dalam template string
+        var getTarget = `#modal-edit-product-${id}-${nameForId}`;
+        $.ajax({
+            url: url,
+            type: 'GET',
+            success: function(data) {
+                $('#modalContainer').html(data); // Load the modal content
+                $(getTarget).modal('show'); // Show the modal with the correct ID
+                $(getTarget).on('shown.bs.modal', function () {
+                    // Now bind the event handlers here
                 });
+            },
+            error: function(xhr, status, error) {
+                console.error('Failed to load Product: ', error);
+            }
+        });
+    }
+    function ModalEditQtyProduct(url = '/modal-edit-qty-product', id, order_id, product_name, token) {
+        $(`#modal-edit-product-${order_id}`+`-${product_name}`).modal('hide');
+        var getTarget = `#modal-edit-qty-product-${id}`; 
+        $.ajax({
+            url: url,
+            type: 'GET',
+            success: function(data) {
+                $('#modalContainer').html(data); // Load the modal content
+                // Mengganti spasi dengan tanda hubung dalam nama produk
+                console.log(order_id, product_name);
+                $(getTarget).modal('show'); // Show the modal with the correct ID
+                $(getTarget).on('shown.bs.modal', function () {
+                    // Now bind the event handlers here
+                    $("#btn-add").on("click", function() {
+                        var input = $(this).siblings("input[type='number']");
+                        var value = parseInt(input.val());
+                        input.val(value + 1);
+                    });
 
-                $(".qty-add").on("change", function() {
-                    if ($(this).val() < 1) {
-                        $(this).val(1);
-                    }
+                    $("#btn-min").on("click", function() {
+                        var input = $(this).siblings("input[type='number']");
+                        var value = parseInt(input.val());
+                        if (value > 1) {
+                            input.val(value - 1);
+                        }
+                    });
+
+                    $(".qty-add").on("change", function() {
+                        if ($(this).val() < 1) {
+                            $(this).val(1);
+                        }
+                    });
+
+                    $('#updateQtyCartButton').on('click', function() {
+                        const quantity = $('#qty-add').val();
+                        const route = $(this).data('route');
+                        const token = $(this).data('token');
+                        const orderId = $(this).data('orderid');
+                        console.log(orderId);
+
+                        updateCartQuantity(id, quantity, route, token, getTarget, orderId);
+                    });
                 });
-
-                $('#updateQtyCartButton').on('click', function() {
-                    const quantity = $('#qty-add').val();
-                    const route = $(this).data('route');
-                    const token = $(this).data('token');
-                    const orderId = $(this).data('orderid');
-                    console.log(orderId);
-
-                    updateCartQuantity(id, quantity, route, token, getTarget, orderId);
-                });
-            });
-        },
-        error: function(xhr, status, error) {
-            console.error('Failed to load Product: ', error);
-        }
-    });
-}
+            },
+            error: function(xhr, status, error) {
+                console.error('Failed to load Product: ', error);
+            }
+        });
+    }
 
 
 function updateCartQuantity(order_detail_id, quantity, url, token, modalSelector, order_id) {

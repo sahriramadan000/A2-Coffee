@@ -25,6 +25,7 @@ use Mike42\Escpos\PrintConnectors\NetworkPrintConnector;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
 use Darryldecode\Cart\Facades\CartFacade as Cart;
+use FontLib\Table\Type\name;
 use Illuminate\Support\Facades\Cache;
 use PDF;
 use Illuminate\Support\Facades\Crypt;
@@ -114,6 +115,26 @@ class TransactionController extends Controller
             'id'          => $productDetail->id,
             'order_id'    => $productDetail->order_id,
             'quantity'    => $productDetail->qty, // Passing quantity ke view
+            // 'orderId'  => $orderId, // Passing orderId ke view
+            // 'productDetailIds' => $productDetailIds, // Passing productDetailIds ke view
+        ]);
+    }
+     public function modalEditProduct($id, $name)
+    {
+        // $decryptedKey = Crypt::decrypt($key);
+        // Pecah string menjadi tiga bagian: orderId, productDetailIds, dan qty
+        // list($orderId, $productDetailIds, $qty) = explode('-', $decryptedKey);
+
+        // Pecah string productDetailIds menjadi array
+        // $productDetailIds = explode(',', $productDetailIds);
+        
+        // Mengambil data order dan produk jika diperlukan (komentar dihapus karena sudah tersedia)
+        // $order = Order::find($orderId);
+        $productDetail = OrderProduct::where('order_id', $id)->where('name', $name)->get();
+        return View::make('admin.pesanan.modal-edit-product')->with([
+            'order_id'    => $id,
+            'product_name'    => $name,
+            'productDetail'    => $productDetail,
             // 'orderId'  => $orderId, // Passing orderId ke view
             // 'productDetailIds' => $productDetailIds, // Passing productDetailIds ke view
         ]);
@@ -929,54 +950,57 @@ class TransactionController extends Controller
     {
         try {
             $orderId = $request->input('order_id');
-            $orderProductId = $request->input('order_detail_id'); // Single product ID
-        
+            $orderProductIds = $request->input('order_detail_id'); // Array of product IDs
+            
             // Mengambil order berdasarkan ID
-            $orders = Order::find($orderId);
-        
-            if (!$orders) {
+            $order = Order::find($orderId);
+            
+            if (!$order) {
                 return redirect()->back()->with('failed', 'Pesanan tidak ditemukan.');
             }
-        
-            $subtotal = $orders->subtotal;
-        
-            // Mengambil orderDetail berdasarkan ID produk yang akan dibatalkan
-            $orderDetail = OrderProduct::find($orderProductId);
-            if ($orderDetail) {
-                // Kurangi subtotal dengan harga produk yang dibatalkan
-                $subtotal -= $orderDetail->selling_price * $orderDetail->qty;
-                $orderDetail->delete();
+            
+            $subtotal = $order->subtotal;
+            
+            // Iterate through each product ID and cancel it
+            foreach ($orderProductIds as $orderProductId) {
+                $orderDetail = OrderProduct::find($orderProductId);
+                if ($orderDetail) {
+                    // Kurangi subtotal dengan harga produk yang dibatalkan
+                    $subtotal -= $orderDetail->selling_price * $orderDetail->qty;
+                    $orderDetail->delete();
+                }
             }
-        
+            
             // Menghitung biaya layanan dan pajak
             $other_setting = OtherSetting::first();
             $service = $other_setting->layanan / 100;
             $biaya_layanan = 0;
             $pb01 = 0;
-        
+            
             if ($other_setting->layanan != 0) {
                 $biaya_layanan = $subtotal * $service;
             }
-        
+            
             if ($other_setting->pb01 != 0) {
                 $pb01 = $subtotal * ($other_setting->pb01 / 100);
             }
-        
+            
             $total_price = $subtotal + $biaya_layanan + $pb01;
-        
+            
             // Update order dengan subtotal baru, pajak, dan total harga
-            $orders->subtotal = $subtotal;
-            $orders->pb01 = $pb01;
-            $orders->service = $biaya_layanan;
-            $orders->total = $total_price;
-            $orders->save();
-        
+            $order->subtotal = $subtotal;
+            $order->pb01 = $pb01;
+            $order->service = $biaya_layanan;
+            $order->total = $total_price;
+            $order->save();
+            
             return redirect()->back()->with('success', 'Cancel Product Berhasil.');
-        
+            
         } catch (\Throwable $th) {
             return redirect()->back()->with('failed', 'Gagal Cancel Product: ' . $th->getMessage());
         }
     }
+
 
     public function updateCartQuantityProduct(Request $request)
     {

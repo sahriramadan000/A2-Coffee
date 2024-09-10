@@ -287,7 +287,9 @@ Route::middleware(['auth'])->group(function () {
 
     // Cancel Order Product
     Route::post('/cancel-order-product', [TransactionController::class, 'cancelOrderProduct'])->name('cancel-order-product');
+    Route::get('/modal-edit-product/{id}/{name}', [TransactionController::class, 'modalEditProduct'])->name('modal-edit-product');
     Route::get('/modal-edit-qty-product/{id}', [TransactionController::class, 'modalEditQtyProduct'])->name('modal-edit-qty-product');
+    // Route::post('/update-cart-product',[TransactionController::class, 'updateCartQuantityProduct'])->name('update-cart-product');
     Route::post('/update-cart-qty-product',[TransactionController::class, 'updateCartQuantityProduct'])->name('update-cart-qty-product');
 
     // Checkout
