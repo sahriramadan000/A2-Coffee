@@ -1002,6 +1002,7 @@ class TransactionController extends Controller
 
                 // Update qty dengan nilai baru
                 $orderDetail->qty = $newQty;
+                $orderDetail->status_realtime = 'new';
                 $orderDetail->save();
 
                 // Tambahkan subtotal dengan harga produk baru
