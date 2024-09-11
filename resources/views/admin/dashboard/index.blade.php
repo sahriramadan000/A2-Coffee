@@ -72,6 +72,37 @@
                 </div>
             </div>
         {{-- </div> --}}
+
+        <div class="col-12 col-md-4 col-lg-6">
+            <div class="card radius-10 bg-secondary">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div>
+                            <p class="mb-0 text-white">Total Penjualan</p>
+                            <h4 class="my-1 text-white">Rp. {{ number_format($acceptSales,0) }}</h4>
+                        </div>
+                        <div class="widgets-icons bg-white text-danger ms-auto">
+                            <i class="bx bx-dollar"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-4 col-lg-6">
+            <div class="card radius-10 bg-secondary">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div>
+                            <p class="mb-0 text-white">Total Penjualan</p>
+                            <h4 class="my-1 text-white">Rp. {{ number_format($totalUnpaidSales,0) }}</h4>
+                        </div>
+                        <div class="widgets-icons bg-white text-danger ms-auto">
+                            <i class="bx bx-dollar"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </form><!--end row-->
     <div class="widget widget-chart-one">
         <div class="widget-content">

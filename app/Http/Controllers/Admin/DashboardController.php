@@ -22,9 +22,18 @@ class DashboardController extends Controller
                         ->whereDate('created_at', $date)
                         ->orderBy('id', 'desc')
                         ->get();
+                $ordersUnpaid = Order::where('payment_status', 'Unpaid')
+                        ->whereDate('created_at', $date)
+                        ->orderBy('id', 'desc')
+                        ->get();
             } else {
                 $orders = Order::where('cashier_name', $cashierName)
                         ->where('payment_status', 'Paid')
+                        ->whereDate('created_at', $date)
+                        ->orderBy('id', 'desc')
+                        ->get();
+                $ordersUnpaid = Order::where('cashier_name', $cashierName)
+                        ->where('payment_status', 'Unpaid')
                         ->whereDate('created_at', $date)
                         ->orderBy('id', 'desc')
                         ->get();
@@ -39,13 +48,27 @@ class DashboardController extends Controller
                     ->where('payment_status', 'Paid')
                     ->orderBy('id', 'desc')
                     ->get();
+            $ordersUnpaid = Order::whereMonth('created_at', $monthPart)
+                    ->when($cashierName != 'All', function ($query) use ($cashierName) {
+                        return $query->where('cashier_name', $cashierName);
+                    })
+                    ->where('payment_status', 'Paid')
+                    ->orderBy('id', 'desc')
+                    ->get();
         } elseif ($type == 'yearly') {
             $year = $request->input('year', date('Y'));
             $orders = Order::whereYear('created_at', $year)
                     ->when($cashierName != 'All', function ($query) use ($cashierName) {
                         return $query->where('cashier_name', $cashierName);
                     })
-                    ->where('payment_status', 'Paid')
+                    ->where('payment_status', 'Unpaid')
+                    ->orderBy('id', 'desc')
+                    ->get();
+            $ordersUnpaid = Order::whereYear('created_at', $year)
+                    ->when($cashierName != 'All', function ($query) use ($cashierName) {
+                        return $query->where('cashier_name', $cashierName);
+                    })
+                    ->where('payment_status', 'Unpaid')
                     ->orderBy('id', 'desc')
                     ->get();
         }
@@ -59,6 +82,11 @@ class DashboardController extends Controller
             ];
         });
     
+        $totalUnpaidSales = $orders->sum('total');
+        $acceptSales = $orders->sum('total');
+
+        $data['acceptSales'] = $acceptSales;
+        $data['totalUnpaidSales'] = $totalUnpaidSales;
         $data['hourlyOrders'] = $hourlyOrders;
     
         return view('admin.dashboard.index', $data);
