@@ -79,7 +79,7 @@
                     <div class="d-flex align-items-center">
                         <div>
                             <p class="mb-0 text-white">Total Penjualan</p>
-                            <h4 class="my-1 text-white">Rp. {{ number_format($acceptSales,0) }}</h4>
+                            <h4 class="my-1 text-white">Rp. {{ number_format($totalUnpaidSales,0) }}</h4>
                         </div>
                         <div class="widgets-icons bg-white text-danger ms-auto">
                             <i class="bx bx-dollar"></i>
@@ -94,7 +94,7 @@
                     <div class="d-flex align-items-center">
                         <div>
                             <p class="mb-0 text-white">Terima Pembayaran</p>
-                            <h4 class="my-1 text-white">Rp. {{ number_format($totalUnpaidSales,0) }}</h4>
+                            <h4 class="my-1 text-white">Rp. {{ number_format($acceptSales,0) }}</h4>
                         </div>
                         <div class="widgets-icons bg-white text-danger ms-auto">
                             <i class="bx bx-dollar"></i>
