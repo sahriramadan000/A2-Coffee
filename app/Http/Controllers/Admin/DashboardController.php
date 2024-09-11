@@ -82,11 +82,15 @@ class DashboardController extends Controller
             ];
         });
     
-        $totalUnpaidSales = $orders->sum('total');
+        $totalUnpaidSales = $ordersUnpaid->sum('total');
         $acceptSales = $orders->sum('total');
+        $totalTransaction = $orders->count();
+        $totalProduct = $orders->sum('total_qty');
 
         $data['acceptSales'] = $acceptSales;
         $data['totalUnpaidSales'] = $totalUnpaidSales;
+        $data['totalTransaction'] = $totalTransaction;
+        $data['totalProduct'] = $totalProduct;
         $data['hourlyOrders'] = $hourlyOrders;
     
         return view('admin.dashboard.index', $data);
