@@ -73,12 +73,27 @@
             </div>
         {{-- </div> --}}
 
-        <div class="col-12 col-md-4 col-lg-6" style="z-index: -99999999">
+        <div class="col-12 col-md-3 col-lg-6" style="z-index: -99999999">
             <div class="card radius-10 bg-secondary">
                 <div class="card-body">
                     <div class="d-flex align-items-center">
                         <div>
-                            <p class="mb-0 text-white">Pembayaran Belum Di Terima</p>
+                            <p class="mb-0 text-white">Total Penjualan</p>
+                            <h4 class="my-1 text-white">Rp. {{ number_format($totalPaidUnpaid,0) }}</h4>
+                        </div>
+                        <div class="widgets-icons bg-white text-danger ms-auto">
+                            <i class="bx bx-dollar"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-3 col-lg-6" style="z-index: -99999999">
+            <div class="card radius-10 bg-secondary">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div>
+                            <p class="mb-0 text-white">Open Bill</p>
                             <h4 class="my-1 text-white">Rp. {{ number_format($totalUnpaidSales,0) }}</h4>
                         </div>
                         <div class="widgets-icons bg-white text-danger ms-auto">
@@ -88,7 +103,8 @@
                 </div>
             </div>
         </div>
-        <div class="col-12 col-md-4 col-lg-6">
+
+        <div class="col-12 col-md-3 col-lg-6">
             <div class="card radius-10 bg-secondary">
                 <div class="card-body">
                     <div class="d-flex align-items-center">

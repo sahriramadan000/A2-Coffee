@@ -90,6 +90,7 @@ class DashboardController extends Controller
         $data['acceptSales'] = $acceptSales;
         $data['totalUnpaidSales'] = $totalUnpaidSales;
         $data['totalTransaction'] = $totalTransaction;
+        $data['totalPaidUnpaid'] = $totalUnpaidSales + $acceptSales;
         $data['totalProduct'] = $totalProduct;
         $data['hourlyOrders'] = $hourlyOrders;
     
