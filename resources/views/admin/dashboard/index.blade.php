@@ -73,7 +73,7 @@
             </div>
         {{-- </div> --}}
 
-        <div class="col-12 col-md-3 col-lg-6" style="z-index: -99999999">
+        <div class="col-12 col-md-4 col-lg-4" style="z-index: -99999999">
             <div class="card radius-10 bg-secondary">
                 <div class="card-body">
                     <div class="d-flex align-items-center">
@@ -88,7 +88,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-12 col-md-3 col-lg-6" style="z-index: -99999999">
+        <div class="col-12 col-md-4 col-lg-4" style="z-index: -99999999">
             <div class="card radius-10 bg-secondary">
                 <div class="card-body">
                     <div class="d-flex align-items-center">
@@ -104,7 +104,7 @@
             </div>
         </div>
 
-        <div class="col-12 col-md-3 col-lg-6">
+        <div class="col-12 col-md-4 col-lg-4">
             <div class="card radius-10 bg-secondary">
                 <div class="card-body">
                     <div class="d-flex align-items-center">
