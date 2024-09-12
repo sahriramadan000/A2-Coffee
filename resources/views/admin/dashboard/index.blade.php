@@ -78,7 +78,7 @@
                 <div class="card-body">
                     <div class="d-flex align-items-center">
                         <div>
-                            <p class="mb-0 text-white">Total Penjualan</p>
+                            <p class="mb-0 text-white">Pembayaran Belum Di Terima</p>
                             <h4 class="my-1 text-white">Rp. {{ number_format($totalUnpaidSales,0) }}</h4>
                         </div>
                         <div class="widgets-icons bg-white text-danger ms-auto">
