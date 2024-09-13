@@ -137,11 +137,12 @@ class OrderController extends Controller
 
                     // Set nilai baru ke model order 
                     $order->update([
-                        'subtotal' => $subtotals,
-                        'service' => $service,
-                        'pb01' => $pb01,
-                        'total' => $subtotals + $service + $pb01,
-                        'inputer' => $request->inputer ?? $order->inputer,
+                        'subtotal'  => $subtotals,
+                        'service'   => $service,
+                        'pb01'      => $pb01,
+                        'total'     => $subtotals + $service + $pb01,
+                        'inputer'   => $request->inputer ?? $order->inputer,
+                        'note'      => $request->note,
                         'status_input' => 'cloud',
                         'status_realtime' => 'new',
                         'updated_at' => now(),
@@ -159,7 +160,7 @@ class OrderController extends Controller
                         'payment_status'    => 'Unpaid',
                         'payment_method'    => 'Open Bill',
                         'status_input'      => 'cloud',
-                        'note'      => $request->note,
+                        'note'              => $request->note,
         
                         'total_qty'         => array_sum($request->qty),
                         'subtotal'          => $subtotal,
