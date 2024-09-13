@@ -101,6 +101,7 @@ class OrderController extends Controller
                     'payment_status'    => 'Paid',
                     'status_input'      => 'cloud',
                     'payment_method'    => $request->payment_method,
+                    'note'              => $request->note,
     
                     'total_qty'         => array_sum($request->qty),
                     'subtotal'          => $subtotal,
@@ -158,6 +159,7 @@ class OrderController extends Controller
                         'payment_status'    => 'Unpaid',
                         'payment_method'    => 'Open Bill',
                         'status_input'      => 'cloud',
+                        'note'      => $request->note,
         
                         'total_qty'         => array_sum($request->qty),
                         'subtotal'          => $subtotal,

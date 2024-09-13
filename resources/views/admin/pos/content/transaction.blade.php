@@ -249,6 +249,11 @@
                                                             <option value="Order Tambahan">Order Tambahan</option>
                                                         </select>
                                                     </div>
+                                                    <div class="form-group mb-3">
+                                                        <label for="note">Note</label>
+                                                        <textarea name="note" id="note" cols="30" rows="5" class="form-control" placeholder="Ex:note">{{ old('note') }}</textarea>
+                
+                                                    </div>
                                                 </div>
                                                 <div class="modal-footer">
                                                     <button type="button" class="btn btn-danger" data-bs-dismiss="modal">CLOSE</button>

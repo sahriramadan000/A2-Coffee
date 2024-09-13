@@ -113,6 +113,9 @@
                             <div class="mt-1">
                                 <span class="badge badge-light-primary mb-2 me-4">{{ $item->payment_method }}</span>
                             </div>
+                            <div class="mt-1">
+                                <span class="badge badge-light-primary mb-2 me-4">Note : {{ $item->note ?? '' }}</span>
+                            </div>
                         </div>
                     </button>
                 </h2>
