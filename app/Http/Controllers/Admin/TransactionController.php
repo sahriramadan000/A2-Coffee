@@ -884,6 +884,7 @@ class TransactionController extends Controller
                 $order->kembalian = 0;
             }
 
+            $order->created_at = Carbon::now();
             $order->save();
 
             $table = Table::where('name', $order->table)->first(); // Assuming 'table_name' is the correct field
