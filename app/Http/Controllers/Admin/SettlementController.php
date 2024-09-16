@@ -105,6 +105,7 @@ class SettlementController extends Controller
             }
             $printSettlement->shift = $request->shift;
             $printSettlement->start_date = $request->start_date;
+            $printSettlement->kasir = Auth::user()->username;
             $printSettlement->status_print_settlement = 'new';
             $printSettlement->save();
 

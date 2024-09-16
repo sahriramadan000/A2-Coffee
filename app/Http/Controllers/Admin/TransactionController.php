@@ -1179,61 +1179,77 @@ class TransactionController extends Controller
             return;
         }
 
+        // Menggabungkan produk dengan nama yang sama
+        $groupedOrderProducts = [];
+        foreach ($filteredOrderProducts as $orderProduct) {
+            if (isset($groupedOrderProducts[$orderProduct->name])) {
+                // Jika produk sudah ada, tambahkan qty
+                $groupedOrderProducts[$orderProduct->name]['qty'] += $orderProduct->qty;
+            } else {
+                // Jika produk belum ada, tambahkan produk ke array
+                $groupedOrderProducts[$orderProduct->name] = [
+                    'name' => $orderProduct->name,
+                    'qty' => $orderProduct->qty,
+                    'id' => $orderProduct->id
+                ];
+            }
+        }
+
         // Loop to print 2 times
         for ($i = 0; $i < 2; $i++) {
-            // $connector = new WindowsPrintConnector("POS-80");
-            // $printer = new Printer($connector);
+            $connector = new WindowsPrintConnector("POS-80");
+            $printer = new Printer($connector);
 
-            // /* Initialize */
-            // $printer->initialize();
-            // $printer->selectPrintMode(Printer::MODE_DOUBLE_HEIGHT);
-            // $printer->setJustification(Printer::JUSTIFY_CENTER);
+            /* Initialize */
+            $printer->initialize();
+            $printer->selectPrintMode(Printer::MODE_DOUBLE_HEIGHT);
+            $printer->setJustification(Printer::JUSTIFY_CENTER);
 
-            // // Print store name
-            // $printer->text("A2 Coffee & Eatry \n");
-            // $printer->text("\n");
+            // Print store name
+            $printer->text("A2 Coffee & Eatry \n");
+            $printer->text("\n");
 
-            // // Print store address
-            // $printer->initialize();
-            // $printer->setJustification(Printer::JUSTIFY_CENTER);
-            // $printer->text("\n");
+            // Print store address
+            $printer->initialize();
+            $printer->setJustification(Printer::JUSTIFY_CENTER);
+            $printer->text("\n");
 
-            // // Print transaction details
-            // $printer->initialize();
-            // $printer->text("No Inv    : " . $orders->no_invoice . "\n");
-            // $printer->text("Customer  : " . ($orders->customer_name ?? '-') . "\n");
-            // $printer->text("Kasir     : " . ($orders->cashier_name ?? '-') . "\n");
-            // $printer->text("Table     : " . ($orders->table ?? '-') . "\n");
-            // $printer->text("Waktu     : " . $orders->created_at . "\n\n");
+            // Print transaction details
+            $printer->initialize();
+            $printer->text("No Inv    : " . $orders->no_invoice . "\n");
+            $printer->text("Customer  : " . ($orders->customer_name ?? '-') . "\n");
+            $printer->text("Kasir     : " . ($orders->cashier_name ?? '-') . "\n");
+            $printer->text("Table     : " . ($orders->table ?? '-') . "\n");
+            $printer->text("Waktu     : " . $orders->created_at . "\n\n");
 
-            // // Print table header
-            // $printer->initialize();
-            // $printer->text("------------------------------------------------\n");
-            // $printer->text(self::buatBaris2Kolom("Menu", "Qty"));
+            // Print table header
+            $printer->initialize();
+            $printer->text("------------------------------------------------\n");
+            $printer->text(self::buatBaris2Kolom("Menu", "Qty"));
 
             // Print each order item based on category
             foreach ($filteredOrderProducts as $orderProduct) {
-                // $printer->text(self::buatBaris2Kolom(
-                //     $orderProduct->name,
-                //     $orderProduct->qty
-                // ));
+                $printer->text(self::buatBaris2Kolom(
+                    $orderProduct['name'],
+                    $orderProduct['qty']
+                ));
                 $dataOrderProduct = OrderProduct::find($orderProduct->id);
                 $dataOrderProduct->status_realtime = 'old';
                 $dataOrderProduct->status_input = 'local';
                 $dataOrderProduct->save();
             }
 
-            // $printer->text("------------------------------------------------\n");
+            $printer->text("------------------------------------------------\n");
 
-            // // Print thank you message
-            // $printer->initialize();
-            // $printer->setJustification(Printer::JUSTIFY_CENTER);
-            // $printer->text("\nTerima kasih\n");
+            // Print thank you message
+            $printer->initialize();
+            $printer->setJustification(Printer::JUSTIFY_CENTER);
+            $printer->text("\nTerima kasih\n");
 
-            // // Cut the paper
-            // $printer->feed(5);
-            // $printer->cut();
-            // $printer->close();
+            // Cut the paper
+            $printer->feed(5);
+            $printer->cut();
+            $printer->close();
         }
     }
 

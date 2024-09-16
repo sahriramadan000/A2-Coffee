@@ -21,5 +21,5 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::get('/print-customer/{id}', [TransactionController::class, 'printCustomer'])->name('print-customer'); 
-Route::get('/print-settlement', [SettlementController::class, 'printSettlement'])->name('api-print-settlement'); 
+Route::post('/print-settlement', [SettlementController::class, 'printSettlement'])->name('api-print-settlement'); 
 
