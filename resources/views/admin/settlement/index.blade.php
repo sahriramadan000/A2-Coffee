@@ -46,8 +46,8 @@
                         <span class="input-group-text"><i class="bx bx-calendar-minus"></i></span>
                         <select class="form-control select2" data-placeholder="Choose one" id="daterange" name="type">
                             <option value="day" {{ (Request::get('type') == 'day') ? 'selected' : ''}}>Daily </option>
-                            <option value="monthly" {{ (Request::get('type') == 'monthly') ? 'selected' : '' }}>Monthly </option>
-                            <option value="yearly" {{ (Request::get('type') == 'yearly') ? 'selected' : '' }}>Yearly </option>
+                                {{-- <option value="monthly" {{ (Request::get('type') == 'monthly') ? 'selected' : '' }}>Monthly </option>
+                                <option value="yearly" {{ (Request::get('type') == 'yearly') ? 'selected' : '' }}>Yearly </option> --}}
                         </select>
                     </div>
                </div>
@@ -101,7 +101,9 @@
     <div class="card">
         <div class="card-body">
             <div class="col-lg-6 mx-auto">
-                <form action="{{ route('settlements.print-settlement') }}" method="GET">
+                <form action="{{ route('settlements.update-print-settlement',$print_settlements->id ?? 0) }}" method="POST">
+                    @csrf
+                    @method('PUT')
                     <div class="form-group mt-4 ">
                         <button type="submit" class="btn btn-success btn-sm p-2 w-100">
                             <input type="hidden" name="type" value="{{ Request::get('type') }}">

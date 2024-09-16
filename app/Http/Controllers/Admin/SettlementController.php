@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderProduct;
+use App\Models\PrintSettlement;
 use App\Models\Store;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -19,6 +20,7 @@ class SettlementController extends Controller
     public function index(){
         $data ['page_title'] = 'Report Settlement';
         $data['account_users'] = User::get();
+        $data['print_settlements'] = PrintSettlement::get()->first();
 
         return view('admin.settlement.index',$data);
     }
@@ -43,21 +45,25 @@ class SettlementController extends Controller
                 ->get();
             } else {
                 $store = Store::where('shift',$request->shift)->latest()->first(); // Assuming there's only one store
-                // Ensure open and close times are in the correct format
-                $openTime = \Carbon\Carbon::parse($store->open_store)->format('H:i:s');
-                $closeTime = \Carbon\Carbon::parse($store->close_store)->format('H:i:s');
-    
-                // Combine date with times correctly
-                $openDateTime = $date . ' ' . $openTime;
-                $closeDateTime = $date . ' ' . $closeTime;
-    
-                // Ensure the datetime strings are in the correct format
-                $openDateTime = date('Y-m-d H:i:s', strtotime($openDateTime));
-                $closeDateTime = date('Y-m-d H:i:s', strtotime($closeDateTime));
-                $orders = Order::where('payment_status', 'Paid')
-                                ->whereBetween('created_at', [$openDateTime, $closeDateTime])
-                                ->orderBy('id', 'desc')
-                                ->get();
+                if (!$store) {
+                    $orders = [];
+                } else {
+                    // Ensure open and close times are in the correct format
+                    $openTime = \Carbon\Carbon::parse($store->open_store)->format('H:i:s');
+                    $closeTime = \Carbon\Carbon::parse($store->close_store)->format('H:i:s');
+        
+                    // Combine date with times correctly
+                    $openDateTime = $date . ' ' . $openTime;
+                    $closeDateTime = $date . ' ' . $closeTime;
+        
+                    // Ensure the datetime strings are in the correct format
+                    $openDateTime = date('Y-m-d H:i:s', strtotime($openDateTime));
+                    $closeDateTime = date('Y-m-d H:i:s', strtotime($closeDateTime));
+                    $orders = Order::where('payment_status', 'Paid')
+                                    ->whereBetween('created_at', [$openDateTime, $closeDateTime])
+                                    ->orderBy('id', 'desc')
+                                    ->get();
+                }
             }
 
 
@@ -88,6 +94,24 @@ class SettlementController extends Controller
             ->rawColumns(['order_products'])
             ->make(true);
 
+    }
+
+    public function UpdatePrintSettlement(Request $request,$settlementId){
+        try {
+            if ($settlementId == '0') {
+                $printSettlement = new PrintSettlement();
+            } else {
+                $printSettlement = PrintSettlement::findorFail($settlementId);
+            }
+            $printSettlement->shift = $request->shift;
+            $printSettlement->start_date = $request->start_date;
+            $printSettlement->status_print_settlement = 'new';
+            $printSettlement->save();
+
+            return redirect()->back()->with('success','Print Berhasil');
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('failed','Print Gagal');
+        }
     }
 
     public function printSettlement(Request $request){

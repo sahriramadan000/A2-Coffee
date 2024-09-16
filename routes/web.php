@@ -189,6 +189,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', [SettlementController::class, 'index'])->name('index');
         Route::get('get-data', [SettlementController::class, 'getSettlement'])->name('get-data');
         Route::get('print', [SettlementController::class, 'printSettlement'])->name('print-settlement');
+        Route::put('print-settlement/{settlementId}', [SettlementController::class, 'updatePrintSettlement'])->name('update-print-settlement');
     });
 
     // Tag

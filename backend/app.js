@@ -8,6 +8,7 @@ const moment = require('moment');
 
 const bodyParser = require('body-parser');
 const axios = require('axios');
+const { log } = require('console');
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -38,13 +39,13 @@ const options = {
 //   password: 'SuksesJooal2024!',
 // });
 
-// const localPool = new Pool({
-//     host: 'localhost',
-//     port: 5432,
-//     database: 'a2test',
-//     user: 'postgres',
-//     password: 'root',
-//   });
+const localPool = new Pool({
+    host: 'localhost',
+    port: 5432,
+    database: 'a2coffee',
+    user: 'postgres',
+    password: 'root',
+  });
 
 const cloudPool = new Pool({
     host: '85.31.224.243',
@@ -57,11 +58,12 @@ const cloudPool = new Pool({
 
 setInterval(() => {
     RealtimeDashboardOrder()
+    RealtimeDashboardPrintSettlement()
     // syncAllOrdersAndRelatedTables()
     // syncAllOrdersAndRelatedTablesLocalToCloud()
     // syncKeys()
     // syncTables()
-}, 1000);
+}, 3000);
 
 // const promisifiedLocalQuery = util.promisify(localPool.query).bind(localPool);
 const promisifiedCloudQuery = util.promisify(cloudPool.query).bind(cloudPool);
@@ -1117,11 +1119,51 @@ const promisifiedCloudQuery = util.promisify(cloudPool.query).bind(cloudPool);
 //     }
 // };
 
+// async function RealtimeDashboardOrder() {
+//   // Mendapatkan tanggal saat ini dalam format YYYY-MM-DD
+//   const currentDate = new Date();
+//   var formattedDate = moment().format('YYYY-MM-DD');
+//   var formattedTime = currentDate.toLocaleTimeString('en-US', { hour12: true });
+
+//   const query1 = `SELECT * FROM orders
+//   WHERE created_at::text LIKE '${formattedDate}%'
+//   AND (payment_status = 'Paid' OR payment_method = 'Open Bill')
+//   AND status_realtime = 'new'
+//   ORDER BY created_at ASC`;
+
+//   const [result1] = await Promise.all([promisifiedCloudQuery(query1)]);
+
+//   const orderFromSql1 = result1.rows;
+
+//   // For Resto
+//   for (const element of orderFromSql1) {
+//     try {
+//       axios.get('http://a2-coffee.test/api/print-customer/' + element.id, {
+//         headers: {
+//           'Content-Type': 'multipart/form-data',
+//         },
+//       })
+//         .then(data => {
+//           console.log('success print!');
+//           promisifiedCloudQuery(`UPDATE orders SET status_realtime = 'Success Print', status_input = 'local' WHERE id = ${element.id}`);
+
+//         })
+//         .catch(err => {
+//           console.log(err);
+//           return null;
+//         });
+
+
+//     } catch (error) {
+//       console.log(error);
+//     }
+//   }
+// }
+let pendingUpdateOrders = new Set();
+
 async function RealtimeDashboardOrder() {
-  // Mendapatkan tanggal saat ini dalam format YYYY-MM-DD
   const currentDate = new Date();
   var formattedDate = moment().format('YYYY-MM-DD');
-  var formattedTime = currentDate.toLocaleTimeString('en-US', { hour12: true });
 
   const query1 = `SELECT * FROM orders
   WHERE created_at::text LIKE '${formattedDate}%'
@@ -1133,30 +1175,91 @@ async function RealtimeDashboardOrder() {
 
   const orderFromSql1 = result1.rows;
 
-  // For Resto
   for (const element of orderFromSql1) {
+    // Cek apakah order ini sedang menunggu update ke database
+    if (pendingUpdateOrders.has(element.id)) {
+      console.log(`Order ID ${element.id} is pending update, skipping print.`);
+      continue;
+    }
+
     try {
-      axios.get('http://a2-coffee.test/api/print-customer/' + element.id, {
+      // Tandai order ini sebagai pending untuk update
+      pendingUpdateOrders.add(element.id);
+
+      await axios.get('http://a2-coffee.test/api/print-customer/' + element.id, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
-      })
-        .then(data => {
-          console.log('success print!');
-          promisifiedCloudQuery(`UPDATE orders SET status_realtime = 'Success Print', status_input = 'local' WHERE id = ${element.id}`);
+      });
 
-        })
-        .catch(err => {
-          console.log(err);
-          return null;
-        });
+      console.log(`Success print for order ID ${element.id}`);
+      
+      // Coba update status di database
+      await promisifiedCloudQuery(`UPDATE orders SET status_realtime = 'Success Print', status_input = 'local' WHERE id = ${element.id}`);
 
+      // Jika berhasil, hapus dari pending list
+      pendingUpdateOrders.delete(element.id);
 
     } catch (error) {
-      console.log(error);
+      console.log(`Error processing order ID ${element.id}:`, error);
     }
   }
 }
+
+let pendingUpdateSettlements = new Set();
+
+async function RealtimeDashboardPrintSettlement() {
+  const currentDate = new Date();
+  var formattedDate = moment().format('YYYY-MM-DD');
+
+  const query2 = `SELECT * FROM print_settlements
+  WHERE start_date = '${formattedDate}'
+  AND status_print_settlement = 'new'
+  ORDER BY created_at ASC`;
+
+  const [result2] = await Promise.all([promisifiedCloudQuery(query2)]);
+
+  const settlementsFromSql = result2.rows;
+
+  for (const element of settlementsFromSql) {
+    // Cek apakah settlement ini sedang menunggu update ke database
+    if (pendingUpdateSettlements.has(element.id)) {
+      console.log(`Settlement ID ${element.id} is pending update, skipping print.`);
+      continue;
+    }
+
+    try {
+      // Tandai settlement ini sebagai pending untuk update
+      pendingUpdateSettlements.add(element.id);
+
+      // Prepare POST data
+      const postData = {
+        type: element.type,        // Use the type from the database
+        shift: element.shift,      // Use the shift from the database
+        start_date: element.start_date // Use the start_date from the database
+      };
+
+      // Use POST request to send data
+      await axios.post('http://a2-coffee.test/api/print-settlement/', postData, {
+        headers: {
+          'Content-Type': 'application/json', // Indicating that we are sending JSON data
+        },
+      });
+
+      console.log(`Success print settlement`);
+      
+      // Coba update status di database
+      await promisifiedCloudQuery(`UPDATE print_settlements SET status_print_settlement = 'Success Print' WHERE id = ${element.id}`);
+
+      // Jika berhasil, hapus dari pending list
+      pendingUpdateSettlements.delete(element.id);
+
+    } catch (error) {
+      console.log(`Error processing settlement:`, error);
+    }
+  }
+}
+
 
 // app.post('/sync-local-to-cloud', async (req, res) => {
 //     try {
@@ -1176,7 +1279,7 @@ async function RealtimeDashboardOrder() {
 //     }
 // });
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

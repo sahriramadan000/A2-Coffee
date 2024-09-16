@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\SettlementController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\TransactionController;
@@ -20,4 +21,5 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::get('/print-customer/{id}', [TransactionController::class, 'printCustomer'])->name('print-customer'); 
+Route::get('/print-settlement', [SettlementController::class, 'printSettlement'])->name('api-print-settlement'); 
 
