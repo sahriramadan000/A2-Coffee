@@ -123,6 +123,9 @@
                         <a href="{{ route('customers.index') }}"> Customer </a>
                     </li>
                     @endcan
+                    <li class="{{ request()->routeIs('memberships.index') ? 'active' : '' }}">
+                        <a href="{{ route('memberships.index') }}"> Membership </a>
+                    </li>
                 </ul>
             </li>
             @endcanany
@@ -166,6 +169,25 @@
                 </ul>
             </li>
             @endcan
+            <li class="menu {{ (request()->routeIs(['stock-ins.index'])) ? 'active' : '' }}">
+                <a href="#inventory-stock" data-bs-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
+                    <div class="">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                        <span>Inventory</span>
+                    </div>
+                    <div>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </div>
+                </a>
+
+                <ul class="collapse submenu list-unstyled {{ (request()->routeIs(['stock-ins.index'])) ? 'show' : '' }}" id="inventory-stock" data-bs-parent="#accordionExample">
+                    @can('report-gross-profit')
+                    <li class="{{ request()->routeIs('stock-ins.index') ? 'active' : '' }}">
+                        <a href="{{ route('stock-ins.index') }}"> Stock In </a>
+                    </li>
+                    @endcan
+                </ul>
+            </li>
 
             @can('coupon-list')
             <li class="menu {{ request()->routeIs('coupons.index') ? 'active' : '' }}">

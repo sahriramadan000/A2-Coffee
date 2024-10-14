@@ -37,7 +37,7 @@ class ProductController extends Controller
     public function getProducts(Request $request)
     {
         if ($request->ajax()) {
-            return DataTables::of(Product::query())
+            return DataTables::of(Product::orderBy('name','asc')->get())
             ->addIndexColumn()
             ->addColumn('action', function ($row) {
                 $btn = '<button type="button" class="btn btn-sm btn-warning products-edit-table" data-bs-target="#tabs-'.$row->id.'-edit-product">Edit</button>';

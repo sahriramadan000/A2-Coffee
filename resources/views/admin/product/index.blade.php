@@ -32,6 +32,7 @@
                     <th>Category</th>
                     <th>Cost Price</th>
                     <th>Selling Price</th>
+                    <th>Stock</th>
                     <th>Status</th>
                     <th class="no-content" width="10%">Action</th>
                 </tr>
@@ -90,6 +91,7 @@
                     }
                 }
             },
+            {data: 'current_stock', name:'current_stock'},
             {
                 data: 'status',
                 render: function(data) {

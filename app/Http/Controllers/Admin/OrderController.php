@@ -17,7 +17,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Darryldecode\Cart\Facades\CartFacade as Cart;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\DB;  
 
 class OrderController extends Controller
 {

@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SettlementController;
+use App\Http\Controllers\Admin\StockInController;
 use App\Http\Controllers\Admin\StoreController;
 use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\TableController;
@@ -19,6 +20,7 @@ use App\Http\Controllers\Admin\TagController;
 use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\KeyVoidController;
+use App\Http\Controllers\MembershipController;
 use App\Http\Controllers\Mobile\CartController;
 use App\Http\Controllers\Mobile\HomepageController;
 use App\Http\Controllers\Mobile\TransactionController as MobileTransactionController;
@@ -203,6 +205,31 @@ Route::middleware(['auth'])->group(function () {
         Route::get('modal-delete/{tagId}', [TagController::class, 'getModalDelete'])->name('modal-delete');
         Route::delete('delete/{tagId}', [TagController::class, 'destroy'])->name('destroy');
     });
+
+    // Stock In
+    Route::prefix('stock-in')->name('stock-ins.')->group(function () {
+        Route::get('/', [StockInController::class, 'index'])->name('index');
+        Route::get('get-data', [StockInController::class, 'getTags'])->name('get-data');
+        Route::get('modal-add', [StockInController::class, 'getModalAdd'])->name('modal-add');
+        Route::post('store', [StockInController::class, 'store'])->name('store');
+        Route::get('modal-edit/{tagId}', [StockInController::class, 'getModalEdit'])->name('modal-edit');
+        Route::put('update/{tagId}', [StockInController::class, 'update'])->name('update');
+        Route::get('modal-delete/{stockId}', [StockInController::class, 'getModalDelete'])->name('modal-delete');
+        Route::delete('delete/{tagId}', [StockInController::class, 'destroy'])->name('destroy');
+    });
+
+    // Membership
+    Route::prefix('membership')->name('memberships.')->group(function () {
+        Route::get('/', [MembershipController::class, 'index'])->name('index');
+        Route::get('get-data', [MembershipController::class, 'getMembership'])->name('get-data');
+        Route::get('modal-add', [MembershipController::class, 'getModalAdd'])->name('modal-add');
+        Route::post('store', [MembershipController::class, 'store'])->name('store');
+        Route::get('modal-edit/{id}', [MembershipController::class, 'getModalEdit'])->name('modal-edit');
+        Route::put('update/{tagId}', [MembershipController::class, 'update'])->name('update');
+        Route::get('modal-delete/{tagId}', [MembershipController::class, 'getModalDelete'])->name('modal-delete');
+        Route::delete('delete/{tagId}', [MembershipController::class, 'destroy'])->name('destroy');
+    });
+
 
     // Addon
     Route::prefix('addons')->name('addons.')->group(function () {
