@@ -172,7 +172,7 @@
                             </div>
                         </div>
                         <div class="tab-pane fade" id="pills-stock-icon" role="tabpanel" aria-labelledby="pills-stock-icon-tab" tabindex="0">
-                            <div class="row">
+                            {{-- <div class="row">
                                 <div class="col-12">
                                     <div class="form-group mb-3">
                                         <label for="stock_per_day">Stock Per Day</label>
@@ -185,7 +185,7 @@
                                         <input type="number" name="minimum_stock" min="0" id="minimum_stock" class="form-control form-control-sm" placeholder="Ex:10" aria-label="minimum_stock">
                                     </div>
                                 </div>
-                            </div>
+                            </div> --}}
                         </div>
                         <div class="tab-pane fade" id="pills-others-icon" role="tabpanel" aria-labelledby="pills-others-icon-tab" tabindex="0">
                             <div class="row mb-5">
