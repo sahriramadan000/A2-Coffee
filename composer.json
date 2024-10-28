@@ -17,6 +17,7 @@
         "intervention/image": "^2.7",
         "laravel/fortify": "^1.19",
         "laravel/framework": "^8.0",
+        "laravel/sanctum": "^2.15",
         "laravel/tinker": "^2.0",
         "midtrans/midtrans-php": "^2.5",
         "mike42/escpos-php": "^4.0",
