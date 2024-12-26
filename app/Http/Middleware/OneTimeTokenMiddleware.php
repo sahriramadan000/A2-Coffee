@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use Carbon\Carbon;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -28,36 +29,25 @@ class OneTimeTokenMiddleware
         }
 
         // Get the authenticated user using Sanctum's default authentication guard
-        $user = $request->user();
+        // $user = $request->user();
         
-        if (!$user) {
-            Log::warning('User not authenticated', [
-                'token' => $token,
-                'user' => $request->user() // This will likely be null
-            ]);
-            return response()->json(['error' => 'User not authenticated'], 401);
-        }
+        // if (!$user) {
+        //     Log::warning('User not authenticated', [
+        //         'token' => $token,
+        //         'user' => $request->user() // This will likely be null
+        //     ]);
+        //     return response()->json(['error' => 'User not authenticated'], 401);
+        // }
 
         // Hash the incoming token to match the stored token format
-        $hashedToken = hash('sha256', $token);
-
-        // Check if the token exists in the database
-        $tokenRecord = $user->tokens()->where('token', $hashedToken)->first();
+        $tokenRecord = PersonalAccessToken::findToken($token);  
 
         if (!$tokenRecord) {
-            Log::warning('Token not found or invalid', [
-                'hashedToken' => $hashedToken,
-                'user_tokens' => $user->tokens->pluck('token')->toArray()
-            ]);
             return response()->json(['error' => 'Token not found or invalid'], 401);
         }
 
         // Check if the token is expired
-        if ($tokenRecord->expires_at < now()) {
-            Log::warning('Token expired', [
-                'token_id' => $tokenRecord->id,
-                'expires_at' => $tokenRecord->expires_at
-            ]);
+        if (Carbon::parse($tokenRecord->expires_at)->isPast()) {
             return response()->json(['error' => 'Token has expired'], 401);
         }
 

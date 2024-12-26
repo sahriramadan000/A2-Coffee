@@ -251,12 +251,6 @@ class ProductController extends Controller
             $product = Product::findOrFail($productId);
             $product->delete();
 
-            // Cek koneksi sebelum menghapus dari cloud
-            // if (CloudConnectionHelper::isConnectedToCloud()) {
-            //     DB::connection('pgsql_cloud')->table('products')
-            //         ->where('id', $product->id)
-            //         ->delete();
-            // }
 
             $request->session()->flash('success', "Delete data product successfully!");
 
