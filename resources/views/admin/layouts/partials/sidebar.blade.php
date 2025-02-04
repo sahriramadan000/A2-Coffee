@@ -88,11 +88,11 @@
                         <a href="{{ route('stores.index') }}"> Store </a>
                     </li> --}}
 
-                    {{-- @can('material-list')
+                    @can('material-list')
                     <li class="{{ request()->routeIs('materials.index') ? 'active' : '' }}">
                         <a href="{{ route('materials.index') }}"> Materials </a>
                     </li>
-                    @endcan --}}
+                    @endcan
 
                     @can('tag-list')
                     <li class="{{ request()->routeIs('tags.index') ? 'active' : '' }}">
@@ -106,11 +106,11 @@
                     </li>
                     @endcan --}}
 
-                    {{-- @can('addon-list')
+                    @can('addon-list')
                     <li class="{{ request()->routeIs('addons.index') ? 'active' : '' }}">
                         <a href="{{ route('addons.index') }}"> Addons </a>
                     </li>
-                    @endcan --}}
+                    @endcan
 
                     @can('product-list')
                     <li class="{{ request()->routeIs('products.index') ? 'active' : '' }}">
