@@ -84,9 +84,9 @@
                     </li>
                     @endcan
 
-                    <li class="{{ request()->routeIs('stores.index') ? 'active' : '' }}">
+                    {{-- <li class="{{ request()->routeIs('stores.index') ? 'active' : '' }}">
                         <a href="{{ route('stores.index') }}"> Store </a>
-                    </li>
+                    </li> --}}
 
                     {{-- @can('material-list')
                     <li class="{{ request()->routeIs('materials.index') ? 'active' : '' }}">
@@ -100,11 +100,11 @@
                     </li>
                     @endcan
 
-                    @can('table-list')
+                    {{-- @can('table-list')
                     <li class="{{ request()->routeIs('tables.index') ? 'active' : '' }}">
                         <a href="{{ route('tables.index') }}"> Table </a>
                     </li>
-                    @endcan
+                    @endcan --}}
 
                     {{-- @can('addon-list')
                     <li class="{{ request()->routeIs('addons.index') ? 'active' : '' }}">
@@ -161,11 +161,11 @@
                     </li>
                     @endcan
 
-                    {{-- @can('report-absensi')
+                    @can('report-absensi')
                     <li class="{{ request()->routeIs('report.sales.report-absensi') ? 'active' : '' }}">
                         <a href="{{ route('report.sales.report-absensi') }}"> Absensi </a>
                     </li>
-                    @endcan --}}
+                    @endcan
                 </ul>
             </li>
             @endcan
@@ -211,7 +211,7 @@
             </li>
             @endcan
 
-            @can('settlement')
+            {{-- @can('settlement')
             <li class="menu {{ request()->routeIs('settlements.index') ? 'active' : '' }}">
                 <a href="{{ route('settlements.index') }}" aria-expanded="false" class="dropdown-toggle">
                     <div class="">
@@ -220,7 +220,7 @@
                     </div>
                 </a>
             </li>
-            @endcan
+            @endcan --}}
 
             {{-- <li class="menu {{ request()->routeIs('customers.index') ? 'active' : '' }}">
                 <a href="{{ route('customers.index') }}" aria-expanded="false" class="dropdown-toggle">
