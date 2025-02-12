@@ -290,16 +290,16 @@ class OrderController extends Controller
             }
 
             // Pengecekan stok sebelum menyimpan ke tabel order_products
-            // foreach ($stockCheck as $productId => $totalQty) {
-            //     $product = Product::findOrFail($productId);
-            //     if ((int)$product->current_stock < $totalQty) {
-            //         return redirect()->back()->with(['failed' => 'Stock product ' . $product->name . ' kurang - Stock tersisa ' . $product->current_stock]);
-            //     }
+            foreach ($stockCheck as $productId => $totalQty) {
+                $product = Product::findOrFail($productId);
+                if ((int)$product->current_stock < $totalQty) {
+                    return redirect()->back()->with(['failed' => 'Stock product ' . $product->name . ' kurang - Stock tersisa ' . $product->current_stock]);
+                }
 
-            //     // Kurangi stok produk
-            //     $product->current_stock = (int) $product->current_stock - (int) $totalQty;
-            //     $product->save();
-            // }
+                // Kurangi stok produk
+                $product->current_stock = (int) $product->current_stock - (int) $totalQty;
+                $product->save();
+            }
 
             // Simpan produk dan addons ke tabel order_products
             foreach ($orderProducts as $product) {
