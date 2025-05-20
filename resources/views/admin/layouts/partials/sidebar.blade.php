@@ -123,9 +123,9 @@
                         <a href="{{ route('customers.index') }}"> Customer </a>
                     </li>
                     @endcan
-                    {{-- <li class="{{ request()->routeIs('memberships.index') ? 'active' : '' }}">
+                    <li class="{{ request()->routeIs('memberships.index') ? 'active' : '' }}">
                         <a href="{{ route('memberships.index') }}"> Membership </a>
-                    </li> --}}
+                    </li>
                 </ul>
             </li>
             @endcanany

@@ -98,7 +98,7 @@ class TransactionController extends Controller
     }
 
      // Modal edit QTY Product
-     public function modalEditQtyProduct($id)
+    public function modalEditQtyProduct($id)
     {
         // $decryptedKey = Crypt::decrypt($key);
         // Pecah string menjadi tiga bagian: orderId, productDetailIds, dan qty
@@ -119,7 +119,7 @@ class TransactionController extends Controller
             // 'productDetailIds' => $productDetailIds, // Passing productDetailIds ke view
         ]);
     }
-     public function modalEditProduct($id, $name)
+    public function modalEditProduct($id, $name)
     {
         // $decryptedKey = Crypt::decrypt($key);
         // Pecah string menjadi tiga bagian: orderId, productDetailIds, dan qty

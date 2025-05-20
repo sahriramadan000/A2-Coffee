@@ -190,21 +190,21 @@
                                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                 </div>
                                                 <div class="modal-body">
-                                                    <div class="form-group">
-                                                        <h6 class="mb-3">Metode Payment</h6>
-                                                        <select name="payment_method" id="payment_method" class="form-control form-control-sm">
-                                                            <option selected disabled value="">Pilih Metode Pembayaran</option>
-                                                            <option value="EDC BCA">EDC BCA</option>
-                                                            <option value="EDC BRI">EDC BRI</option>
-                                                            <option value="EDC BNI">EDC BNI</option>
-                                                            <option value="EDC PANIN">EDC PANIN</option>
-                                                            <option value="Qris BCA">Qris BCA</option>
-                                                            <option value="Qris BRI">Qris BRI</option>
-                                                            <option value="Qris BNI">Qris BNI</option>
-                                                            <option value="Qris MANDIRI">Qris MANDIRI</option>
-                                                            <option value="Cash">Cash</option>
-                                                        </select>
-                                                    </div>
+                                                        <div class="form-group">
+                                                            <h6 class="mb-3">Metode Payment</h6>
+                                                            <select name="payment_method" id="payment_method" class="form-control form-control-sm">
+                                                                <option selected disabled value="">Pilih Metode Pembayaran</option>
+                                                                <option value="EDC BCA">EDC BCA</option>
+                                                                <option value="EDC BRI">EDC BRI</option>
+                                                                <option value="EDC BNI">EDC BNI</option>
+                                                                <option value="EDC PANIN">EDC PANIN</option>
+                                                                <option value="Qris BCA">Qris BCA</option>
+                                                                <option value="Qris BRI">Qris BRI</option>
+                                                                <option value="Qris BNI">Qris BNI</option>
+                                                                <option value="Qris MANDIRI">Qris MANDIRI</option>
+                                                                <option value="Cash">Cash</option>
+                                                            </select>
+                                                        </div>
                                                     <div class="form-group mt-2" id="cashInput" style="display: none;">
                                                         <label for="cash" class="form-label">Cash</label>
                                                         <input type="text" name="cash" value="{{ old('cash') }}" class="form-control form-control-sm" placeholder="Ex:50.000" id="cash" aria-describedby="cash">
@@ -242,13 +242,13 @@
                                                         </select>
                                                     </div>
 
-                                                    <div class="form-group">
-                                                        <h6 class="mt-3">Status Order</h6>
-                                                        <select name="status_order" id="status_order" class="form-control form-control-sm">
-                                                            <option selected value="Order Baru">Order Baru</option>
-                                                            <option value="Order Tambahan">Order Tambahan</option>
-                                                        </select>
-                                                    </div>
+                                                        <div class="form-group">
+                                                            <h6 class="mt-3">Status Order</h6>
+                                                            <select name="status_order" id="status_order" class="form-control form-control-sm">
+                                                                <option selected value="Order Baru">Order Baru</option>
+                                                                <option value="Order Tambahan">Order Tambahan</option>
+                                                            </select>
+                                                        </div>
                                                     <div class="form-group mb-3">
                                                         <label for="note">Note</label>
                                                         <textarea name="note" id="note" cols="30" rows="5" class="form-control" placeholder="Ex:note">{{ old('note') }}</textarea>

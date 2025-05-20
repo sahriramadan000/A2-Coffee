@@ -147,6 +147,7 @@
                     <th>Nama Kasir</th>
                     <th>Nama Customer</th>
                     <th>Menu</th>
+                    <th>Total Qty</th>
                     <th>Metode Pembayaran</th>
                     <th>Sub Total</th>
                     <th>Type Discount</th>
@@ -214,6 +215,7 @@
             {data: 'cashier_name', name: 'cashier_name'},
             {data: 'customer_name', name: 'customer_name'},
             {data: 'order_products', name: 'order_products', orderable: false, searchable: false},
+            {data: 'total_qty', name: 'total_qty'},
             {data: 'payment_method', name: 'payment_method'},
             {
                 data: 'subtotal',
